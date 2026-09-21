@@ -1,7 +1,6 @@
 # chronic_pain_omics
 
-Analysis code for **"Disjoint evidence layers in chronic pain: a systematic
-multi-omics meta-analysis"** (A. G. Zippo, 2026): a systematic, PRISMA-style multi-omics meta-analysis of
+Analysis code for **"Meta-analysis of chronic pain multi-omics datasets reveals disjoint evidence"** (A. G. Zippo, 2026): a systematic, PRISMA-style multi-omics meta-analysis of
 **chronic pain**, integrating genomics, transcriptomics, proteomics and
 metabolomics across human cohorts and rodent models.
 
@@ -16,9 +15,7 @@ literature screening, data harmonisation across heterogeneous omics
 repositories, statistical pooling, cross-species integration, and the
 bookkeeping that makes those reproducible.
 
-**Paper:** *Disjoint evidence layers in chronic pain: pain models, species, and
-genomic risk implicate non-overlapping gene sets in a systematic multi-omics
-meta-analysis* (`manuscript/manuscript.pdf`).
+**Paper:** *Meta-analysis of chronic pain multi-omics datasets reveals disjoint evidence* (`manuscript/manuscript.pdf`).
 
 ## What it found
 
