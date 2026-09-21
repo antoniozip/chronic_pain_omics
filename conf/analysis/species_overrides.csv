@@ -1,0 +1,2 @@
+study_id,species,reason
+GSE236754,Rattus norvegicus,"Manifest records Mus musculus and Rattus norvegicus over 56 samples on two platforms (GPL22396;GPL21103), but only 32 samples carry a case/control assignment in GSE236754_groups.csv and 05d filters to those. The merged matrix 05 analysed is entirely ENSRNOG-keyed; a vocabulary test puts 1127/1195 rat-only symbols in the normalized output against 372/22512 mouse-only. What was analysed is rat-only, so excluding it as multi-species withheld it from the pool it belongs to. Verified 2026-08-28."

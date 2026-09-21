@@ -1,0 +1,54 @@
+study_id,stratum,species,n_case,n_control,title
+GSE120103,endometriosis_human,Homo sapiens,18,18,Homo sapiens whole genome expression microarray of endometrium obtained from fertile and Infertile women with stage IV ovarian endometriosis and without endometriosis
+GSE130435,endometriosis_human,Homo sapiens,16,2,Macrophages in eutopic endometrium endometriosis
+GSE134056,endometriosis_human,Homo sapiens,16,22,Machine Learning Classifiers for Endometriosis Using Transcriptomics and Methylomics Data [Transcriptomics]
+GSE135485,endometriosis_human,Homo sapiens,54,4,Gene expression signature of endometrial samples from women with and without endometriosis.
+GSE145701,endometriosis_human,Homo sapiens,32,16,Steroid Hormones Regulate Genome-Wide Epigenetic Programming and Gene Transcription in Human Endometrial Cells with Mark
+GSE153739,endometriosis_human,Homo sapiens,4,3,Transcriptional profiling of the mid-proliferative phase eutopic endometrial samples from women with endometriosis
+GSE153740,endometriosis_human,Homo sapiens,4,4,Transcriptional profiling of the mid-secretory phase eutopic endometrial samples from women with endometriosis
+GSE17504,endometriosis_human,Homo sapiens,5,5,The PKA Pathway of Endometrial Stromal Fibroblasts Reveals Differentiation and Proliferative Potential in Endometriosis
+GSE179640,endometriosis_human,Homo sapiens,51,8,Single cell analysis of endometriosis reveals a coordinated transcriptional program driving immunotolerance and angiogen
+GSE192636,endometriosis_human,Homo sapiens,5,5,"mRNA, lncRNA and circular RNA expression profiles and ceRNA network construction of granulosa cells in ovarian endometri"
+GSE193928,endometriosis_human,Homo sapiens,18,19,Discovery study in endometrial samples using RNA-HighSeq to build classifiers to differentiate between control patients 
+GSE201912,endometriosis_human,Homo sapiens,4,2,"Gene expression data from normal endometrium (NE), endometrium with endometriosis (EE) and ovarian endometrioma (OE)"
+GSE205494,endometriosis_human,Homo sapiens,6,6,Iron-overloaded follicular fluid increases the risk of endometriosis-related infertility by triggering granulosa cell fe
+GSE212787,endometriosis_human,Homo sapiens,14,6,Multi-Omics Integration Highlights the Role of Ubiquitination in Endometriosis Fibrosis
+GSE214411,endometriosis_human,Homo sapiens,6,4,Single-cell Transcriptomics of Endometrial Cells from Patients with Minimal/mild Endometriosis.
+GSE232713,endometriosis_human,Homo sapiens,7,7,Combined Proteomics and Transcriptomics Identifies Serpin Family C Member 1 Associated Protein as a Biomarker of Endomet
+GSE23339,endometriosis_human,Homo sapiens,10,9,Gene expression profiles of endometriosis
+GSE243039,endometriosis_human,Homo sapiens,20,20,Impaired bone morphogenetic protein signaling pathways perturb decidualization in patients with endometriosis (Time-cour
+GSE248593,endometriosis_human,Homo sapiens,6,6,m6A related mRNAs in ovarian-endometriosis control vs normal endometrial tissue
+GSE25628,endometriosis_human,Homo sapiens,8,14,Endometriosis transcription profiling
+GSE262037,endometriosis_human,Homo sapiens,6,3,"Analysis of lncRNA expression in endometriosis infertility, tubal disease infertility and normal subjects"
+GSE276193,endometriosis_human,Homo sapiens,8,10,Integrative Single-Cell Analysis Reveals Iron Overload-Induced Senescence and Metabolic Reprogramming in Ovarian Endometriosis-Associated Infertility
+GSE278827,endometriosis_human,Homo sapiens,3,3,Ectopic endometrial stromal cell-derived extracellular vesicles encapsulating PKM2 inhibit autophagy inducing endometria
+GSE281569,endometriosis_human,Homo sapiens,6,6,Mechanism of quercetin in the treatment of endometriosis based on network pharmacology and transcriptome sequencing
+GSE313775,endometriosis_human,Homo sapiens,30,36,"Circulating Th1, Th1/17, and Th17 cell bulk RNA sequencing from endometriosis patients and controls"
+GSE315857,endometriosis_human,Homo sapiens,4,4,YWHAZ is Downregulated in the Proliferative Eutopic Endometrium in Endometriosis and Is Required Downstream of Progesterone Receptor and STAT3 Signaling.
+GSE51981,endometriosis_human,Homo sapiens,77,34,Molecular Classification of Endometriosis and Disease Stage Using High-Dimensional Genomic Data
+GSE57733,endometriosis_human,Homo sapiens,3,3,Profile of differential expression and DNA methylation status in choriodecidua of women affected with severe endometrios
+GSE58178,endometriosis_human,Homo sapiens,6,6,Endometriosis: Normal endometrial stromal cells and endometriotic stromal cells
+GSE6364,endometriosis_human,Homo sapiens,21,16,Gene Profiling of Endometrium Reveals Progesterone Resistance and Candidate Genetic Loci in Women with Endometriosis
+GSE72428,endometriosis_human,Papio anubis; Homo sapiens,15,4,"Changes in eutopic endometrial gene expression during the progression of experimental endometriosis in the baboon, Papio"
+GSE7305,endometriosis_human,Homo sapiens,10,10,Human endometriosis vs normal endometrium study - transcriptional profiling
+GSE7846,endometriosis_human,Homo sapiens,5,5,Differentially expressed genes in HEECs of eutopic endometrium of patients with endometriosis compared with control
+GSE87809,endometriosis_human,Homo sapiens,4,5,Epigenetic alterations affecting transcription factors and signaling pathways in stromal cells of endometriosis: Express
+GSE240392,endometriosis_rodent,Mus musculus,16,8,Transcriptomic changes in eutopic endometrium and ectopic lesions in mouse model during progression of endometriosis-rel
+GSE296883,endometriosis_rodent,Rattus norvegicus,60,6,A Transcriptomics-Based Computational Drug Repositioning Pipeline Identifies Simvastatin And Primaquine As Therapeutics 
+GSE229750,fibromyalgia_human,Homo sapiens,7,5,Effect of subcutaneous tocilizumab on gene expression of neutrophils in fibromyalgia patients
+GSE67311,fibromyalgia_human,Homo sapiens,67,75,Peripheral Blood Gene Expression in Fibromyalgia Patients Reveals  Potential Biological Markers and Physiological Pathwa
+GSE36701,ibs_human,Homo sapiens,87,37,Gene expression analysis of rectal mucosa in chronic irritable bowel syndrome (IBS) compared to healthy volunteers (HV)
+GSE63379,ibs_human,Homo sapiens,35,32,Genome-wide Expression Profiling in Irritable Bowel Syndrome
+GSE186505,neuropathy_human,Homo sapiens,10,10,RNA sequencing of whole blood cells in patients with trigeminal neuralgia
+GSE11343,neuropathy_rodent,Mus musculus,5,5,Rosiglitazone Treatment Reduces Diabetic Neuropathy in STZ treated DBA/2J mice
+GSE236592,neuropathy_rodent,Rattus norvegicus,6,12,Shentong zhuyu decoction treatments regulate expression of inflammatory gene by potentially targeting transcription fact
+GSE255553,neuropathy_rodent,Mus musculus,4,4,Macrophages protect against sensory axon degeneration in diabetic neuropathy
+GSE289659,neuropathy_rodent,Rattus norvegicus,4,12,Single-nuclei RNA Sequencing Reveals Distinct Transcriptomic Signatures of Rat Dorsal Root Ganglia in a Disc-associated 
+GSE318478,neuropathy_rodent,Rattus norvegicus,13,7,"Omega-3 Fatty Acids Mitigate Neuropathic Pain by Modulating Ferroptosis, Glutamate and Lipid Remodeling"
+GSE322631,neuropathy_rodent,Rattus norvegicus,3,3,RNA-seq of the central amygdala of rats with painful diabetic neuropathy
+GSE333494,neuropathy_rodent,Mus musculus,10,8,Hippocampal CA3 Nex+ neuronal TNFR2 alleviates chronic neuropathic pain by sex-dependently engaging opioid and endocanna
+GSE343056,neuropathy_rodent,Mus musculus,3,3,"Whole-brain transcriptomic profiling of control, diabetic neuropathic pain, and baclofen-treated mice"
+GSE11839,other_human_amendment,Homo sapiens,6,6,Differentiation associated changes in gene expression profiles for interstitial cystitis and control urothelial cells
+GSE47603,other_human_amendment,Homo sapiens,4,5,Genome-wide expression profiling of complex regional pain syndrome
+GSE57560,other_human_amendment,Homo sapiens,13,3,Correlation of gene expression with bladder capacity in interstitial cystitis/bladder pain syndrome
+GSE305138,other_rodent_amendment,Mus musculus,6,6,Microglial TIA1 in Lateral Septum Facilitates Chronic Inflammatory Pain via Regulating NF-κB Signaling Pathway

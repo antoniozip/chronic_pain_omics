@@ -1,0 +1,199 @@
+peptide,gene_symbol,precursor,evidence
+AASAPLVETSTPL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AASAPLVETSTPLRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AEAQEAEDQQARVL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AGDETPDVDPELLRYLLGRILTGSSEPEAAPAP,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AGDETPDVDPELLRYLLGRILTGSSEPEAAPAPRRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+ALAHLLEAERQE,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+ANQIPKVAWIPDVESRQAPYENLNDQELGEYLARMLVKYPELLNTNQL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+APLVETSTPLRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+ARELEQEEEQEAEGSSVTA,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+ARELEQEEEQEAEGSSVTAQ,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+ARPVKEPRSLSAASAPLVETSTPL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+ARPVKEPRSLSAASAPLVETSTPLRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,named_cleavage_product_of_uniprot:Q9QXV0:Big SAAS
+ASAPLVETSTPL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+ASAPLVETSTPLRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+ASFQRNQLLQKEPD,Scg2,secretogranin II,substring_of_uniprot:Q03517
+ASFQRNQLLQKEPDLRL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+ASFQRNQLLQKEPDLRLENV,Scg2,secretogranin II,substring_of_uniprot:Q03517
+ATLESVFQELGKLTGPSNQ,Scg2,secretogranin II,substring_of_uniprot:Q03517
+AVGHPC(-1.01)GPQGIC(-1.01)GQTGLLQLLGDLSRGQETLAKQTPQLEAWVREPLEE,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+AVGHPC[-1]GPQGIC[-1]GQTGLLQLLGDLSRGQETLAKQTPQLEAWV,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+AVGHPC[-1]GPQGIC[-1]GQTGLLQLLGDLSRGQETLAKQTPQLEAWVREPL,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+AVGHPC[-1]GPQGIC[-1]GQTGLLQLLGDLSRGQETLAKQTPQLEAWVREPLE,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+AVGHPC[-1]GPQGIC[-1]GQTGLLQLLGDLSRGQETLAKQTPQLEAWVREPLEE,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+AVPRGEAAGAVQEL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AVPRGEAAGAVQELA,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AVPRGEAAGAVQELARAL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AVPRGEAAGAVQELARALAHLL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AVPRGEAAGAVQELARALAHLLEAE,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AVPRGEAAGAVQELARALAHLLEAERQ,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AVPRGEAAGAVQELARALAHLLEAERQE,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+AVPRGEAAGAVQELARALAHLLEAERQERA,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+DADEGDTLANSSDLLKELLGTGDNRA,Penk,proenkephalin,substring_of_uniprot:P22005
+DADEGDTLANSSDLLKELLGTGDNRAKDSHQQESTNNDEDM,Penk,proenkephalin,substring_of_uniprot:P22005
+DADEGDTLANSSDLLKELLGTGDNRAKDSHQQESTNNDEDMS,Penk,proenkephalin,named_cleavage_product_of_uniprot:P22005:PENK(143-184)
+DELYPMEPEEEANGGEILA,Penk,proenkephalin,substring_of_uniprot:P22005
+DGPTGPDVEDAGDETPDVDPELLRYLLGRILTGSSEPEAAPAPRRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+DLQRVRGDLGAALDSWIT,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+DS[+80]KENTEKNEQINEEM,Scg2,secretogranin II,substring_of_uniprot:Q03517
+DVAHEILNEAYRKVLDQLSARKYLQSVV,Adcyap1,pituitary adenylate cyclase-activating polypeptide (PACAP),substring_of_uniprot:O70176
+DVAHEILNEAYRKVLDQLSARKYLQSVVA,Adcyap1,pituitary adenylate cyclase-activating polypeptide (PACAP),substring_of_uniprot:O70176
+EAERQERARAEAQEAEDQQARVL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+EEKEEDVEAEERGDLGEVGAWRPH,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+ELEQEEEQEAEGSSVTAQ,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+ELSAERPLNEQIAEAE,Scg3,secretogranin III,substring_of_uniprot:P47867
+ELSAERPLNEQIAEAEAD,Scg3,secretogranin III,substring_of_uniprot:P47867
+ELSAERPLNEQIAEAEADKI,Scg3,secretogranin III,substring_of_uniprot:P47867
+ELYPMEPEEEANGGEILA,Penk,proenkephalin,substring_of_uniprot:P22005
+ENPSPQAPARRLLP,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+ENPSPQAPARRLLPP,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+ERGDLGEVGAWRPH,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+ERQERARAEAQEAEDQQARVL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+ESKDQLSEDASKVITY,Scg2,secretogranin II,substring_of_uniprot:Q03517
+ESKDQLSEDASKVITYL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+ESKDQLSEDASKVITYLRRLVNAVGSGRSQSGPNGDRAA,Scg2,secretogranin II,substring_of_uniprot:Q03517
+ESSPGMATLSEEEVRL,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+ETPDVDPELLRYLLGRILTGSSEPEAAPAPRRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+EYLNQEQAEQGREHL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+EYLNQEQAEQGREHLA,Scg2,secretogranin II,substring_of_uniprot:Q03517
+E[-18]EKEEDVEAEERGDLGEVGAWRPH,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+FAESLPSDEEGENYS(+79.97)KEVPEIE,Penk,proenkephalin,named_cleavage_product_of_uniprot:P22005:PENK(238-259)
+FAESLPSDEEGENYSKEVPE,Penk,proenkephalin,substring_of_uniprot:P22005
+FAESLPSDEEGENYSKEVPEI,Penk,proenkephalin,substring_of_uniprot:P22005
+FAESLPSDEEGENYSKEVPEIE,Penk,proenkephalin,named_cleavage_product_of_uniprot:P22005:PENK(238-259)
+FAESLPSDEEGENYS[+80]KEVPEIEKRYGGFMRF,Penk,proenkephalin,substring_of_uniprot:P22005
+FAESLPSDEEGENY[+80]SKEVPEIEKRYGGFMRF,Penk,proenkephalin,substring_of_uniprot:P22005
+FIDPELQRSWEETEGEEGGLMPE,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+FLRKDLQRVRGDLGAALDSWIT,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+FPKPEGSQDKSLHN,Scg3,secretogranin III,substring_of_uniprot:P47867
+FPKPEGSQDKSLHNRELSAERPLNEQIAEAEADKI,Scg3,secretogranin III,substring_of_uniprot:P47867
+GAGENLGGSAVDDPAPLT,Adcyap1,pituitary adenylate cyclase-activating polypeptide (PACAP),substring_of_uniprot:O70176
+GDLGAALDSWIT,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+GEAAGAVQELARALAHLLEAERQ,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+GEAAGAVQELARALAHLLEAERQE,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+GMENVVNQKSPYFPNQYSQDKAL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+GPTGPDVEDAGDETPDVDPELLRYLLGRILTGSSEPEAAPAPRRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+GRILTGSSEPEAAPAP,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+GRILTGSSEPEAAPAPRRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+GRPEWWMDYQ,Penk,proenkephalin,substring_of_uniprot:P22005
+HADGVFTSDYSRLLGQISAKKYLESLI(-.98),Vip,vasoactive intestinal peptide,named_cleavage_product_of_uniprot:P32648:Intestinal peptide PHI-27
+ILTGSSEPEAAPAPR,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+IPVGSLKNEDTP,Scg2,secretogranin II,substring_of_uniprot:Q03517
+IPVGSLKNEDTPN,Scg2,secretogranin II,substring_of_uniprot:Q03517
+IPVGSLKNEDTPNRQY,Scg2,secretogranin II,substring_of_uniprot:Q03517
+IPVGSLKNEDTPNRQYLDEDML,Scg2,secretogranin II,substring_of_uniprot:Q03517
+IPVGSLKNEDTPNRQYLDEDMLLKV,Scg2,secretogranin II,substring_of_uniprot:Q03517
+IPVGSLKNEDTPNRQYLDEDMLLKVLE,Scg2,secretogranin II,substring_of_uniprot:Q03517
+IPVGSLKNEDTPNRQYLDEDMLLKVLEYLNQEQAEQGREHL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+IPVGSLKNEDTPNRQYLDEDMLLKVLEYLNQEQAEQGREHLA,Scg2,secretogranin II,substring_of_uniprot:Q03517
+ISSSISEDPVPI,Vip,vasoactive intestinal peptide,substring_of_uniprot:P32648
+KAGEKPNGLVEPEQDLE,Scg2,secretogranin II,substring_of_uniprot:Q03517
+KAGEKPNGLVEPEQDLEL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+KARELEQEEEQEAEGSSVTAQ,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+KIETQTQEEVRDS[+80]KENTEKNEQINEEM,Scg2,secretogranin II,substring_of_uniprot:Q03517
+LAGLLSRSGGVVKDNFVPTNVGSEAF(-.98),Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+LATLESVFQELGKLTGPSNQ,Scg2,secretogranin II,substring_of_uniprot:Q03517
+LDEDMLLKVLEYLNQEQAEQGREHLA,Scg2,secretogranin II,substring_of_uniprot:Q03517
+LENPSPQAPA,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,named_cleavage_product_of_uniprot:Q9QXV0:Little LEN
+LENPSPQAPARRLL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+LENPSPQAPARRLLPP,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,named_cleavage_product_of_uniprot:Q9QXV0:Big LEN
+LLEAAQEEGAVTPDLPGLEKVQVRPE,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+LLSRSGGVVKDNFVPTNVGSEAF(-.98),Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+LVETSTPLRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+LYPMEPEEEANGGEILA,Penk,proenkephalin,substring_of_uniprot:P22005
+MDELYPMEPEEEANGGEIL,Penk,proenkephalin,substring_of_uniprot:P22005
+MDELYPMEPEEEANGGEILA,Penk,proenkephalin,named_cleavage_product_of_uniprot:P22005:PENK(114-133)
+MKARELEQEEEQEAEGSSVTAQ,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+MQMKARELEQEEEQEAEGSSVTAQ,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+NDQELGEYLARMLVKYPELLNTNQL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+NFVPTNVGSEAF(-.98),Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+PELLNTNQL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+PELLRYLLGRILTGSSEPEAAPAPRRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+PEWWMDYQ,Penk,proenkephalin,substring_of_uniprot:P22005
+PLDSQSIYQLIEI,Scg2,secretogranin II,substring_of_uniprot:Q03517
+PPLAPDDDPDAPAAQLARALLRA,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+PRGEAAGAVQELARALAHLLEAERQE,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+Q(-17.03)LEDEAKELQ,Penk,proenkephalin,substring_of_uniprot:P22005
+Q(-17.03)MAVKKYLAAVL(-.98),Adcyap1,pituitary adenylate cyclase-activating polypeptide (PACAP),substring_of_uniprot:O70176
+Q(-17.03)MAVKKYLNSILN(-.98),Vip,vasoactive intestinal peptide,substring_of_uniprot:P32648
+QLEDEAKELQ,Penk,proenkephalin,substring_of_uniprot:P22005
+Q[-17]ELGKLTGPSNQ,Scg2,secretogranin II,substring_of_uniprot:Q03517
+Q[-17]LEDEAKELQ,Penk,proenkephalin,substring_of_uniprot:P22005
+RFLRKDLQRVRGDLGAALDSWIT,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+RILTGSSEPEAAPAPRRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+RPEWWMD,Penk,proenkephalin,substring_of_uniprot:P22005
+RPEWWMDYQ,Penk,proenkephalin,substring_of_uniprot:P22005
+RPVKEPRSLSAASAPLVETSTPL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+RPVKEPRSLSAASAPLVETSTPLRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+RSGGVVKDNFVPTNVGSEAF(-.98),Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+RSPQLEDEAKELQ,Penk,proenkephalin,substring_of_uniprot:P22005
+RVGRPEWWMDYQ,Penk,proenkephalin,substring_of_uniprot:P22005
+SAASAPLVETSTPLRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+SAPLVETSTPLRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+SC(-.98)NTATC(-.98)VTHRLAGLLSRSGGVVKDNFVPTNVGSEAF(-.98),Calca,calcitonin gene-related peptide (CGRP),named_cleavage_product_of_uniprot:Q99JA0:Calcitonin gene-related peptide 1
+SC(-1.01)NTATC(-.1.01)VTHRLAGLLSRSGGVVKDNFVPTNVGSEAF(-.98),Calca,calcitonin gene-related peptide (CGRP),named_cleavage_product_of_uniprot:Q99JA0:Calcitonin gene-related peptide 1
+SC(-1.01)NTATC(-1.01)VTHRLAGLLS,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+SC(-1.01)NTATC(-1.01)VTHRLAGLLSRSGGVVKDNFVPTNVGSEAF(-.98),Calca,calcitonin gene-related peptide (CGRP),named_cleavage_product_of_uniprot:Q99JA0:Calcitonin gene-related peptide 1
+SC(-1.01)NTATCVTHRLAGLLSRSGGVVKDNFVPTNVGSEAF,Calca,calcitonin gene-related peptide (CGRP),named_cleavage_product_of_uniprot:Q99JA0:Calcitonin gene-related peptide 1
+SFPWMESDVT,Trh,thyrotropin-releasing hormone,substring_of_uniprot:Q62361
+SGGVVKDNFVPTNVGSEAF(-.98),Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+SGQLGLPDEE,Scg2,secretogranin II,substring_of_uniprot:Q03517
+SGQLGLPDEEN,Scg2,secretogranin II,substring_of_uniprot:Q03517
+SGQLGLPDEENRRES,Scg2,secretogranin II,substring_of_uniprot:Q03517
+SGQLGLPDEENRRESKDQLSEDASKVITY,Scg2,secretogranin II,substring_of_uniprot:Q03517
+SGQLGLPDEENRRESKDQLSEDASKVITYL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+SLPSDEEGENYSKEVPEIE,Penk,proenkephalin,substring_of_uniprot:P22005
+SLSAASAPLVETSTPL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+SLSAASAPLVETSTPLRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,named_cleavage_product_of_uniprot:Q9QXV0:Little SAAS
+SPQLEDEAKEL,Penk,proenkephalin,substring_of_uniprot:P22005
+SPQLEDEAKELQ,Penk,proenkephalin,substring_of_uniprot:P22005
+SVDQDLGPEVPPENVLGA,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+SVDQDLGPEVPPENVLGAL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,named_cleavage_product_of_uniprot:Q9QXV0:PEN-19
+SVDQDLGPEVPPENVLGALL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,named_cleavage_product_of_uniprot:Q9QXV0:PEN-20
+SVDQDLGPEVPPENVLGALLRV,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,named_cleavage_product_of_uniprot:Q9QXV0:PEN
+SVDQDLGPEVPPENVLGALLRVKRLENPSPQAPARRLLPP,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,named_cleavage_product_of_uniprot:Q9QXV0:Big PEN-LEN
+S[+80]PVSSEDDLQEEEQLEQAIKEHLGPGSSQEMERLAKVS,Scg2,secretogranin II,substring_of_uniprot:Q03517
+TNEIVEEQYTPQSLATLESVF,Scg2,secretogranin II,substring_of_uniprot:Q03517
+TNEIVEEQYTPQSLATLESVFQELGKLTGPS,Scg2,secretogranin II,substring_of_uniprot:Q03517
+TNEIVEEQYTPQSLATLESVFQELGKLTGPSNQ,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Secretoneurin
+VDPELLRYLLGRILTGSSEPEAAPAP,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+VDPELLRYLLGRILTGSSEPEAAPAPRRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+VEDAGDETPDVDPELLRYLLGRILTGSSEPEAAPAPRRL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+VGRPEWWMDY,Penk,proenkephalin,substring_of_uniprot:P22005
+VGRPEWWMDYQ,Penk,proenkephalin,substring_of_uniprot:P22005
+VPLRSIL,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+VPLRSILESSPGMATL,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+VPLRSILESSPGMATLSEEE,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+VPLRSILESSPGMATLSEEEVRL,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+VPLRSILESSPGMATLSEEEVRLLAALVQDYMQMKARELEQEEEQEAEGSSVTAQ,Calca,calcitonin gene-related peptide (CGRP),substring_of_uniprot:Q99JA0
+VPS(+79.97)PVSSEDDLQEEEQLEQAIKEHLGPGSS(+79.97)QEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VPSPVS(+79.97)SEDDLQEEEQLEQAIKEHLGPGS(+79.97)SQEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VPSPVS(+79.97)SEDDLQEEEQLEQAIKEHLGPGSS(+79.97)QEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VPSPVS(+79.97)SEDDLQEEEQLEQAIKEHLGPGSSQEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VPSPVSSEDDLQEEEQLEQAIKEHLGPGSSQE,Scg2,secretogranin II,substring_of_uniprot:Q03517
+VPSPVSSEDDLQEEEQLEQAIKEHLGPGSSQEMERLA,Scg2,secretogranin II,substring_of_uniprot:Q03517
+VPSPVSSEDDLQEEEQLEQAIKEHLGPGSSQEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VPSPVSSEDDLQEEEQLEQAIKEHLGPGSS[+80]QEMERLA,Scg2,secretogranin II,substring_of_uniprot:Q03517
+VPSPVSS[+80]EDDLQEEEQLEQAIKEHLGPGSSQEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VPSPVS[+80]SEDDLQEEEQLEQAIKEHLGPGSSQE,Scg2,secretogranin II,substring_of_uniprot:Q03517
+VPSPVS[+80]SEDDLQEEEQLEQAIKEHLGPGSSQEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VPSPVS[+80]SEDDLQEEEQLEQAIKEHLGPGSS[+80]QEMERLA,Scg2,secretogranin II,substring_of_uniprot:Q03517
+VPSPVS[+80]SEDDLQEEEQLEQAIKEHLGPGSS[+80]QEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VPSPVS[+80]SEDDLQEEEQLEQAIKEHLGPGS[+80]SQEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VPSPVS[+80]SEDDLQEEEQLEQAIKEHLGPGS[+80]S[+80]QEMERLAKVS,Scg2,secretogranin II,named_cleavage_product_of_uniprot:Q03517:Manserin
+VVGGEDWSPIEEKIETQTQEEVRDSKENT[+80]EKNEQINEEM,Scg2,secretogranin II,substring_of_uniprot:Q03517
+VVGGEDWSPIEEKIETQTQEEVRDS[+80]KENTEKNEQINE,Scg2,secretogranin II,substring_of_uniprot:Q03517
+WGSPRASDPPLAPDDDPDAPAAQLARAL,Pcsk1n,proSAAS / proprotein convertase subtilisin-kexin type 1 inhibitor,substring_of_uniprot:Q9QXV0
+YEENSRENPF,Scg2,secretogranin II,substring_of_uniprot:Q03517
+YGGFL,Penk,proenkephalin,named_cleavage_product_of_uniprot:P22005:Leu-enkephalin
+YGGFM,Penk,proenkephalin,named_cleavage_product_of_uniprot:P22005:Met-enkephalin
+YGGFMKKMDELYPMEPEEEANGGEIL,Penk,proenkephalin,substring_of_uniprot:P22005
+YGGFMKKMDELYPMEPEEEANGGEILA,Penk,proenkephalin,substring_of_uniprot:P22005
+YGGFMRF,Penk,proenkephalin,named_cleavage_product_of_uniprot:P22005:Met-enkephalin-Arg-Phe
+YGGFMRRV(-.98),Penk,proenkephalin,substring_of_uniprot:P22005
+YGGFMRRVGRPEWWMDYQ,Penk,proenkephalin,substring_of_uniprot:P22005
+YGGFMRRVGRPEWWMDYQKRYGGFL,Penk,proenkephalin,substring_of_uniprot:P22005
+YGGFMRSL,Penk,proenkephalin,named_cleavage_product_of_uniprot:P22005:Met-enkephalin-Arg-Ser-Leu
+YLNQEQAEQGREHL,Scg2,secretogranin II,substring_of_uniprot:Q03517
+YLNQEQAEQGREHLA,Scg2,secretogranin II,substring_of_uniprot:Q03517

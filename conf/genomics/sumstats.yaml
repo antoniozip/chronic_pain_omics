@@ -1,0 +1,28 @@
+# Stage 1 genomics: summary-statistics retrieval configuration.
+# Admitted pain EFO traits (osteoarthritis excluded per cohort_expansion_plan §7.1;
+# knee/hip pain enter under their own traits). Used by pipeline/04b_gwas_sumstats.py.
+
+efo_traits:
+  - chronic pain
+  - neuropathic pain
+  - back pain
+  - fibromyalgia
+  - knee pain
+  - hip pain
+  - multisite chronic pain
+  - chronic widespread pain
+  - headache
+
+ftp_base: "https://ftp.ebi.ac.uk/pub/databases/gwas/summary_statistics"
+gwas_rest: "https://www.ebi.ac.uk/gwas/rest/api/studies/search/findByEfoTrait"
+
+output:
+  raw_dir: "data/raw/genomics/sumstats"
+  interim_dir: "data/interim/genomics/sumstats"
+  manifest: "results/meta/genomics/sumstats_manifest.csv"
+  # Per-file safety cap: skip (and log) any harmonised file larger than this.
+  # Older pain sumstats are ~330-360 MB, but modern imputed studies reach ~1.5 GB
+  # (e.g. GCST90477530 = 1.52 GB, which the initial 1500 MB cap wrongly rejected on
+  # the 2026-07-11 smoke test). 4000 MB clears real files with headroom while still
+  # guarding against a runaway download.
+  max_file_mb: 4000

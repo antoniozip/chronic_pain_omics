@@ -1,0 +1,2 @@
+run_id,config_file,databases,total_hits,duplicates_removed,after_dedup,timestamp
+9349e4c29f,/Users/antoniogiulianozippo/Documents/Claude/Projects/CP_multi-omics/conf/search/chronic_pain.yaml,pubmed;europe_pmc,2787,0,2787,2026-05-16T08:34:13.685494+00:00

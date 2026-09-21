@@ -1,0 +1,52 @@
+# Per-modality ingestion configuration.
+# Used by pipeline/03_ingest_omics.py
+
+search:
+  terms:
+    - "chronic pain"
+    - "neuropathic pain"
+    - "inflammatory pain"
+    - "nociplastic pain"
+  # Named pain conditions, added 2026-08-28 as a disclosed search amendment.
+  #
+  # `terms` above are pain *mechanism* phrases, and the repository ingesters
+  # match them against titles and abstracts. A clinical series called
+  # "Peripheral Blood Gene Expression in Fibromyalgia Patients" therefore
+  # matched nothing: fibromyalgia, CRPS and low back pain appear in none of
+  # them. Preclinical papers say "neuropathic pain" in the title where clinical
+  # papers name the disease, so the transcriptomic corpus came back 99 rodent
+  # against 6 human with essentially no blood study, while an independent GEO
+  # query found 41 human blood series of which we held 4.
+  # See plan/2026-08-28-geo-human-blood-gap.md.
+  #
+  # Kept as a separate key so the amendment is visible as its own change and so
+  # `terms` still describes the original protocol.
+  conditions:
+    - "fibromyalgia"
+    - "complex regional pain syndrome"
+    - "low back pain"
+    - "sciatica"
+    - "trigeminal neuralgia"
+    - "temporomandibular disorder"
+    - "osteoarthritis pain"
+    - "irritable bowel syndrome"
+    - "endometriosis"
+    - "interstitial cystitis"
+    - "diabetic neuropathy"
+    - "postherpetic neuralgia"
+  species:
+    - "Homo sapiens"
+    - "Mus musculus"
+    - "Rattus norvegicus"
+
+filters:
+  min_samples: 5          # exclude tiny pilot studies
+  year_min: 2000
+
+output:
+  raw_dir: "data/raw"     # datasets.jsonl written to {raw_dir}/{modality}/
+  # No cap by default: paginate to exhaustion. Set an integer only as a safety
+  # valve during development; reaching it emits a WARNING because a truncated
+  # result set is not an exhausted one.
+  hard_limit: null
+  page_size: 100

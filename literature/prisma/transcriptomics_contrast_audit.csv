@@ -1,0 +1,91 @@
+accession,n_case,n_control,n_fields,n_separating,model_field_separates,separating_fields,flags,detail
+GSE10238,21,31,1,1,no,sample title,,
+GSE102721,9,3,6,0,no,,,
+GSE11343,5,5,4,2,no,treatment | sample title,,
+GSE113941,3,4,5,2,no,treatment | sample title,treatment_values_in_treatment,treatment -> normal=control; paclitaxel treated=case
+GSE117526,3,3,3,0,no,,,
+GSE11783,5,6,3,2,yes,disease state | sample title,,
+GSE11839,6,6,3,2,yes,disease status | sample title,,
+GSE120103,18,18,4,2,yes,sample group | sample title,arms_merge_levels_of_sample_group,sample group -> disease free endometrium of fertile women=control; disease free endometrium of infertile women=control; endometrium  from stage iv ovarian endometriosis of fertile women=case; endometrium  from stage iv ovarian endometriosis of infertile women=case
+GSE126611,5,5,2,1,no,sample title,,
+GSE130435,16,2,6,2,yes,disease state | sample title,arms_merge_levels_of_disease_state,disease state -> endometriosis=case; fibroids=case; fibroids and adenomyosis=case; healthy=control
+GSE130755,3,3,2,1,no,sample title,,
+GSE134056,16,22,3,2,yes,group | sample title,,
+GSE135080,6,5,3,2,no,assay | sample title,,
+GSE135485,54,4,3,3,yes,subject status | tissue | sample title,repeated_subjects_in_subject_status;separates_on_tissue,"tissue -> endometrial samples and lesions=case; healthy endometrium=control || subject status: 58 samples, 2 subjects"
+GSE138024,8,8,6,0,no,,,
+GSE143895,3,2,4,2,no,treatment | sample title,,
+GSE145226,3,3,5,2,no,treatment | sample title,,
+GSE145701,32,16,6,3,yes,disease state | individual | sample title,arms_merge_levels_of_disease_state;arms_merge_levels_of_individual;repeated_subjects_in_individual;treatment_values_in_sample_title,"sample title -> genomic rna from endo i esf sample 1 treated with p4=case; genomic rna from endo i esf sample 1, treated with e2=case; genomic rna from endo i esf sample 1, treated with e2+p4=case; genomic rna from endo i esf sample 1, treated with vehicle=case; genomic rna from endo i esf sample 2 treated with p4=case; genomic rna from endo i esf sample 2, treated with e2=case || disease state -> endometriosis stage i=case; endometriosis stage iv=case; normal=control || individual -> endo i-1=case; endo i-2=case; endo i-3=case; endo i-4=case; endo iv-1=case; endo iv-2=case || individual: 48 s"
+GSE147216,6,6,6,2,no,treatment | sample title,,
+GSE15041,5,6,6,3,yes,surgery type | experimetal group | sample title,arms_merge_levels_of_experimetal_group,experimetal group -> adult ipsilateral=case; adult sham=control; young ipsilateral=case; young sham=control
+GSE153739,4,3,4,3,yes,group | disease state | sample title,arms_merge_levels_of_disease_state,disease state -> healthy=control; ovarian and peritoneal endometriosis=case; ovarian endometriosis=case; peritoneal endometriosis=case
+GSE153740,4,4,4,3,yes,group | disease state | sample title,arms_merge_levels_of_disease_state,disease state -> healthy=control; ovarian endometriosis=case; peritoneal endometriosis=case
+GSE154816,36,36,4,2,no,treatment | sample title,treatment_values_in_treatment,treatment -> i.p. injection of cisplatin on day1 and day3.  intrathecal (i.t.) injection of  saline on day 7=case; naïve (no treatment)=control
+GSE159895,9,9,6,2,no,treatment | sample title,treatment_values_in_sample_title;treatment_values_in_treatment,treatment -> intraplantar cfa=case; intraplantar saline=control || sample title -> hdac 4wt_cfa_rep2=case; hdac4 3sa_cfa_rep1=case; hdac4 3sa_cfa_rep2=case; hdac4 3sa_cfa_rep3=case; hdac4 3sa_saline_rep1=control; hdac4 3sa_saline_rep2=control
+GSE160543,8,4,3,0,no,,,
+GSE162284,4,4,4,3,yes,age | model type | sample title,separates_on_age,age -> day 0=control; day 3=case
+GSE172133,15,3,5,2,no,treatment | sample title,arms_merge_levels_of_treatment,treatment -> cci 0.5d=case; cci 14d=case; cci 1d=case; cci 3d=case; cci 7d=case; sham=control
+GSE17504,10,10,5,2,yes,disease status | sample title,,
+GSE175760,15,3,6,0,no,,,
+GSE177034,49,49,7,4,yes,individual | age | paingroup | sample title,arms_merge_levels_of_individual;separates_on_age,age -> 21.0553656869446=case; 25.1237183868763=control; 26.4688995215311=case; 26.7368421052632=case; 31.6226930963773=control; 32.637047163363=control || individual -> 0098=control; 0101=control; 0102=control; 0105=control; 0108=case; 0110=control
+GSE180627,48,48,5,2,no,treatment | sample title,,
+GSE186237,4,4,7,2,no,treatment | sample title,,
+GSE186505,10,10,4,2,yes,condition | sample title,,
+GSE18803,12,12,5,2,yes,treatment group | sample title,,
+GSE193928,18,19,14,2,yes,disease state | sample title,arms_merge_levels_of_disease_state,disease state -> adeno=case; control=control; die=case; oe=case
+GSE197233,12,12,6,2,no,treatment | sample title,,
+GSE205494,6,6,3,2,yes,disease state | sample title,,
+GSE214204,4,4,3,1,no,sample title,,
+GSE217932,4,4,4,2,no,treatment | sample title,,
+GSE221921,96,93,5,3,yes,cell type | disease state | sample title,separates_on_cell_type,cell type -> blood cells from fibromylagia patient (fma)=case; blood cells from healthy patient (control)=control
+GSE224814,3,3,5,0,no,,,
+GSE232713,7,7,6,2,yes,disease state | sample title,,
+GSE23339,10,9,3,3,yes,disease state | patient | sample title,arms_merge_levels_of_patient,patient -> 1=control; 12=control; 14=case; 18=control; 19=case; 2=case
+GSE235287,3,3,3,2,no,treatment | sample title,,
+GSE236592,6,12,4,2,yes,disease state | sample title,arms_merge_levels_of_disease_state,disease state -> ctrl=control; npp=case; sham=control
+GSE236754,16,16,6,0,no,,,
+GSE237896,15,15,6,2,yes,surgery | sample title,,
+GSE240392,16,8,8,3,yes,disease status | endometrial location | sample title,arms_merge_levels_of_endometrial_location,endometrial location -> ectopic=case; eutopic=case; sham eutopic=control
+GSE241361,8,10,4,2,no,treatment | sample title,treatment_values_in_sample_title,"sample title -> sample a1, no treated, wild type, dorsal root ganglion=control; sample a3, no treated, wild type, dorsal root ganglion=control; sample a5, no treated, wild type, spinal cord=control; sample a7, no treated, wild type, spinal cord=control; sample b1, no treated, wild type, dorsal root ganglion=control; sample b3, no treated, wild type, dorsal root ganglion=control"
+GSE245768,3,3,6,0,no,,,
+GSE24982,20,20,9,4,no,procedure | extract | extract_description | sample title,arms_merge_levels_of_extract;arms_merge_levels_of_extract_description,extract -> pain_snl_v2:11104.04=case; pain_snl_v2:11104.08=case; pain_snl_v2:11104.09=case; pain_snl_v2:11104.18=case; pain_snl_v2:11104.48=case; pain_snl_v2:11204.04=case || extract_description -> sham_l4_drgc_4wk:12404.01=control; sham_l4_drgc_4wk:12404.14=control; sham_l4_drgc_4wk:12404.17=control; sham_l4_drgc_4wk:12404.22=control; sham_l4_drgc_4wk:12404.23=control; sham_l4_drgi_4wk:12304.01=control
+GSE250152,22,11,4,3,yes,tissue | disease state | sample title,separates_on_tissue,tissue -> nerves of the upper and lower limbs=control; plantar digital nerves=case
+GSE25628,8,14,4,2,yes,disease state | sample title,arms_merge_levels_of_disease_state;repeated_subjects_in_donor,"disease state -> normal (control)=control; normal (eutopic)=control; pathological (ectopic)=case || donor: 22 samples, 2 subjects"
+GSE256472,3,3,3,2,no,time | sample title,separates_on_time,time -> sham=control; spared nerve injury=case
+GSE2636,3,7,1,1,no,sample title,,
+GSE272517,4,4,4,0,no,,,
+GSE276193,8,10,2,1,no,sample title,,
+GSE278827,3,3,2,2,no,tissue | sample title,separates_on_tissue,tissue -> human endometrium of control women=control; human endometrium of endometriosis patients=case
+GSE28242,8,5,4,3,yes,age | disease state | sample title,arms_merge_levels_of_disease_state;separates_on_age,age -> 20=case; 30=case; 36=case; 38=control; 51=control; 55=case || disease state -> normal=control; pbs with lesions=case; pbs without lesions=case
+GSE289097,3,3,5,2,no,treatment | sample title,treatment_values_in_treatment,treatment -> cfa=case; saline=control
+GSE295863,24,8,5,2,no,treatment | sample title,,
+GSE301439,5,5,3,2,no,treatment | sample title,treatment_values_in_treatment,treatment -> 10 mg/kg oxaliplatin=case; control (5% dextrose)=control
+GSE305138,6,6,4,2,no,treatment | sample title,treatment_values_in_treatment,treatment -> cfa=case; saline=control
+GSE306455,3,3,5,2,no,treatment | sample title,,
+GSE30691,35,21,5,2,no,lesion | sample title,arms_merge_levels_of_lesion,lesion -> cci=case; ch=case; chsh=control; naïve=control; sni=case; snish=control
+GSE315857,4,4,2,1,no,sample title,,
+GSE318938,6,6,4,2,no,treatment | sample title,treatment_values_in_sample_title;treatment_values_in_treatment,treatment -> paclitaxel=case; vehicle=control || sample title -> mouse spinal cord wt female paclitaxel rep1=case; mouse spinal cord wt female paclitaxel rep2=case; mouse spinal cord wt female paclitaxel rep3=case; mouse spinal cord wt female vehicle rep1=control; mouse spinal cord wt female vehicle rep2=control; mouse spinal cord wt female vehicle rep3=control
+GSE322631,3,3,5,2,yes,sample group | sample title,,
+GSE325961,24,24,2,1,no,sample title,,
+GSE326825,6,6,4,2,no,treatment | sample title,,
+GSE35287,40,40,8,3,yes,individual identifier | disease | sample title,arms_merge_levels_of_individual_identifier;n_inflated_8x;repeated_subjects_in_individual_identifier,"individual identifier -> 233=case; 236=control; 243=case; 267=case; 270=case; 310=control || treatment duration: 4 distinct values, each appearing a multiple of 8 times, so 80 samples are ~10 subjects || individual identifier: 80 samples, 8 subjects"
+GSE38038,4,4,4,1,no,sample title,,
+GSE47603,4,5,4,2,yes,disease status | sample title,,
+GSE51294,4,4,2,1,no,sample title,,
+GSE51295,4,4,2,1,no,sample title,,
+GSE51981,77,71,4,3,no,endometriosis/no endometriosis | endometriosis severity | sample title,arms_merge_levels_of_endometriosis_severity,endometriosis severity -> minimal/mild=case; moderate/severe=case; no uterine pelvic pathology=control; uterine pelvic pathology=control
+GSE53764,3,3,4,2,no,treatment | sample title,,
+GSE53860,3,3,4,2,no,treatment | sample title,,
+GSE58178,6,6,2,2,no,tissure | sample title,,
+GSE621,6,6,1,1,no,sample title,,
+GSE63379,35,32,4,2,yes,disease status | sample title,,
+GSE63442,6,6,7,2,no,treatment | sample title,,
+GSE6364,21,16,1,1,no,sample title,,
+GSE67311,67,75,10,3,yes,diagnosis | fiqr score | sample title,arms_merge_levels_of_fiqr_score,fiqr score -> -0.2=control; -0.5=control; -1.0=control; -1.2=control; -1.5=control; -2.0=control
+GSE7305,10,10,1,1,no,sample title,,
+GSE73622,22,28,5,2,yes,disease | sample title,,
+GSE7846,5,5,1,1,no,sample title,,
+GSE89224,33,7,7,3,yes,treatment | timepoint (days post sni) | sample title,arms_merge_levels_of_timepoint_days_post_sni_,timepoint (days post sni) -> 0=control; 120=case; 144=case; 16=case; 168=case; 192=case
+GSE91396,18,18,7,2,no,treatment | sample title,,
+GSE92718,12,12,6,2,no,treatment | sample title,,

@@ -1,0 +1,66 @@
+# Analysis configuration for steps 05 (per-study DA) and 06 (meta-analysis).
+
+da:
+  # Differential analysis thresholds
+  padj_threshold: 0.05
+  lfc_threshold: 1.0          # |log2FC| threshold for transcriptomics/proteomics
+  min_count: 10               # DESeq2: minimum read count to keep a gene
+  min_samples_per_group: 2    # Require at least this many samples per condition
+
+  # Group labels expected in GEO phenotype metadata (case-insensitive substring match)
+  # Condition names must match the search query. The 2026-08-28 amendment added
+  # them to the query and not here, so retrieval could find these studies and
+  # group assignment could not. assign_groups() resolves negation before the
+  # case loop, so a control labelled "no endometriosis" is not read as a case.
+  case_labels:
+    - "chronic pain"
+    - "neuropathic"
+    - "pain patient"
+    - "fibromyalgia"
+    - "CRPS"
+    - "endometriosis"
+    - "interstitial cystitis"
+    - "painful bladder"
+    - "irritable bowel"
+    - "osteoarthritis"
+    - "low back pain"
+    - "sciatica"
+    - "temporomandibular"
+    - "trigeminal neuralgia"
+  control_labels:
+    - "healthy"
+    - "control"
+    - "normal"
+    - "unaffected"
+    - "disease free"
+
+  # Covariates to include in model if available in metadata
+  covariates:
+    - "age"
+    - "sex"
+    - "batch"
+
+meta:
+  # Random-effects meta-analysis (metafor)
+  method: "REML"              # REML | DL (DerSimonian-Laird) | ML | HE
+  min_studies: 3              # minimum studies for a feature to enter the
+                              # BH correction family. Features below this
+                              # keep padj = NA. Note k>=3 empties any stratum
+                              # with only two contributing studies (CFA).
+  measure: "GEN"              # Generic effect size (uses yi + sei from per-study output)
+  slab_max_chars: 60          # Truncate study labels in forest plots
+
+  # Heterogeneity thresholds for annotation
+  i2_moderate: 50             # I² > 50% = moderate heterogeneity
+  i2_high: 75                 # I² > 75% = high heterogeneity
+
+  # Publication bias
+  egger_alpha: 0.10           # Egger's test significance threshold
+
+  # Output: top N features to report
+  top_n_features: 50
+
+output:
+  per_study_dir: "results/per_study"
+  meta_dir:      "results/meta"
+  figures_dir:   "manuscript/figures"

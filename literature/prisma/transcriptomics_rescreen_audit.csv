@@ -1,0 +1,76 @@
+accession,status,n_samples,n_fields,n_candidate_fields,field,n_case,n_control,case_label,control_label,field_looks_non_disease,other_candidate_fields
+GSE101176,candidate_contrast_found,12,5,2,disease severity,9,3,minimal endometriosis,no disease,no,sample title
+GSE104176,candidate_contrast_found,30,5,1,sample title,25,5,donor10 embelin,donor10 vehicle,no,
+GSE11691,no_control_like_value,18,1,0,,,,,,,
+GSE11768,no_control_like_value,18,1,0,,,,,,,
+GSE11783,candidate_contrast_found,16,3,1,sample title,10,6,patient:12--location:ni--r:01,patient:10--location:healthy--r:01,no,
+GSE120103,candidate_contrast_found,36,4,2,sample group,18,18,endometrium  from stage iv ovarian endometriosis of fertile women,disease free endometrium of fertile women,no,sample title
+GSE134056,candidate_contrast_found,38,3,2,group,16,22,disease,control,no,sample title
+GSE141549,candidate_contrast_found,408,5,2,disease stage,342,66,4,healthy,no,cycle phase
+GSE146853,candidate_contrast_found,68,7,2,cohort (2),14,8,diarrhea,healthy,no,cohort
+GSE148059,no_control_like_value,77,4,0,,,,,,,
+GSE148061,no_control_like_value,130,4,0,,,,,,,
+GSE157153,no_control_like_value,66,2,0,,,,,,,
+GSE168902,candidate_contrast_found,6,3,1,tissue,3,3,ectopic endometrium,normal endometrium,yes,
+GSE17504,candidate_contrast_found,20,5,2,disease status,10,10,endometriosis,no endometriosis,no,treatment group
+GSE182983,candidate_contrast_found,29,4,1,sample title,19,10,mon-392-endo,mon-373-control,no,
+GSE184431,candidate_contrast_found,6,3,2,sample title,3,3,iheecs/luc 2mm n-butyrate rep 1,iheecs/luc vehicle rep 1,no,treatment
+GSE196748,no_control_like_value,12,2,0,,,,,,,
+GSE202571,no_control_like_value,18,4,0,,,,,,,
+GSE203191,no_control_like_value,11,2,0,,,,,,,
+GSE213216,candidate_contrast_found,51,6,1,tissue,47,4,endometriosis,no endometriosis detected,yes,
+GSE222182,no_control_like_value,9,2,0,,,,,,,
+GSE226575,no_control_like_value,9,2,0,,,,,,,
+GSE226870,no_control_like_value,57,5,0,,,,,,,
+GSE230956,no_control_like_value,16,5,0,,,,,,,
+GSE238208,no_control_like_value,63,6,0,,,,,,,
+GSE241751,candidate_contrast_found,12,5,2,sample title,6,6,"ihescs, wt, ifnα treatment, replicate 1","ihescs, wt, vehicle, replicate 1",no,treatment
+GSE24290,no_control_like_value,35,2,0,,,,,,,
+GSE243157,candidate_contrast_found,12,4,1,treatment,6,6,"scrambled sirna, epc","scrambled sirna, vehicle",yes,
+GSE244499,no_control_like_value,19,2,0,,,,,,,
+GSE262645,no_control_like_value,6,3,0,,,,,,,
+GSE266026,no_control_like_value,7,4,0,,,,,,,
+GSE266265,candidate_contrast_found,60,5,1,endometriosis status,35,25,endometriosis,no endometriosis,no,
+GSE266435,no_control_like_value,8,4,0,,,,,,,
+GSE267283,candidate_contrast_found,6,4,1,transfection,3,3,mir-1229-5p mimics,control mimics-nc,no,
+GSE268541,no_control_like_value,6,4,0,,,,,,,
+GSE269047,candidate_contrast_found,43,2,2,diagnosis,34,9,co-diagnosis,healthy control,no,sample title
+GSE269530,no_control_like_value,20,4,0,,,,,,,
+GSE274134,no_control_like_value,12,2,0,,,,,,,
+GSE281916,candidate_contrast_found,6,4,2,sample title,3,3,"12z p40, linc01638 sirna (linc01638_2) 72 hours, replicate c","12z p40, control sirna (ambion #4390846) 72 hours, replicate a",no,treatment
+GSE28242,candidate_contrast_found,13,4,2,disease state,8,5,pbs without lesions,normal,no,sample title
+GSE282532,no_control_like_value,10,2,0,,,,,,,
+GSE283623,no_control_like_value,19,2,0,,,,,,,
+GSE283755,no_control_like_value,8,2,0,,,,,,,
+GSE284362,candidate_contrast_found,20,4,1,treatment,15,5,e2,control,yes,
+GSE285917,no_control_like_value,122,3,0,,,,,,,
+GSE289057,candidate_contrast_found,9,5,2,sample title,6,3,"endometriotic stromal cells, il1beta, rep 1","endometriotic stromal cells, vehicle, rep 1",no,treatment
+GSE289058,candidate_contrast_found,10,5,1,treatment,8,2,10ng/ml il1beta,vehicle,yes,
+GSE294255,no_control_like_value,8,3,0,,,,,,,
+GSE294342,no_control_like_value,20,4,0,,,,,,,
+GSE294577,candidate_contrast_found,28,4,2,sample title,21,7,"endothelial cells co-cultured with scrambled sirna transfected ivd cells, sample 1; technical replicate 1","naive endothelial cells (not co-cultured), sample 1; technical replicate 1",no,treatment
+GSE295758,no_control_like_value,120,8,0,,,,,,,
+GSE303635,no_control_like_value,20,3,0,,,,,,,
+GSE310557,candidate_contrast_found,17,2,1,sample title,10,7,"human hic bladder, biol rep 1","human control bladder, biol rep 1",no,
+GSE310627,no_control_like_value,6,2,0,,,,,,,
+GSE312510,no_control_like_value,8,2,0,,,,,,,
+GSE315857,candidate_contrast_found,8,2,1,sample title,4,4,eosis prolif1,control prolif1,no,
+GSE316028,no_control_like_value,6,4,0,,,,,,,
+GSE31683,no_control_like_value,10,3,0,,,,,,,
+GSE328464,candidate_contrast_found,6,3,1,sample title,3,3,"thp1 cells, siccr1, rep1","thp1 cells, normal, rep1",no,
+GSE334369,no_control_like_value,206,4,0,,,,,,,
+GSE339400,no_control_like_value,17,5,0,,,,,,,
+GSE343024,no_control_like_value,46,6,0,,,,,,,
+GSE35287,candidate_contrast_found,80,8,2,disease,40,40,endometriosis,no endometriosis,no,in vitro treatment
+GSE37837,no_control_like_value,36,8,0,,,,,,,
+GSE44207,no_control_like_value,16,2,0,,,,,,,
+GSE51981,candidate_contrast_found,148,4,1,endometriosis/no endometriosis,77,71,endometriosis,non-endometriosis,no,
+GSE58178,candidate_contrast_found,12,2,2,tissure,6,6,endometriotic tissue,normal endometrial tissue,no,sample title
+GSE621,candidate_contrast_found,28,1,1,sample title,22,6,bladder cell with apf,normal control 1,no,
+GSE66824,candidate_contrast_found,66,8,3,sample title,52,14,"patient a01, ibs, after 9 weeks of intervention","patient a01, ibs, baseline before intervention",no,time point; time point (2)
+GSE7305,candidate_contrast_found,20,1,1,sample title,10,10,endometrium/ovary-disease 1,endometrium-normal 1,no,
+GSE73622,candidate_contrast_found,50,5,1,disease,22,28,endometriosis,no endometriosis,no,
+GSE86534,no_control_like_value,12,3,0,,,,,,,
+GSE86572,candidate_contrast_found,6,4,1,arid1a status,4,2,knockdown,control,no,
+GSE94414,no_control_like_value,15,3,0,,,,,,,
+GSE99949,no_control_like_value,8,2,0,,,,,,,

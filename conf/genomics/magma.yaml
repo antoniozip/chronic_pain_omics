@@ -1,0 +1,18 @@
+# Genomics MAGMA gene-based analysis configuration
+# (plan/2026-07-14-genomics-magma.md). Runs the real MAGMA binary on the 4 pooled
+# METAL meta-analyses; single-cohort groups are out of scope.
+
+paths:
+  metal_dir: "results/meta/genomics/metal"      # input {group}_1.tbl files
+  out_dir: "results/meta/genomics/magma"
+
+magma_bin: "tools/magma/magma"
+bfile: "tools/magma/g1000_eur"                   # plink prefix (.bed/.bim/.fam)
+gene_loc: "tools/magma/NCBI37.3.gene.loc"        # GRCh37, matches the reference
+
+# Pooled groups only (>=2 independent cohorts in the METAL stage).
+groups:
+  - back_pain
+  - fibromyalgia
+  - neuropathic_pain
+  - chronic_pain_broad

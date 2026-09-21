@@ -1,0 +1,14 @@
+# Keep the build context small: results/ is 12.6 GB and tools/ is 4 GB, and
+# both are mounted at run time rather than baked into the image.
+results/
+tools/
+data/raw/
+data/interim/
+.venv/
+renv/library/
+renv/staging/
+.git/
+temp/
+manuscript/*.pdf
+manuscript/*.docx
+*.tar.gz

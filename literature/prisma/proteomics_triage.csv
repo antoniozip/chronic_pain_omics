@@ -1,0 +1,44 @@
+accession,verdict,reason_code,species,has_human,has_animal,n_files,title
+PXD054342,processed_table,candidate_table:proteinGroups.txt,Mus musculus,False,True,18,Proteomic Analysis of Spinal Dorsal Horn in Prior-Exercise Protection against Neuropathic Pain
+PXD046464,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,100,Plasma proteomic analysis on neuropathic pain in idiopathic peripheral neuropathy patients
+PXD017473,raw_only,no_recognised_quantification_table,Rattus norvegicus,False,True,100,Quantative proteomic analysis of teh central amygdala in neuropathic pain model rats
+PXD067890,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,25,TMT-based quantitative proteomic analysis of serum from patients with postherpetic neuralgia reveals a key role of Endog
+PXD073925,raw_only,no_recognised_quantification_table,Mus musculus,False,True,35,Recombinant dimeric PICK1 protein inhibitors for long-term relief of chronic pain by AAV therapeutics
+PXD074049,raw_only,no_recognised_quantification_table,Mus musculus,False,True,35,Recombinant dimeric PICK1 protein inhibitors for long-term relief of chronic pain by AAV therapeutics
+PXD034960,raw_only,no_recognised_quantification_table,Rattus norvegicus,False,True,20,Quantitative proteomic analysis of cellular nuclear protein TMT markers from  rat spinal cord tissue samples in neuropat
+PXD022478,raw_only,no_recognised_quantification_table,Rattus norvegicus,False,True,72,Chronic pain susceptibility is associated with anhedonic behavior and alterations in the accumbal ubiquitin-proteasome s
+PXD072701,raw_only,no_recognised_quantification_table,Mus musculus,False,True,100,Temporal Multi-Omic Exploration of the Ventral Tegmental Area in Chronic Pain and Passive Coping Behaviors
+PXD039251,raw_only,no_recognised_quantification_table,Mus musculus,False,True,16,Targeting Supramolecular Active Complexes of Nav 1.7/Nav 1.8 to Relieve Chronic Neuropathic Pain
+PXD022886,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,82,Serum proteomics of sng- and pain-trend fibromyalgia patients
+PXD038416,raw_only,no_recognised_quantification_table,Mus musculus,False,True,11,Ventral hippocampal CA1 modulates pain behaviors in mice with peripheral inflammation
+PXD030391,raw_only,no_recognised_quantification_table,Mus musculus,False,True,18,Adipose tissue is a pro-active player in sex dependent response to neuropathy
+PXD055816,processed_table,candidate_table:GeneGroup_Quant_224Samples.csv,Mus musculus,False,True,4,Deep proteome profiling of dorsal root ganglia after nerve injury deciphers shared signatures in adolescent and adult ma
+PXD040947,ineligible,organism_not_eligible:Microbiota,Microbiota,False,False,20,Expanding the Characterization of Microbial Ecosystems using DIA-PASEF Metaproteomics
+PXD070478,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,7,Mapping the protein-protein interaction interface between recombinant CB1R and GlyT2 using cross-linking mass spectromet
+PXD055980,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,43,Novel phosphorylation substrates reveal a spatially regulated role for AAK1 in cell migration - AAK1 interactome profili
+PXD055851,processed_table,candidate_table:proteinGroups.txt,Homo sapiens,True,False,40,Novel phosphorylation substrates reveal a spatially regulated role for AAK1 in cell migration -  SILAC proteome profilin
+PXD055831,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,74,Novel phosphorylation substrates reveal a spatially regulated role for AAK1 in cell migration -  LFQ proteome profiling 
+PXD013362,processed_table,candidate_table:peptide_quantitation.xlsx,Mus musculus,False,True,53,PACAP and other neuropeptide targets link chronic migraine and opioid-induced hyperalgesia in mouse models
+PXD056027,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,16,Novel phosphorylation substrates reveal a spatially regulated role for AAK1 in cell migration - AAK1 C-terminal interact
+PXD056013,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,22,Novel phosphorylation substrates reveal a spatially regulated role for AAK1 in cell migration - AAK1 C-terminal interact
+PXD055873,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,18,Novel phosphorylation substrates reveal a spatially regulated role for AAK1 in cell migration - AAK1 differential intera
+PXD055516,raw_only,no_recognised_quantification_table,Homo sapiens;Mus musculus,True,True,17,Proteomic analysis of isolated nerve terminals from NaV1.9 knockout mice reveals pathways relevant for pain signaling
+PXD006046,raw_only,no_recognised_quantification_table,Mus musculus,False,True,5,KCC2 Proteome -  Native KCC2 interactome reveals PACSIN1 as a critical regulator of synaptic inhibition
+PXD034447,raw_only,no_recognised_quantification_table,Mus musculus,False,True,11,Proteomics on Nav1.8-positive nociceptors of mouse DRG
+PXD025005,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,100,Quantitative Urinary Proteomics of UCPPS
+PXD069113,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,10,Label-free quantitative proteomics of human healthy gracilis and diseased rotator cuff tear tendons
+PXD022354,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,52,Epithelial cell line derived from endometriotic lesions mimics macrophage nervous mechanism of pain generation on proteo
+PXD056826,raw_only,no_recognised_quantification_table,Mus musculus,False,True,51,Transgenic sickle cell mouse plasma and brain
+PXD033592,raw_only,instrument_or_peak_files_only,Homo sapiens,True,False,25,Blood proteomics and multimodal risk profiling of human volunteers after incision injury: a translational study for adva
+PXD066745,raw_only,no_recognised_quantification_table,Rattus norvegicus,False,True,4,Phosphoproteomics Uncovers a Neuroimmune Perspective on Trigeminal Neuralgia: Sexually Dimorphic Regulatory Networks Lin
+PXD018774,processed_table,candidate_table:proteinGroups_pLac.txt,Homo sapiens,True,False,24,Modulation of immune cell reactivity with cis-binding Siglec-9 agonists
+PXD070094,processed_table,candidate_table:proteinGroups.txt,Homo sapiens,True,False,35,Time-resolved multi-omic analysis of paclitaxel exposure in human iPSC-derived sensory neurons unveils mechanisms of che
+PXD067743,raw_only,no_recognised_quantification_table,Mus musculus,False,True,13,Extracellular vesicle‑mediated restraint of hepatic CD74–NF‑κB repairs diabetic neuropathy
+PXD019836,raw_only,no_recognised_quantification_table,Mus musculus,False,True,13,Proteomics of WT or G2A deficient macrophages with 9-HODE
+PXD023111,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,17,Long term intrathecal administration of morphine vs baclofen: differences in CSF identified using multi-glycomics
+PXD062182,raw_only,no_recognised_quantification_table,Mus musculus,False,True,8,Sensory nerve-secreted factors regulate basal keratinocyte function in vitro
+PXD004087,raw_only,no_recognised_quantification_table,Mus musculus,False,True,74,Protein expression in the prefrontal cortex of aged mice with progranulin deficiency or neuronal progranulin overexpress
+PXD069894,raw_only,no_recognised_quantification_table,Homo sapiens;Rattus norvegicus,True,True,34,Suppression of pain transmission and behavior by inhibition of peripheral diacylglycerol metabolism
+PXD033902,raw_only,no_recognised_quantification_table,Mus musculus,False,True,26,Identification of potential visceral pain biomarkers in colon exudates from mice with experimental colitis: an explorato
+PXD030828,raw_only,no_recognised_quantification_table,Homo sapiens;Mus musculus,True,True,60,DIA LC-MS analysis of post-incisional human and mouse skin biopsies
+PXD042101,raw_only,no_recognised_quantification_table,Homo sapiens,True,False,62,Menstrual fluid-derived extracellular vesicles as a non-invasive diagnostic tool for endometriosis

@@ -1,0 +1,7 @@
+accession,species,verdict,reason_code,design_evidence
+PXD054342,Mus musculus,include,pain_vs_control_groups_labelled,"Intensity cci-01..05 vs ex-01.. ; CCI model with comparison groups in column names (30 sample columns)"
+PXD055816,Mus musculus,include,pain_vs_control_groups_labelled,"224 samples; columns encode condition_sex_age_timepoint_animal: SNI / Sham / NV, F and M, 4w and 12w, D7 and D14, 6 replicates per cell"
+PXD013362,Mus musculus,include,pain_vs_control_groups_labelled,"peptide_quantitation.xlsx; 7 brain regions x migraine/OIH; already the analysed arm"
+PXD055851,Homo sapiens,exclude,no_pain_contrast,"SILAC Intensity L/H with labels A_ID, A_IM etc; phosphorylation-substrate mechanism study, no pain-versus-control design"
+PXD018774,Homo sapiens,exclude,no_pain_contrast,"TMT reporter channels labelled WTcontrolLac; Siglec-9 immune-reactivity study, no pain phenotype"
+PXD070094,Homo sapiens,exclude,no_pain_contrast,"TMT channels labelled Project_Method_comparison; paclitaxel exposure method comparison, no pain-versus-control arm"

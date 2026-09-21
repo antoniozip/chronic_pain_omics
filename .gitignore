@@ -1,0 +1,95 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# R
+renv/library/
+renv/local/
+renv/cellar/
+renv/staging/
+.Rhistory
+.RData
+.Rproj.user/
+
+# Data (large / raw) — track structure but not content
+data/raw/*
+data/interim/*
+data/processed/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+
+# Outputs — track structure but not content
+# (regenerable from pipeline/06*, 09-13; keep figures under manuscript/ instead)
+results/per_study/*
+results/meta/*
+results/cross_species/*
+results/pathway_enrichment/*
+results/proteomics/*
+!results/per_study/.gitkeep
+!results/meta/.gitkeep
+!results/cross_species/.gitkeep
+temp/
+outputs/
+
+# Tooling scratch
+graphify-out/
+.claude/logs/
+
+# Secrets / env
+.env
+.env.*
+/settings.json
+.claude/settings.json
+.claude/settings.local.json
+
+# OS
+.DS_Store
+
+# External binaries (METAL, etc.) — not version-controlled
+tools/
+
+# subagent-driven-development scratch ledgers
+.superpowers/
+manuscript/*.aux
+manuscript/*.log
+manuscript/*.out
+manuscript/*.bbl
+manuscript/*.blg
+manuscript/*.toc
+
+# LibreOffice/OpenOffice lock files, left behind while a document is open
+.~lock.*#
+
+# Egger publication-bias summary is tracked by exception: ~1 MB, a summary
+# rather than raw data, costs a full 06 re-run to reproduce, and is not
+# derivable from any other tracked file. A plain negation cannot re-include it
+# because results/meta/* excludes the parent directory, so the directory is
+# un-ignored, its contents re-ignored, and the one file allowed through.
+!results/meta/transcriptomics
+results/meta/transcriptomics/*
+!results/meta/transcriptomics/egger_test.csv
+
+# CI fixture archive built by scripts/build_claims_archive.py. ~80 MB, and it
+# is distributed as a release asset (see CLAUDE.md), never through the repo.
+results-claims.tar.gz
+
+# Local scratch buffer from an editor plugin; never part of the analysis.
+.freebuff/
+
+# Raster exports of the figures. Elsevier asks for TIFF at submission, so these
+# get produced per figure and are large: the graphical abstract alone is 84 MB,
+# against 85 kB for the vector source it was exported from. They are derived
+# from the tracked PDF or from manuscript/figures/graphical_abstract_edited.svg
+# and can be re-exported at whatever size a journal asks for, so the repository
+# carries the vector and not the raster. Use git add -f if one ever has to ship
+# through git rather than through the submission system.
+*.tif
+*.tiff

@@ -1,0 +1,19 @@
+accession,status,n_samples_fields,control_like,case_like,contrast,prior_verdict,prior_reason,species
+GSE134003,audited,76.0,0.0,9.0,insufficient,pending,usable_pending_file_check,Mus musculus
+GSE155622,audited,1570.0,48.0,580.0,usable,pending,usable_pending_file_check,Mus musculus
+GSE162807,audited,124.0,19.0,12.0,usable,pending,usable_pending_file_check,Homo sapiens; Mus musculus
+GSE179640,audited,354.0,18.0,102.0,usable,exclude,single_cell_not_bulk_expression,Homo sapiens
+GSE198608,audited,120.0,11.0,17.0,usable,pending,usable_pending_file_check,Rattus norvegicus
+GSE203191,audited,22.0,0.0,0.0,insufficient,exclude,no_case_control_split_in_series_matrix,Homo sapiens
+GSE213216,audited,306.0,0.0,90.0,insufficient,exclude,no_case_control_split_in_series_matrix,Homo sapiens
+GSE214411,audited,52.0,4.0,6.0,usable,exclude,single_cell_not_bulk_expression,Homo sapiens
+GSE222182,audited,18.0,0.0,6.0,insufficient,exclude,no_case_control_split_in_series_matrix,Homo sapiens
+GSE253345,audited,36.0,14.0,4.0,usable,pending,usable_pending_file_check,Mus musculus
+GSE254360,audited,90.0,18.0,12.0,usable,pending,usable_pending_file_check,Mus musculus
+GSE266026,audited,28.0,0.0,28.0,insufficient,exclude,no_case_control_split_in_series_matrix,Homo sapiens
+GSE266265,audited,300.0,0.0,120.0,insufficient,exclude,no_case_control_split_in_series_matrix,Homo sapiens
+GSE276193,no_series_matrix,,,,,exclude,no_pain_versus_control_contrast,Homo sapiens
+GSE283177,audited,24.0,6.0,12.0,usable,pending,usable_pending_file_check,Mus musculus
+GSE289659,audited,64.0,24.0,8.0,usable,pending,raw_tar_filenames_match_neither_groups_nor_vocabulary,Rattus norvegicus
+GSE312510,audited,16.0,0.0,4.0,insufficient,exclude,no_case_control_split_in_series_matrix,Homo sapiens
+GSE328175,audited,48.0,6.0,10.0,usable,pending,usable_pending_file_check,Mus musculus

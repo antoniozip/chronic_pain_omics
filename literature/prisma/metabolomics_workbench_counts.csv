@@ -1,0 +1,3 @@
+excluded_no_pain_phenotype,excluded_wrong_modality_arm,modality,n_candidates,n_enumerated,source
+4484,1,metabolomics,22,4507,METABOLOMICS_WORKBENCH
+4484,22,lipidomics,1,4507,METABOLOMICS_WORKBENCH

@@ -1,0 +1,18 @@
+# Genomics METAL meta-analysis configuration (plan/2026-07-13-genomics-metal-meta.md).
+# Consumes the Stage-1 harmonized per-study tables + manifest and pools each
+# poolable broad clinical pain group with the real METAL binary.
+
+paths:
+  sumstats_manifest: "results/meta/genomics/sumstats_manifest.csv"
+  interim_dir: "data/interim/genomics/sumstats"
+  out_dir: "results/meta/genomics/metal"
+
+metal_bin: "tools/generic-metal/metal"
+
+# A group is meta-analyzed only with at least this many independent cohorts after
+# §7.7 collapse; single-cohort groups are reported without pooling.
+min_cohorts: 2
+
+# pooled_summary.csv keeps only genome-wide-significant markers (the full
+# per-marker results stay in the per-group .tbl files). Standard GWAS threshold.
+gws_threshold: 5.0e-8

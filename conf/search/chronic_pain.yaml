@@ -1,0 +1,36 @@
+# Literature search configuration for the chronic pain meta-study.
+# Used by pipeline/01_search_literature.py
+
+databases:
+  - pubmed
+  - europe_pmc
+
+query:
+  terms:
+    - "chronic pain"
+    - "neuropathic pain OR inflammatory pain OR nociplastic pain"
+  omics:
+    genomics: "genome-wide association OR GWAS OR SNP"
+    transcriptomics: "transcriptomics OR RNA-seq OR gene expression"
+    proteomics: "proteomics OR mass spectrometry"
+    metabolomics: "metabolomics OR metabolite profiling"
+    lipidomics: "lipidomics OR lipid profiling"
+  species:
+    human: "Homo sapiens OR human OR patient OR cohort"
+    animal: "mouse OR rat OR rodent OR animal model"
+
+filters:
+  date_range:
+    start: "2000-01-01"
+    end: null              # open-ended; set a date for reproducibility
+  article_types:
+    - "Journal Article"
+    - "Clinical Trial"
+    - "Observational Study"
+  languages:
+    - "eng"
+
+output:
+  raw_hits_dir: "data/raw/literature"
+  prisma_log: "literature/prisma/search_log.csv"
+  max_results_per_query: 5000

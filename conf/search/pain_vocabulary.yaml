@@ -1,0 +1,179 @@
+# Single source of truth for the pain vocabulary (157 terms).
+# Loaded by src/cp_multiomics/vocabulary.py. As of Stage 0 it drives SCREENING
+# (pipeline/02_screen.py) and the proteomics scorer (scripts/analyze_proteomics.py).
+# Retrieval (pipeline/03_ingest_omics.py, pipeline/01_search_literature.py) still uses
+# the original 4-term query; wiring retrieval to this vocabulary is a Stage 1 task
+# (see plan/cohort_expansion_plan.md).
+# Previously this list lived in scripts/analyze_proteomics.py and was applied
+# only AFTER retrieval, so the recall damage was already done.
+
+# The four terms the original ingestion query used. Everything else was missing.
+core:
+  - chronic pain
+  - neuropathic pain
+  - inflammatory pain
+  - nociplastic pain
+
+# Clinical pain syndromes and diagnoses.
+conditions:
+  - nociceptive pain
+  - visceral pain
+  - cancer pain
+  - persistent pain
+  - intractable pain
+  - pain patient
+  - pain disorder
+  - pain condition
+  - pain syndrome
+  - chronic widespread pain
+  - diabetic neuropathy
+  - peripheral neuropathy
+  - trigeminal neuralgia
+  - postherpetic neuralgia
+  - sciatic
+  - sciatica
+  - spinal cord injury
+  - arthritis
+  - osteoarthritis
+  - rheumatoid arthritis
+  - colitis
+  - cystitis
+  - pancreatitis
+  - migraine
+  - headache
+  - cluster headache
+  - tension headache
+  - migraine with aura
+  - chronic migraine
+  - cephalic
+  - fibromyalgia
+  - myofascial pain
+  - temporomandibular
+  - TMJ
+  - chronic fatigue
+  - complex regional pain
+  - CRPS
+  - back pain
+  - neck pain
+  - pelvic pain
+  - musculoskeletal pain
+  - neurogenic pain
+  - phantom limb
+  - stump pain
+  - endometriosis
+  - interstitial cystitis
+  - bladder pain
+
+# Pain models, behavioural assays, mediators and pathways.
+mechanisms:
+  - nerve injury
+  - nerve damage
+  - peripheral nerve injury
+  - peripheral nerve damage
+  - nerve crush
+  - nerve ligation
+  - nerve transection
+  - axotomy
+  - neuroma
+  - neuropathic
+  - dorsal root ganglion
+  - DRG
+  - nociceptor
+  - nociceptive
+  - pain pathway
+  - pain signaling
+  - pain transmission
+  - CGRP
+  - substance P
+  - TRPV1
+  - TRPA1
+  - Nav1.7
+  - Nav1.8
+  - opioid
+  - morphine
+  - fentanyl
+  - hyperalgesia
+  - allodynia
+  - analgesic
+  - analgesia
+  - antinociceptive
+  - nociception
+  - endorphin
+  - enkephalin
+  - dynorphin
+  - PACAP
+  - VIP
+  - calcitonin gene-related peptide
+  - neurokinin
+  - bradykinin
+  - prostaglandin
+  - formalin test
+  - hot plate
+  - tail flick
+  - von Frey
+  - mechanical allodynia
+  - thermal hyperalgesia
+  - cold allodynia
+  - CFA
+  - complete Freund
+  - carrageenan
+  - SNI
+  - SNL
+  - CCI
+  - chronic constriction
+  - spared nerve
+  - spinal nerve ligation
+  - partial sciatic
+  - pSNL
+  - pSNI
+  - pain model
+  - pain-like
+  - pain behavior
+  - pain-related
+  - rat pain
+  - mouse pain
+  - stress-induced analgesia
+  - stress-induced hyperalgesia
+
+# Anatomy and generic biology. NOT pain-defining: a paper mentioning
+# 'brain' or 'inflammation' is not thereby a pain study. Retained for
+# provenance and dataset scoring, but EXCLUDED from all_terms and matches().
+context:
+  - inflammation
+  - inflammatory
+  - dorsal root
+  - dorsal horn
+  - spinal cord
+  - spinal dorsal horn
+  - trigeminal
+  - sensory neuron
+  - sensory ganglia
+  - sodium channel
+  - ion channel
+  - voltage-gated
+  - cytokine
+  - chemokine
+  - BDNF
+  - nervous system
+  - central nervous system
+  - peripheral nervous system
+  - brain
+  - cerebellum
+  - cortex
+  - hippocampus
+  - amygdala
+  - hypothalamus
+  - thalamus
+  - brainstem
+  - medulla
+  - pons
+  - midbrain
+  - periaqueductal
+  - PAG
+  - RVM
+  - rostral ventromedial
+  - cerebrospinal
+  - CSF
+  - cerebrospinal fluid
+  - stress-induced
+  - stress induced

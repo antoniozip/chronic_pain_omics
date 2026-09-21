@@ -1,0 +1,34 @@
+# Broad clinical pain groups for genomic METAL pooling (cohort_expansion_plan §7.7).
+# Each fetched GWAS phenotype string is assigned to the FIRST group whose patterns
+# match (order matters: specific before general). Non-pain phenotypes are checked
+# first and excluded. Patterns are lowercase substrings tested against the
+# lowercased phenotype. Validated against the 57 Stage-1 harmonized studies.
+
+# Checked before any group: acute adverse-event / non-pain phenotypes that must
+# never enter a pain pool (e.g. a covid-booster headache is an adverse event, not
+# chronic headache, so it must beat the `headache` group rule).
+nonpain:
+  - "menstruation quality of life impact"
+  - "response to bnt162b2 vaccine"
+  - "covid-19 booster vaccination"
+
+# Ordered: widespread -> fibromyalgia -> neuropathic -> knee -> hip -> headache
+# -> back -> chronic_pain_broad. Knee/hip/neuropathic precede back so
+# "chronic knee pain" and "central neuropathic pain" do not fall through to back.
+groups:
+  - group: chronic_widespread_pain
+    patterns: ["chronic widespread"]
+  - group: fibromyalgia
+    patterns: ["fibromyalgia", "m79"]
+  - group: neuropathic_pain
+    patterns: ["neuropath", "postlaminectomy", "post-surgical neuropathic"]
+  - group: knee_pain
+    patterns: ["knee"]
+  - group: hip_pain
+    patterns: ["hip"]
+  - group: headache
+    patterns: ["headache", "r51"]
+  - group: back_pain
+    patterns: ["back", "m54", "lumbago", "dorsalgia", "sciatica"]
+  - group: chronic_pain_broad
+    patterns: ["chronic pain", "r52", "chronic intractable"]

@@ -1,0 +1,515 @@
+accession,sample_id,title,group,subject,reason
+GSE134003,GSM3932591,SI01,control,GSM3932591,control_on_title
+GSE134003,GSM3932592,SI02,control,GSM3932592,control_on_title
+GSE134003,GSM3932593,SI03,control,GSM3932593,control_on_title
+GSE134003,GSM3932594,SI04,control,GSM3932594,control_on_title
+GSE134003,GSM3932595,SI05,control,GSM3932595,control_on_title
+GSE134003,GSM3932596,SI06,control,GSM3932596,control_on_title
+GSE134003,GSM3932597,SI07,control,GSM3932597,control_on_title
+GSE134003,GSM3932598,SI08,control,GSM3932598,control_on_title
+GSE134003,GSM3932599,SI09,control,GSM3932599,control_on_title
+GSE134003,GSM3932600,SI10,control,GSM3932600,control_on_title
+GSE134003,GSM3932601,SNI01,case,GSM3932601,case_on_title
+GSE134003,GSM3932602,SNI02,case,GSM3932602,case_on_title
+GSE134003,GSM3932603,SNI03,case,GSM3932603,case_on_title
+GSE134003,GSM3932604,SNI05,case,GSM3932604,case_on_title
+GSE134003,GSM3932605,SNI06,case,GSM3932605,case_on_title
+GSE134003,GSM3932606,SNI07,case,GSM3932606,case_on_title
+GSE134003,GSM3932607,SNI08,case,GSM3932607,case_on_title
+GSE134003,GSM3932608,SNI09,case,GSM3932608,case_on_title
+GSE134003,GSM3932609,SNI10,case,GSM3932609,case_on_title
+GSE155622,GSM4708679,Single Dorsal root ganglion neuron_SNI 14d [N101],,GSM4708679,excluded_not_eligible_on_technology
+GSE155622,GSM4708680,Single Dorsal root ganglion neuron_SNI 14d [N102],,GSM4708680,excluded_not_eligible_on_technology
+GSE155622,GSM4708681,Single Dorsal root ganglion neuron_SNI 14d [N103],,GSM4708681,excluded_not_eligible_on_technology
+GSE155622,GSM4708682,Single Dorsal root ganglion neuron_SNI 14d [N104],,GSM4708682,excluded_not_eligible_on_technology
+GSE155622,GSM4708683,Single Dorsal root ganglion neuron_SNI 14d [N105],,GSM4708683,excluded_not_eligible_on_technology
+GSE155622,GSM4708684,Single Dorsal root ganglion neuron_SNI 14d [N108],,GSM4708684,excluded_not_eligible_on_technology
+GSE155622,GSM4708685,Single Dorsal root ganglion neuron_SNI 14d [N109],,GSM4708685,excluded_not_eligible_on_technology
+GSE155622,GSM4708686,Single Dorsal root ganglion neuron_SNI 14d [N111],,GSM4708686,excluded_not_eligible_on_technology
+GSE155622,GSM4708687,Single Dorsal root ganglion neuron_SNI 14d [N112],,GSM4708687,excluded_not_eligible_on_technology
+GSE155622,GSM4708688,Single Dorsal root ganglion neuron_SNI 14d [N113],,GSM4708688,excluded_not_eligible_on_technology
+GSE155622,GSM4708689,Single Dorsal root ganglion neuron_SNI 14d [N114],,GSM4708689,excluded_not_eligible_on_technology
+GSE155622,GSM4708690,Single Dorsal root ganglion neuron_SNI 14d [N115],,GSM4708690,excluded_not_eligible_on_technology
+GSE155622,GSM4708691,Single Dorsal root ganglion neuron_SNI 14d [N117],,GSM4708691,excluded_not_eligible_on_technology
+GSE155622,GSM4708692,Single Dorsal root ganglion neuron_SNI 14d [N119],,GSM4708692,excluded_not_eligible_on_technology
+GSE155622,GSM4708693,Single Dorsal root ganglion neuron_SNI 14d [N121],,GSM4708693,excluded_not_eligible_on_technology
+GSE155622,GSM4708694,Single Dorsal root ganglion neuron_SNI 14d [N122],,GSM4708694,excluded_not_eligible_on_technology
+GSE155622,GSM4708695,Single Dorsal root ganglion neuron_SNI 14d [N123],,GSM4708695,excluded_not_eligible_on_technology
+GSE155622,GSM4708696,Single Dorsal root ganglion neuron_SNI 14d [N125],,GSM4708696,excluded_not_eligible_on_technology
+GSE155622,GSM4708697,Single Dorsal root ganglion neuron_SNI 14d [N126],,GSM4708697,excluded_not_eligible_on_technology
+GSE155622,GSM4708698,Single Dorsal root ganglion neuron_SNI 14d [N127],,GSM4708698,excluded_not_eligible_on_technology
+GSE155622,GSM4708699,Single Dorsal root ganglion neuron_SNI 14d [N134],,GSM4708699,excluded_not_eligible_on_technology
+GSE155622,GSM4708700,Single Dorsal root ganglion neuron_SNI 14d [N136],,GSM4708700,excluded_not_eligible_on_technology
+GSE155622,GSM4708701,Single Dorsal root ganglion neuron_SNI 14d [N142],,GSM4708701,excluded_not_eligible_on_technology
+GSE155622,GSM4708702,Single Dorsal root ganglion neuron_SNI 14d [N143],,GSM4708702,excluded_not_eligible_on_technology
+GSE155622,GSM4708703,Single Dorsal root ganglion neuron_SNI 14d [N144],,GSM4708703,excluded_not_eligible_on_technology
+GSE155622,GSM4708704,Single Dorsal root ganglion neuron_SNI 14d [N145],,GSM4708704,excluded_not_eligible_on_technology
+GSE155622,GSM4708705,Single Dorsal root ganglion neuron_SNI 14d [N146],,GSM4708705,excluded_not_eligible_on_technology
+GSE155622,GSM4708706,Single Dorsal root ganglion neuron_SNI 14d [N148],,GSM4708706,excluded_not_eligible_on_technology
+GSE155622,GSM4708707,Single Dorsal root ganglion neuron_SNI 14d [N149],,GSM4708707,excluded_not_eligible_on_technology
+GSE155622,GSM4708708,Single Dorsal root ganglion neuron_SNI 14d [N151],,GSM4708708,excluded_not_eligible_on_technology
+GSE155622,GSM4708709,Single Dorsal root ganglion neuron_SNI 14d [N152],,GSM4708709,excluded_not_eligible_on_technology
+GSE155622,GSM4708710,Single Dorsal root ganglion neuron_SNI 14d [N154],,GSM4708710,excluded_not_eligible_on_technology
+GSE155622,GSM4708711,Single Dorsal root ganglion neuron_SNI 14d [N157],,GSM4708711,excluded_not_eligible_on_technology
+GSE155622,GSM4708712,Single Dorsal root ganglion neuron_SNI 14d [N158],,GSM4708712,excluded_not_eligible_on_technology
+GSE155622,GSM4708713,Single Dorsal root ganglion neuron_SNI 14d [N159],,GSM4708713,excluded_not_eligible_on_technology
+GSE155622,GSM4708714,Single Dorsal root ganglion neuron_SNI 14d [N163],,GSM4708714,excluded_not_eligible_on_technology
+GSE155622,GSM4708715,Single Dorsal root ganglion neuron_SNI 14d [N165],,GSM4708715,excluded_not_eligible_on_technology
+GSE155622,GSM4708716,Single Dorsal root ganglion neuron_SNI 14d [N166],,GSM4708716,excluded_not_eligible_on_technology
+GSE155622,GSM4708717,Single Dorsal root ganglion neuron_SNI 14d [N168],,GSM4708717,excluded_not_eligible_on_technology
+GSE155622,GSM4708718,Single Dorsal root ganglion neuron_SNI 14d [N169],,GSM4708718,excluded_not_eligible_on_technology
+GSE155622,GSM4708719,Single Dorsal root ganglion neuron_SNI 14d [N170],,GSM4708719,excluded_not_eligible_on_technology
+GSE155622,GSM4708720,Single Dorsal root ganglion neuron_SNI 14d [N171],,GSM4708720,excluded_not_eligible_on_technology
+GSE155622,GSM4708721,Single Dorsal root ganglion neuron_SNI 14d [N172],,GSM4708721,excluded_not_eligible_on_technology
+GSE155622,GSM4708722,Single Dorsal root ganglion neuron_SNI 14d [N173],,GSM4708722,excluded_not_eligible_on_technology
+GSE155622,GSM4708723,Single Dorsal root ganglion neuron_SNI 14d [N179],,GSM4708723,excluded_not_eligible_on_technology
+GSE155622,GSM4708724,Single Dorsal root ganglion neuron_SNI 14d [N180],,GSM4708724,excluded_not_eligible_on_technology
+GSE155622,GSM4708725,Single Dorsal root ganglion neuron_SNI 14d [N28],,GSM4708725,excluded_not_eligible_on_technology
+GSE155622,GSM4708726,Single Dorsal root ganglion neuron_SNI 14d [N30],,GSM4708726,excluded_not_eligible_on_technology
+GSE155622,GSM4708727,Single Dorsal root ganglion neuron_SNI 14d [N36],,GSM4708727,excluded_not_eligible_on_technology
+GSE155622,GSM4708728,Single Dorsal root ganglion neuron_SNI 14d [N39],,GSM4708728,excluded_not_eligible_on_technology
+GSE155622,GSM4708729,Single Dorsal root ganglion neuron_SNI 14d [N43],,GSM4708729,excluded_not_eligible_on_technology
+GSE155622,GSM4708730,Single Dorsal root ganglion neuron_SNI 14d [N44],,GSM4708730,excluded_not_eligible_on_technology
+GSE155622,GSM4708731,Single Dorsal root ganglion neuron_SNI 14d [N45],,GSM4708731,excluded_not_eligible_on_technology
+GSE155622,GSM4708732,Single Dorsal root ganglion neuron_SNI 14d [N492],,GSM4708732,excluded_not_eligible_on_technology
+GSE155622,GSM4708733,Single Dorsal root ganglion neuron_SNI 14d [N494],,GSM4708733,excluded_not_eligible_on_technology
+GSE155622,GSM4708734,Single Dorsal root ganglion neuron_SNI 14d [N497],,GSM4708734,excluded_not_eligible_on_technology
+GSE155622,GSM4708735,Single Dorsal root ganglion neuron_SNI 14d [N508],,GSM4708735,excluded_not_eligible_on_technology
+GSE155622,GSM4708736,Single Dorsal root ganglion neuron_SNI 14d [N514],,GSM4708736,excluded_not_eligible_on_technology
+GSE155622,GSM4708737,Single Dorsal root ganglion neuron_SNI 14d [N519],,GSM4708737,excluded_not_eligible_on_technology
+GSE155622,GSM4708738,Single Dorsal root ganglion neuron_SNI 14d [N520],,GSM4708738,excluded_not_eligible_on_technology
+GSE155622,GSM4708739,Single Dorsal root ganglion neuron_SNI 14d [N532],,GSM4708739,excluded_not_eligible_on_technology
+GSE155622,GSM4708740,Single Dorsal root ganglion neuron_SNI 14d [N538],,GSM4708740,excluded_not_eligible_on_technology
+GSE155622,GSM4708741,Single Dorsal root ganglion neuron_SNI 14d [N54],,GSM4708741,excluded_not_eligible_on_technology
+GSE155622,GSM4708742,Single Dorsal root ganglion neuron_SNI 14d [N56],,GSM4708742,excluded_not_eligible_on_technology
+GSE155622,GSM4708743,Single Dorsal root ganglion neuron_SNI 14d [N57],,GSM4708743,excluded_not_eligible_on_technology
+GSE155622,GSM4708744,Single Dorsal root ganglion neuron_SNI 14d [N60],,GSM4708744,excluded_not_eligible_on_technology
+GSE155622,GSM4708745,Single Dorsal root ganglion neuron_SNI 14d [N61],,GSM4708745,excluded_not_eligible_on_technology
+GSE155622,GSM4708746,Single Dorsal root ganglion neuron_SNI 14d [N62],,GSM4708746,excluded_not_eligible_on_technology
+GSE155622,GSM4708747,Single Dorsal root ganglion neuron_SNI 14d [N63],,GSM4708747,excluded_not_eligible_on_technology
+GSE155622,GSM4708748,Single Dorsal root ganglion neuron_SNI 14d [N64],,GSM4708748,excluded_not_eligible_on_technology
+GSE155622,GSM4708749,Single Dorsal root ganglion neuron_SNI 14d [N65],,GSM4708749,excluded_not_eligible_on_technology
+GSE155622,GSM4708750,Single Dorsal root ganglion neuron_SNI 14d [N66],,GSM4708750,excluded_not_eligible_on_technology
+GSE155622,GSM4708751,Single Dorsal root ganglion neuron_SNI 14d [N67],,GSM4708751,excluded_not_eligible_on_technology
+GSE155622,GSM4708752,Single Dorsal root ganglion neuron_SNI 14d [N68],,GSM4708752,excluded_not_eligible_on_technology
+GSE155622,GSM4708753,Single Dorsal root ganglion neuron_SNI 14d [N69],,GSM4708753,excluded_not_eligible_on_technology
+GSE155622,GSM4708754,Single Dorsal root ganglion neuron_SNI 14d [N70],,GSM4708754,excluded_not_eligible_on_technology
+GSE155622,GSM4708755,Single Dorsal root ganglion neuron_SNI 14d [N72],,GSM4708755,excluded_not_eligible_on_technology
+GSE155622,GSM4708756,Single Dorsal root ganglion neuron_SNI 14d [N75],,GSM4708756,excluded_not_eligible_on_technology
+GSE155622,GSM4708757,Single Dorsal root ganglion neuron_SNI 14d [N77],,GSM4708757,excluded_not_eligible_on_technology
+GSE155622,GSM4708758,Single Dorsal root ganglion neuron_SNI 14d [N78],,GSM4708758,excluded_not_eligible_on_technology
+GSE155622,GSM4708759,Single Dorsal root ganglion neuron_SNI 14d [N79],,GSM4708759,excluded_not_eligible_on_technology
+GSE155622,GSM4708760,Single Dorsal root ganglion neuron_SNI 14d [N80],,GSM4708760,excluded_not_eligible_on_technology
+GSE155622,GSM4708761,Single Dorsal root ganglion neuron_SNI 14d [N800],,GSM4708761,excluded_not_eligible_on_technology
+GSE155622,GSM4708762,Single Dorsal root ganglion neuron_SNI 14d [N82],,GSM4708762,excluded_not_eligible_on_technology
+GSE155622,GSM4708763,Single Dorsal root ganglion neuron_SNI 14d [N84],,GSM4708763,excluded_not_eligible_on_technology
+GSE155622,GSM4708764,Single Dorsal root ganglion neuron_SNI 14d [N86],,GSM4708764,excluded_not_eligible_on_technology
+GSE155622,GSM4708765,Single Dorsal root ganglion neuron_SNI 14d [N865],,GSM4708765,excluded_not_eligible_on_technology
+GSE155622,GSM4708766,Single Dorsal root ganglion neuron_SNI 14d [N87],,GSM4708766,excluded_not_eligible_on_technology
+GSE155622,GSM4708767,Single Dorsal root ganglion neuron_SNI 14d [N873],,GSM4708767,excluded_not_eligible_on_technology
+GSE155622,GSM4708768,Single Dorsal root ganglion neuron_SNI 14d [N874],,GSM4708768,excluded_not_eligible_on_technology
+GSE155622,GSM4708769,Single Dorsal root ganglion neuron_SNI 14d [N878],,GSM4708769,excluded_not_eligible_on_technology
+GSE155622,GSM4708770,Single Dorsal root ganglion neuron_SNI 14d [N88],,GSM4708770,excluded_not_eligible_on_technology
+GSE155622,GSM4708771,Single Dorsal root ganglion neuron_SNI 14d [N881],,GSM4708771,excluded_not_eligible_on_technology
+GSE155622,GSM4708772,Single Dorsal root ganglion neuron_SNI 14d [N882],,GSM4708772,excluded_not_eligible_on_technology
+GSE155622,GSM4708773,Single Dorsal root ganglion neuron_SNI 14d [N883],,GSM4708773,excluded_not_eligible_on_technology
+GSE155622,GSM4708774,Single Dorsal root ganglion neuron_SNI 14d [N886],,GSM4708774,excluded_not_eligible_on_technology
+GSE155622,GSM4708775,Single Dorsal root ganglion neuron_SNI 14d [N887],,GSM4708775,excluded_not_eligible_on_technology
+GSE155622,GSM4708776,Single Dorsal root ganglion neuron_SNI 14d [N888],,GSM4708776,excluded_not_eligible_on_technology
+GSE155622,GSM4708777,Single Dorsal root ganglion neuron_SNI 14d [N889],,GSM4708777,excluded_not_eligible_on_technology
+GSE155622,GSM4708778,Single Dorsal root ganglion neuron_SNI 14d [N892],,GSM4708778,excluded_not_eligible_on_technology
+GSE155622,GSM4708779,Single Dorsal root ganglion neuron_SNI 14d [N894],,GSM4708779,excluded_not_eligible_on_technology
+GSE155622,GSM4708780,Single Dorsal root ganglion neuron_SNI 14d [N957],,GSM4708780,excluded_not_eligible_on_technology
+GSE155622,GSM4708781,Single Dorsal root ganglion neuron_SNI 14d [S131],,GSM4708781,excluded_not_eligible_on_technology
+GSE155622,GSM4708782,Single Dorsal root ganglion neuron_SNI 14d [S133],,GSM4708782,excluded_not_eligible_on_technology
+GSE155622,GSM4708783,Single Dorsal root ganglion neuron_SNI 14d [S134],,GSM4708783,excluded_not_eligible_on_technology
+GSE155622,GSM4708784,Single Dorsal root ganglion neuron_SNI 14d [S135],,GSM4708784,excluded_not_eligible_on_technology
+GSE155622,GSM4708785,Single Dorsal root ganglion neuron_SNI 14d [S136],,GSM4708785,excluded_not_eligible_on_technology
+GSE155622,GSM4708786,Single Dorsal root ganglion neuron_SNI 14d [S138],,GSM4708786,excluded_not_eligible_on_technology
+GSE155622,GSM4708787,Single Dorsal root ganglion neuron_SNI 14d [S139],,GSM4708787,excluded_not_eligible_on_technology
+GSE155622,GSM4708788,Single Dorsal root ganglion neuron_SNI 14d [S140],,GSM4708788,excluded_not_eligible_on_technology
+GSE155622,GSM4708789,Single Dorsal root ganglion neuron_SNI 14d [S141],,GSM4708789,excluded_not_eligible_on_technology
+GSE155622,GSM4708790,Single Dorsal root ganglion neuron_SNI 14d [S142],,GSM4708790,excluded_not_eligible_on_technology
+GSE155622,GSM4708791,Single Dorsal root ganglion neuron_SNI 14d [S143],,GSM4708791,excluded_not_eligible_on_technology
+GSE155622,GSM4708792,Single Dorsal root ganglion neuron_SNI 14d [S144],,GSM4708792,excluded_not_eligible_on_technology
+GSE155622,GSM4708793,Single Dorsal root ganglion neuron_SNI 14d [S145],,GSM4708793,excluded_not_eligible_on_technology
+GSE155622,GSM4708794,Single Dorsal root ganglion neuron_SNI 14d [S146],,GSM4708794,excluded_not_eligible_on_technology
+GSE155622,GSM4708795,Single Dorsal root ganglion neuron_SNI 14d [S147],,GSM4708795,excluded_not_eligible_on_technology
+GSE155622,GSM4708796,Single Dorsal root ganglion neuron_SNI 14d [S148],,GSM4708796,excluded_not_eligible_on_technology
+GSE155622,GSM4708797,Single Dorsal root ganglion neuron_SNI 14d [S149],,GSM4708797,excluded_not_eligible_on_technology
+GSE155622,GSM4708798,Single Dorsal root ganglion neuron_SNI 14d [S156],,GSM4708798,excluded_not_eligible_on_technology
+GSE155622,GSM4708799,Single Dorsal root ganglion neuron_SNI 14d [S159],,GSM4708799,excluded_not_eligible_on_technology
+GSE155622,GSM4708800,Single Dorsal root ganglion neuron_SNI 14d [S160],,GSM4708800,excluded_not_eligible_on_technology
+GSE155622,GSM4708801,Single Dorsal root ganglion neuron_SNI 14d [S161],,GSM4708801,excluded_not_eligible_on_technology
+GSE155622,GSM4708802,Single Dorsal root ganglion neuron_SNI 14d [S162],,GSM4708802,excluded_not_eligible_on_technology
+GSE155622,GSM4708803,Single Dorsal root ganglion neuron_SNI 14d [S164],,GSM4708803,excluded_not_eligible_on_technology
+GSE155622,GSM4708804,Single Dorsal root ganglion neuron_SNI 14d [S166],,GSM4708804,excluded_not_eligible_on_technology
+GSE155622,GSM4708805,Single Dorsal root ganglion neuron_SNI 14d [S167],,GSM4708805,excluded_not_eligible_on_technology
+GSE155622,GSM4708806,Single Dorsal root ganglion neuron_SNI 14d [S168],,GSM4708806,excluded_not_eligible_on_technology
+GSE155622,GSM4708807,Single Dorsal root ganglion neuron_SNI 14d [S169],,GSM4708807,excluded_not_eligible_on_technology
+GSE155622,GSM4708808,Single Dorsal root ganglion neuron_SNI 14d [S171],,GSM4708808,excluded_not_eligible_on_technology
+GSE155622,GSM4708809,Single Dorsal root ganglion neuron_SNI 14d [S173],,GSM4708809,excluded_not_eligible_on_technology
+GSE155622,GSM4708810,Single Dorsal root ganglion neuron_SNI 14d [S174],,GSM4708810,excluded_not_eligible_on_technology
+GSE155622,GSM4708811,Single Dorsal root ganglion neuron_SNI 14d [S176],,GSM4708811,excluded_not_eligible_on_technology
+GSE155622,GSM4708812,Single Dorsal root ganglion neuron_SNI 14d [S177],,GSM4708812,excluded_not_eligible_on_technology
+GSE155622,GSM4708813,Single Dorsal root ganglion neuron_SNI 14d [S179],,GSM4708813,excluded_not_eligible_on_technology
+GSE155622,GSM4708814,Single Dorsal root ganglion neuron_SNI 14d [S181],,GSM4708814,excluded_not_eligible_on_technology
+GSE155622,GSM4708815,Single Dorsal root ganglion neuron_SNI 14d [S186],,GSM4708815,excluded_not_eligible_on_technology
+GSE155622,GSM4708816,Single Dorsal root ganglion neuron_SNI 14d [S187],,GSM4708816,excluded_not_eligible_on_technology
+GSE155622,GSM4708817,Single Dorsal root ganglion neuron_SNI 14d [S188],,GSM4708817,excluded_not_eligible_on_technology
+GSE155622,GSM4708818,Single Dorsal root ganglion neuron_SNI 14d [S190],,GSM4708818,excluded_not_eligible_on_technology
+GSE155622,GSM4708819,Single Dorsal root ganglion neuron_SNI 14d [S191],,GSM4708819,excluded_not_eligible_on_technology
+GSE155622,GSM4708820,Single Dorsal root ganglion neuron_SNI 14d [S192],,GSM4708820,excluded_not_eligible_on_technology
+GSE155622,GSM4708821,Single Dorsal root ganglion neuron_SNI 14d [S194],,GSM4708821,excluded_not_eligible_on_technology
+GSE155622,GSM4708822,Single Dorsal root ganglion neuron_SNI 14d [S195],,GSM4708822,excluded_not_eligible_on_technology
+GSE155622,GSM4708823,Single Dorsal root ganglion neuron_SNI 14d [S196],,GSM4708823,excluded_not_eligible_on_technology
+GSE155622,GSM4708824,Single Dorsal root ganglion neuron_SNI 14d [S197],,GSM4708824,excluded_not_eligible_on_technology
+GSE155622,GSM4708825,Single Dorsal root ganglion neuron_SNI 14d [S199],,GSM4708825,excluded_not_eligible_on_technology
+GSE155622,GSM4708826,Single Dorsal root ganglion neuron_SNI 14d [S201],,GSM4708826,excluded_not_eligible_on_technology
+GSE155622,GSM4708827,Single Dorsal root ganglion neuron_SNI 14d [S202],,GSM4708827,excluded_not_eligible_on_technology
+GSE155622,GSM4708828,Single Dorsal root ganglion neuron_SNI 14d [S203],,GSM4708828,excluded_not_eligible_on_technology
+GSE155622,GSM4708829,Single Dorsal root ganglion neuron_SNI 14d [S205],,GSM4708829,excluded_not_eligible_on_technology
+GSE155622,GSM4708830,Single Dorsal root ganglion neuron_SNI 14d [S208],,GSM4708830,excluded_not_eligible_on_technology
+GSE155622,GSM4708831,Single Dorsal root ganglion neuron_SNI 14d [S209],,GSM4708831,excluded_not_eligible_on_technology
+GSE155622,GSM4708832,Single Dorsal root ganglion neuron_SNI 14d [S210],,GSM4708832,excluded_not_eligible_on_technology
+GSE155622,GSM4708833,Single Dorsal root ganglion neuron_SNI 14d [S211],,GSM4708833,excluded_not_eligible_on_technology
+GSE155622,GSM4708834,Single Dorsal root ganglion neuron_SNI 14d [S212],,GSM4708834,excluded_not_eligible_on_technology
+GSE155622,GSM4708835,Single Dorsal root ganglion neuron_SNI 14d [S213],,GSM4708835,excluded_not_eligible_on_technology
+GSE155622,GSM4708836,Single Dorsal root ganglion neuron_SNI 14d [S214],,GSM4708836,excluded_not_eligible_on_technology
+GSE155622,GSM4708837,Single Dorsal root ganglion neuron_SNI 14d [S215],,GSM4708837,excluded_not_eligible_on_technology
+GSE155622,GSM4708838,Single Dorsal root ganglion neuron_SNI 14d [S216],,GSM4708838,excluded_not_eligible_on_technology
+GSE155622,GSM4708839,Single Dorsal root ganglion neuron_SNI 14d [S217],,GSM4708839,excluded_not_eligible_on_technology
+GSE155622,GSM4708840,Single Dorsal root ganglion neuron_SNI 14d [S219],,GSM4708840,excluded_not_eligible_on_technology
+GSE155622,GSM4708841,Single Dorsal root ganglion neuron_SNI 14d [S220],,GSM4708841,excluded_not_eligible_on_technology
+GSE155622,GSM4708842,Single Dorsal root ganglion neuron_SNI 14d [S221],,GSM4708842,excluded_not_eligible_on_technology
+GSE155622,GSM4708843,Single Dorsal root ganglion neuron_SNI 14d [S222],,GSM4708843,excluded_not_eligible_on_technology
+GSE155622,GSM4708844,Single Dorsal root ganglion neuron_SNI 14d [S223],,GSM4708844,excluded_not_eligible_on_technology
+GSE155622,GSM4708845,Single Dorsal root ganglion neuron_SNI 14d [S224],,GSM4708845,excluded_not_eligible_on_technology
+GSE155622,GSM4708846,Single Dorsal root ganglion neuron_SNI 14d [S225],,GSM4708846,excluded_not_eligible_on_technology
+GSE155622,GSM4708847,Single Dorsal root ganglion neuron_SNI 14d [S226],,GSM4708847,excluded_not_eligible_on_technology
+GSE155622,GSM4708848,Single Dorsal root ganglion neuron_SNI 14d [S228],,GSM4708848,excluded_not_eligible_on_technology
+GSE155622,GSM4708849,Single Dorsal root ganglion neuron_SNI 14d [S241],,GSM4708849,excluded_not_eligible_on_technology
+GSE155622,GSM4708850,Single Dorsal root ganglion neuron_SNI 14d [S245],,GSM4708850,excluded_not_eligible_on_technology
+GSE155622,GSM4708851,Single Dorsal root ganglion neuron_SNI 14d [S246],,GSM4708851,excluded_not_eligible_on_technology
+GSE155622,GSM4708852,Single Dorsal root ganglion neuron_SNI 14d [S247],,GSM4708852,excluded_not_eligible_on_technology
+GSE155622,GSM4708853,Single Dorsal root ganglion neuron_SNI 14d [S249],,GSM4708853,excluded_not_eligible_on_technology
+GSE155622,GSM4708854,Single Dorsal root ganglion neuron_SNI 14d [S250],,GSM4708854,excluded_not_eligible_on_technology
+GSE155622,GSM4708855,Single Dorsal root ganglion neuron_SNI 14d [S251],,GSM4708855,excluded_not_eligible_on_technology
+GSE155622,GSM4708856,Single Dorsal root ganglion neuron_SNI 14d [S252],,GSM4708856,excluded_not_eligible_on_technology
+GSE155622,GSM4708857,Single Dorsal root ganglion neuron_SNI 14d [S253],,GSM4708857,excluded_not_eligible_on_technology
+GSE155622,GSM4708858,Single Dorsal root ganglion neuron_SNI 14d [S254],,GSM4708858,excluded_not_eligible_on_technology
+GSE155622,GSM4708859,Single Dorsal root ganglion neuron_SNI 14d [S255],,GSM4708859,excluded_not_eligible_on_technology
+GSE155622,GSM4708860,Single Dorsal root ganglion neuron_SNI 14d [S256],,GSM4708860,excluded_not_eligible_on_technology
+GSE155622,GSM4708861,Single Dorsal root ganglion neuron_SNI 14d [S257],,GSM4708861,excluded_not_eligible_on_technology
+GSE155622,GSM4708862,Single Dorsal root ganglion neuron_SNI 14d [S258],,GSM4708862,excluded_not_eligible_on_technology
+GSE155622,GSM4708863,Single Dorsal root ganglion neuron_SNI 14d [S260],,GSM4708863,excluded_not_eligible_on_technology
+GSE155622,GSM4708864,Single Dorsal root ganglion neuron_SNI 14d [S271],,GSM4708864,excluded_not_eligible_on_technology
+GSE155622,GSM4708865,Single Dorsal root ganglion neuron_SNI 14d [S272],,GSM4708865,excluded_not_eligible_on_technology
+GSE155622,GSM4708866,Single Dorsal root ganglion neuron_SNI 14d [S273],,GSM4708866,excluded_not_eligible_on_technology
+GSE155622,GSM4708867,Single Dorsal root ganglion neuron_SNI 14d [S274],,GSM4708867,excluded_not_eligible_on_technology
+GSE155622,GSM4708868,Single Dorsal root ganglion neuron_SNI 14d [S275],,GSM4708868,excluded_not_eligible_on_technology
+GSE155622,GSM4708869,Single Dorsal root ganglion neuron_SNI 14d [S276],,GSM4708869,excluded_not_eligible_on_technology
+GSE155622,GSM4708870,Single Dorsal root ganglion neuron_SNI 14d [S279],,GSM4708870,excluded_not_eligible_on_technology
+GSE155622,GSM4708871,Single Dorsal root ganglion neuron_SNI 14d [S280],,GSM4708871,excluded_not_eligible_on_technology
+GSE155622,GSM4708872,Single Dorsal root ganglion neuron_SNI 14d [s294],,GSM4708872,excluded_not_eligible_on_technology
+GSE155622,GSM4708873,Single Dorsal root ganglion neuron_SNI 14d [S339],,GSM4708873,excluded_not_eligible_on_technology
+GSE155622,GSM4708874,Single Dorsal root ganglion neuron_SNI 14d [S346],,GSM4708874,excluded_not_eligible_on_technology
+GSE155622,GSM4708875,Single Dorsal root ganglion neuron_SNI 14d [s371],,GSM4708875,excluded_not_eligible_on_technology
+GSE155622,GSM4708876,Single Dorsal root ganglion neuron_SNI 14d [s422],,GSM4708876,excluded_not_eligible_on_technology
+GSE155622,GSM4708877,Single Dorsal root ganglion neuron_SNI 14d [s497],,GSM4708877,excluded_not_eligible_on_technology
+GSE155622,GSM4708878,Single Dorsal root ganglion neuron_SNI 14d [S581],,GSM4708878,excluded_not_eligible_on_technology
+GSE155622,GSM4708879,Single Dorsal root ganglion neuron_SNI 14d [S583],,GSM4708879,excluded_not_eligible_on_technology
+GSE155622,GSM4708880,Single Dorsal root ganglion neuron_SNI 14d [S584],,GSM4708880,excluded_not_eligible_on_technology
+GSE155622,GSM4708881,Single Dorsal root ganglion neuron_SNI 14d [S585],,GSM4708881,excluded_not_eligible_on_technology
+GSE155622,GSM4708882,Single Dorsal root ganglion neuron_SNI 14d [S586],,GSM4708882,excluded_not_eligible_on_technology
+GSE155622,GSM4708883,Single Dorsal root ganglion neuron_SNI 14d [S587],,GSM4708883,excluded_not_eligible_on_technology
+GSE155622,GSM4708884,Single Dorsal root ganglion neuron_SNI 14d [S588],,GSM4708884,excluded_not_eligible_on_technology
+GSE155622,GSM4708885,Single Dorsal root ganglion neuron_SNI 14d [S589],,GSM4708885,excluded_not_eligible_on_technology
+GSE155622,GSM4708886,Single Dorsal root ganglion neuron_SNI 14d [S590],,GSM4708886,excluded_not_eligible_on_technology
+GSE155622,GSM4708887,Single Dorsal root ganglion neuron_SNI 14d [S591],,GSM4708887,excluded_not_eligible_on_technology
+GSE155622,GSM4708888,Single Dorsal root ganglion neuron_SNI 14d [S592],,GSM4708888,excluded_not_eligible_on_technology
+GSE155622,GSM4708889,Single Dorsal root ganglion neuron_SNI 14d [S593],,GSM4708889,excluded_not_eligible_on_technology
+GSE155622,GSM4708890,Single Dorsal root ganglion neuron_SNI 14d [S594],,GSM4708890,excluded_not_eligible_on_technology
+GSE155622,GSM4708891,Single Dorsal root ganglion neuron_SNI 14d [S595],,GSM4708891,excluded_not_eligible_on_technology
+GSE155622,GSM4708892,Single Dorsal root ganglion neuron_SNI 14d [S596],,GSM4708892,excluded_not_eligible_on_technology
+GSE155622,GSM4708893,Single Dorsal root ganglion neuron_SNI 14d [S597],,GSM4708893,excluded_not_eligible_on_technology
+GSE155622,GSM4708894,Single Dorsal root ganglion neuron_SNI 14d [S598],,GSM4708894,excluded_not_eligible_on_technology
+GSE155622,GSM4708895,Single Dorsal root ganglion neuron_SNI 14d [S599],,GSM4708895,excluded_not_eligible_on_technology
+GSE155622,GSM4708896,Single Dorsal root ganglion neuron_SNI 14d [S616],,GSM4708896,excluded_not_eligible_on_technology
+GSE155622,GSM4708897,Single Dorsal root ganglion neuron_SNI 14d [S617],,GSM4708897,excluded_not_eligible_on_technology
+GSE155622,GSM4708898,Single Dorsal root ganglion neuron_SNI 14d [S618],,GSM4708898,excluded_not_eligible_on_technology
+GSE155622,GSM4708899,Single Dorsal root ganglion neuron_SNI 14d [S619],,GSM4708899,excluded_not_eligible_on_technology
+GSE155622,GSM4708900,Single Dorsal root ganglion neuron_SNI 14d [S632],,GSM4708900,excluded_not_eligible_on_technology
+GSE155622,GSM4708901,Single Dorsal root ganglion neuron_SNI 14d [S633],,GSM4708901,excluded_not_eligible_on_technology
+GSE155622,GSM4708902,Single Dorsal root ganglion neuron_SNI 14d [S634],,GSM4708902,excluded_not_eligible_on_technology
+GSE155622,GSM4708903,Single Dorsal root ganglion neuron_SNI 14d [S635],,GSM4708903,excluded_not_eligible_on_technology
+GSE155622,GSM4708904,Single Dorsal root ganglion neuron_SNI 14d [S638],,GSM4708904,excluded_not_eligible_on_technology
+GSE155622,GSM4708905,Single Dorsal root ganglion neuron_SNI 14d [S639],,GSM4708905,excluded_not_eligible_on_technology
+GSE155622,GSM4708906,Single Dorsal root ganglion neuron_SNI 14d [S640],,GSM4708906,excluded_not_eligible_on_technology
+GSE155622,GSM4708907,Single Dorsal root ganglion neuron_SNI 14d [S641],,GSM4708907,excluded_not_eligible_on_technology
+GSE155622,GSM4708908,Single Dorsal root ganglion neuron_SNI 14d [S642],,GSM4708908,excluded_not_eligible_on_technology
+GSE155622,GSM4708909,Single Dorsal root ganglion neuron_SNI 14d [S643],,GSM4708909,excluded_not_eligible_on_technology
+GSE155622,GSM4708910,Single Dorsal root ganglion neuron_SNI 14d [S645],,GSM4708910,excluded_not_eligible_on_technology
+GSE155622,GSM4708911,Single Dorsal root ganglion neuron_SNI 14d [S647],,GSM4708911,excluded_not_eligible_on_technology
+GSE155622,GSM4708912,Single Dorsal root ganglion neuron_SNI 14d [S649],,GSM4708912,excluded_not_eligible_on_technology
+GSE155622,GSM4708913,Single Dorsal root ganglion neuron_SNI 14d [S650],,GSM4708913,excluded_not_eligible_on_technology
+GSE155622,GSM4708914,Single Dorsal root ganglion neuron_SNI 14d [S654],,GSM4708914,excluded_not_eligible_on_technology
+GSE155622,GSM4708915,Single Dorsal root ganglion neuron_SNI 14d [S655],,GSM4708915,excluded_not_eligible_on_technology
+GSE155622,GSM4708916,Single Dorsal root ganglion neuron_SNI 14d [S656],,GSM4708916,excluded_not_eligible_on_technology
+GSE155622,GSM4708917,Single Dorsal root ganglion neuron_SNI 14d [S657],,GSM4708917,excluded_not_eligible_on_technology
+GSE155622,GSM4708918,Single Dorsal root ganglion neuron_SNI 14d [S660],,GSM4708918,excluded_not_eligible_on_technology
+GSE155622,GSM4708919,Single Dorsal root ganglion neuron_SNI 14d [S671],,GSM4708919,excluded_not_eligible_on_technology
+GSE155622,GSM4708920,Single Dorsal root ganglion neuron_SNI 14d [S673],,GSM4708920,excluded_not_eligible_on_technology
+GSE155622,GSM4708921,Single Dorsal root ganglion neuron_SNI 14d [S674],,GSM4708921,excluded_not_eligible_on_technology
+GSE155622,GSM4708922,Single Dorsal root ganglion neuron_SNI 14d [S675],,GSM4708922,excluded_not_eligible_on_technology
+GSE155622,GSM4708923,Single Dorsal root ganglion neuron_SNI 14d [S676],,GSM4708923,excluded_not_eligible_on_technology
+GSE155622,GSM4708924,Single Dorsal root ganglion neuron_SNI 14d [S677],,GSM4708924,excluded_not_eligible_on_technology
+GSE155622,GSM4708925,Single Dorsal root ganglion neuron_SNI 14d [S678],,GSM4708925,excluded_not_eligible_on_technology
+GSE155622,GSM4708926,Single Dorsal root ganglion neuron_SNI 14d [S682],,GSM4708926,excluded_not_eligible_on_technology
+GSE155622,GSM4708927,Single Dorsal root ganglion neuron_SNI 14d [S683],,GSM4708927,excluded_not_eligible_on_technology
+GSE155622,GSM4708928,Single Dorsal root ganglion neuron_SNI 14d [S684],,GSM4708928,excluded_not_eligible_on_technology
+GSE155622,GSM4708929,Single Dorsal root ganglion neuron_SNI 14d [S685],,GSM4708929,excluded_not_eligible_on_technology
+GSE155622,GSM4708930,Single Dorsal root ganglion neuron_SNI 14d [S686],,GSM4708930,excluded_not_eligible_on_technology
+GSE155622,GSM4708931,Single Dorsal root ganglion neuron_SNI 14d [S687],,GSM4708931,excluded_not_eligible_on_technology
+GSE155622,GSM4708932,Single Dorsal root ganglion neuron_SNI 14d [S689],,GSM4708932,excluded_not_eligible_on_technology
+GSE155622,GSM4708933,Single Dorsal root ganglion neuron_SNI 14d [S693],,GSM4708933,excluded_not_eligible_on_technology
+GSE155622,GSM4708934,Single Dorsal root ganglion neuron_SNI 14d [S694],,GSM4708934,excluded_not_eligible_on_technology
+GSE155622,GSM4708935,Single Dorsal root ganglion neuron_SNI 14d [S696],,GSM4708935,excluded_not_eligible_on_technology
+GSE155622,GSM4708936,Single Dorsal root ganglion neuron_SNI 14d [S697],,GSM4708936,excluded_not_eligible_on_technology
+GSE155622,GSM4708937,Single Dorsal root ganglion neuron_SNI 14d [S698],,GSM4708937,excluded_not_eligible_on_technology
+GSE155622,GSM4708938,Single Dorsal root ganglion neuron_SNI 14d [S699],,GSM4708938,excluded_not_eligible_on_technology
+GSE155622,GSM4708939,Single Dorsal root ganglion neuron_SNI 14d [S700],,GSM4708939,excluded_not_eligible_on_technology
+GSE155622,GSM4708940,Single Dorsal root ganglion neuron_SNI 14d [S704],,GSM4708940,excluded_not_eligible_on_technology
+GSE155622,GSM4708941,Single Dorsal root ganglion neuron_SNI 14d [S709],,GSM4708941,excluded_not_eligible_on_technology
+GSE155622,GSM4708942,Single Dorsal root ganglion neuron_SNI 14d [S712],,GSM4708942,excluded_not_eligible_on_technology
+GSE155622,GSM4708943,Single Dorsal root ganglion neuron_SNI 14d [S713],,GSM4708943,excluded_not_eligible_on_technology
+GSE155622,GSM4708944,Single Dorsal root ganglion neuron_SNI 14d [S714],,GSM4708944,excluded_not_eligible_on_technology
+GSE155622,GSM4708945,Single Dorsal root ganglion neuron_SNI 14d [S715],,GSM4708945,excluded_not_eligible_on_technology
+GSE155622,GSM4708946,Single Dorsal root ganglion neuron_SNI 14d [S716],,GSM4708946,excluded_not_eligible_on_technology
+GSE155622,GSM4708947,Single Dorsal root ganglion neuron_SNI 14d [S717],,GSM4708947,excluded_not_eligible_on_technology
+GSE155622,GSM4708948,Single Dorsal root ganglion neuron_Control [S721],,GSM4708948,excluded_not_eligible_on_technology
+GSE155622,GSM4708949,Single Dorsal root ganglion neuron_Control [S722],,GSM4708949,excluded_not_eligible_on_technology
+GSE155622,GSM4708950,Single Dorsal root ganglion neuron_Control [S723],,GSM4708950,excluded_not_eligible_on_technology
+GSE155622,GSM4708951,Single Dorsal root ganglion neuron_Control [S724],,GSM4708951,excluded_not_eligible_on_technology
+GSE155622,GSM4708952,Single Dorsal root ganglion neuron_Control [S726],,GSM4708952,excluded_not_eligible_on_technology
+GSE155622,GSM4708953,Single Dorsal root ganglion neuron_Control [S731],,GSM4708953,excluded_not_eligible_on_technology
+GSE155622,GSM4708954,Single Dorsal root ganglion neuron_Control [S732],,GSM4708954,excluded_not_eligible_on_technology
+GSE155622,GSM4708955,Single Dorsal root ganglion neuron_Control [S734],,GSM4708955,excluded_not_eligible_on_technology
+GSE155622,GSM4708956,Single Dorsal root ganglion neuron_Control [S736],,GSM4708956,excluded_not_eligible_on_technology
+GSE155622,GSM4708957,Single Dorsal root ganglion neuron_Control [S738],,GSM4708957,excluded_not_eligible_on_technology
+GSE155622,GSM4708958,Single Dorsal root ganglion neuron_Control [S739],,GSM4708958,excluded_not_eligible_on_technology
+GSE155622,GSM4708959,Single Dorsal root ganglion neuron_Control [S740],,GSM4708959,excluded_not_eligible_on_technology
+GSE155622,GSM4708960,Single Dorsal root ganglion neuron_SNI 14d [S742],,GSM4708960,excluded_not_eligible_on_technology
+GSE155622,GSM4708961,Single Dorsal root ganglion neuron_SNI 14d [S743],,GSM4708961,excluded_not_eligible_on_technology
+GSE155622,GSM4708962,Single Dorsal root ganglion neuron_SNI 14d [S744],,GSM4708962,excluded_not_eligible_on_technology
+GSE155622,GSM4708963,Single Dorsal root ganglion neuron_SNI 14d [S745],,GSM4708963,excluded_not_eligible_on_technology
+GSE155622,GSM4708964,Single Dorsal root ganglion neuron_SNI 14d [S746],,GSM4708964,excluded_not_eligible_on_technology
+GSE155622,GSM4708965,Single Dorsal root ganglion neuron_SNI 14d [S747],,GSM4708965,excluded_not_eligible_on_technology
+GSE155622,GSM4708966,Single Dorsal root ganglion neuron_SNI 14d [S748],,GSM4708966,excluded_not_eligible_on_technology
+GSE155622,GSM4708967,Single Dorsal root ganglion neuron_SNI 14d [S749],,GSM4708967,excluded_not_eligible_on_technology
+GSE155622,GSM4708968,Single Dorsal root ganglion neuron_Control [S751],,GSM4708968,excluded_not_eligible_on_technology
+GSE155622,GSM4708969,Single Dorsal root ganglion neuron_Control [S752],,GSM4708969,excluded_not_eligible_on_technology
+GSE155622,GSM4708970,Single Dorsal root ganglion neuron_Control [S753],,GSM4708970,excluded_not_eligible_on_technology
+GSE155622,GSM4708971,Single Dorsal root ganglion neuron_Control [S755],,GSM4708971,excluded_not_eligible_on_technology
+GSE155622,GSM4708972,Single Dorsal root ganglion neuron_Control [S756],,GSM4708972,excluded_not_eligible_on_technology
+GSE155622,GSM4708973,Single Dorsal root ganglion neuron_Control [S757],,GSM4708973,excluded_not_eligible_on_technology
+GSE155622,GSM4708974,Single Dorsal root ganglion neuron_Control [S758],,GSM4708974,excluded_not_eligible_on_technology
+GSE155622,GSM4942749,Dorsal root ganglion cells-Control_rep5,control,GSM4942749,control_on_treatment
+GSE155622,GSM4942750,Dorsal root ganglion cells-SNI 28d,case,GSM4942750,case_on_treatment
+GSE155622,GSM4708669,Dorsal root ganglion cells-Control_rep1 [HFWL201807020265_2],control,GSM4708669,control_on_treatment
+GSE155622,GSM4708670,Dorsal root ganglion cells-SNI 6h_rep1 [HFWL201807020267_2],case,GSM4708670,case_on_treatment
+GSE155622,GSM4708671,Dorsal root ganglion cells-SNI 24h_rep1 [HFWL201807020268_2],case,GSM4708671,case_on_treatment
+GSE155622,GSM4708672,Dorsal root ganglion cells-Control_rep2 [SNI-0d_S98_L001],control,GSM4708672,control_on_treatment
+GSE155622,GSM4708673,Dorsal root ganglion cells-SNI 2d [SNI-2d_S98_L001],case,GSM4708673,case_on_treatment
+GSE155622,GSM4708674,Dorsal root ganglion cells-SNI 7d [SNI-7d_S98_L001],case,GSM4708674,case_on_treatment
+GSE155622,GSM4708675,Dorsal root ganglion cells-SNI 14d [SNI-14d_S98_L001],case,GSM4708675,case_on_treatment
+GSE155622,GSM4708676,Dorsal root ganglion cells-Control_rep3 [CHFPE190313001_S1_L004],control,GSM4708676,control_on_treatment
+GSE155622,GSM4708677,Dorsal root ganglion cells-SNI 6h_rep2 [CHFPE190313002_S2_L004],case,GSM4708677,case_on_treatment
+GSE155622,GSM4708678,Dorsal root ganglion cells-SNI 24h_rep2 [CHFPE190313003_S3_L004],case,GSM4708678,case_on_treatment
+GSE155622,GSM4942743,Dorsal root ganglion cells-Control_rep4,control,GSM4942743,control_on_treatment
+GSE155622,GSM4942744,Dorsal root ganglion cells-SNI 6h_rep3,case,GSM4942744,case_on_treatment
+GSE155622,GSM4942745,Dorsal root ganglion cells-SNI 24h_rep3,case,GSM4942745,case_on_treatment
+GSE155622,GSM4942746,Dorsal root ganglion cells-SNI 2d_rep2,case,GSM4942746,case_on_treatment
+GSE155622,GSM4942747,Dorsal root ganglion cells-SNI 7d_rep2,case,GSM4942747,case_on_treatment
+GSE155622,GSM4942748,Dorsal root ganglion cells-SNI 14d_rep2,case,GSM4942748,case_on_treatment
+GSE162807,GSM4960331,Human microglia SC004,,GSM4960331,excluded_not_eligible_on_title
+GSE162807,GSM4960332,Human microglia SC005B,,GSM4960332,excluded_not_eligible_on_title
+GSE162807,GSM4960333,Human microglia SC010,,GSM4960333,excluded_not_eligible_on_title
+GSE162807,GSM4960303,Mouse microglia 001-R,control,GSE162807_001,control_on_surgery
+GSE162807,GSM4960304,Mouse microglia 002,control,GSE162807_002,control_on_surgery
+GSE162807,GSM4960305,Mouse microglia 003,control,GSE162807_003,control_on_surgery
+GSE162807,GSM4960306,Mouse microglia 004,control,GSE162807_004,control_on_surgery
+GSE162807,GSM4960307,Mouse microglia 101-R,case,GSE162807_101,case_on_surgery
+GSE162807,GSM4960308,Mouse microglia 102,case,GSE162807_102,case_on_surgery
+GSE162807,GSM4960309,Mouse microglia 103-Redo,case,GSE162807_103,case_on_surgery
+GSE162807,GSM4960310,Mouse microglia 103,case,GSE162807_103,case_on_surgery
+GSE162807,GSM4960311,Mouse microglia 104,control,GSE162807_104,control_on_surgery
+GSE162807,GSM4960312,Mouse microglia 105,control,GSE162807_105,control_on_surgery
+GSE162807,GSM4960313,Mouse microglia 106-Redo,control,GSE162807_106,control_on_surgery
+GSE162807,GSM4960314,Mouse microglia 106,control,GSE162807_106,control_on_surgery
+GSE162807,GSM4960315,Mouse microglia 202,case,GSE162807_202,case_on_surgery
+GSE162807,GSM4960316,Mouse microglia 203,case,GSE162807_203,case_on_surgery
+GSE162807,GSM4960317,Mouse microglia 205,control,GSE162807_205,control_on_surgery
+GSE162807,GSM4960318,Mouse microglia 206,control,GSE162807_206,control_on_surgery
+GSE162807,GSM4960319,Mouse microglia 207-R,case,GSE162807_207,case_on_surgery
+GSE162807,GSM4960320,Mouse microglia 209,case,GSE162807_209,case_on_surgery
+GSE162807,GSM4960321,Mouse microglia 210,control,GSE162807_210,control_on_surgery
+GSE162807,GSM4960322,Mouse microglia 212,control,GSE162807_212,control_on_surgery
+GSE162807,GSM4960323,Mouse microglia 302,case,GSE162807_302,case_on_surgery
+GSE162807,GSM4960324,Mouse microglia 303,case,GSE162807_303,case_on_surgery
+GSE162807,GSM4960325,Mouse microglia 304,control,GSE162807_304,control_on_surgery
+GSE162807,GSM4960326,Mouse microglia 306,control,GSE162807_306,control_on_surgery
+GSE162807,GSM4960327,Mouse microglia 307A,case,GSE162807_307,case_on_surgery
+GSE162807,GSM4960328,Mouse microglia 307B,case,GSE162807_307,case_on_surgery
+GSE162807,GSM4960329,Mouse microglia 310-R,control,GSE162807_310,control_on_surgery
+GSE162807,GSM4960330,Mouse microglia 312,control,GSE162807_312,control_on_surgery
+GSE179640,GSM6102532,Control Patient 1 - Control Endometrium,control,GSM6102532,control_on_condition
+GSE179640,GSM6102533,Control Patient 2 - Control Endometrium,control,GSM6102533,control_on_condition
+GSE179640,GSM6102534,Control Patient 3 - Control Endometrium,control,GSM6102534,control_on_condition
+GSE179640,GSM6102537,Endometriosis Patient 1 - Eutopic,case,GSM6102537,case_on_condition
+GSE179640,GSM6102540,Endometriosis Patient 2 - Eutopic,case,GSM6102540,case_on_condition
+GSE179640,GSM6102543,Endometriosis Patient 3 - Eutopic,case,GSM6102543,case_on_condition
+GSE179640,GSM6102546,Endometriosis Patient 4 - Eutopic,case,GSM6102546,case_on_condition
+GSE179640,GSM6102549,Endometriosis Patient 5 - Eutopic,case,GSM6102549,case_on_condition
+GSE179640,GSM6102550,Endometriosis Patient 6 - Ectopic,,GSM6102550,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6102551,Endometriosis Patient 6 - Eutopic,case,GSM6102551,case_on_condition
+GSE179640,GSM6102552,Endometriosis Patient 7 - Ectopic Ovary,,GSM6102552,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6102553,Endometriosis Patient 7 - Ectopic,,GSM6102553,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6102554,Endometriosis Patient 7 - Eutopic,case,GSM6102554,case_on_condition
+GSE179640,GSM6102555,Endometriosis Patient 8 - Eutopic,case,GSM6102555,case_on_condition
+GSE179640,GSM6102556,Endometriosis Patient 9 - Ectopic Ovary,,GSM6102556,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6102560,Endometriosis Patient 9 - Eutopic,case,GSM6102560,case_on_condition
+GSE179640,GSM6102562,Endometriosis Patient 11 - Ectopic Ovary,,GSM6102562,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6102563,Patient-Derived Organoid - E02/E03/E10,,GSM6102563,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6102564,Cell Hashing for EOR01,,GSM6102564,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6102565,Patient-Derived Organoid - E05/E07/C01/C02,,GSM6102565,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6102566,Cell Hashing for EOR03,,GSM6102566,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6102567,Control Patient 1 - Control Endometrium - bulk,,GSM6102567,excluded_not_eligible_on_method
+GSE179640,GSM6102568,Control Patient 4 - Control Endometrium - bulk,,GSM6102568,excluded_not_eligible_on_method
+GSE179640,GSM6102569,Control Patient 5 - Control Endometrium - bulk,,GSM6102569,excluded_not_eligible_on_method
+GSE179640,GSM6102570,Control Patient 6 - Control Endometrium - bulk,,GSM6102570,excluded_not_eligible_on_method
+GSE179640,GSM6102571,Control Patient 7 - Control Endometrium - bulk,,GSM6102571,excluded_not_eligible_on_method
+GSE179640,GSM6102572,Endometriosis Patient 3 - Eutopic - bulk,,GSM6102572,excluded_not_eligible_on_method
+GSE179640,GSM6102573,Endometriosis Patient 5 - Ectopic - bulk,,GSM6102573,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102574,Endometriosis Patient 7 - Ectopic Ovary - bulk,,GSM6102574,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102575,Endometriosis Patient 7 - Eutopic - bulk,,GSM6102575,excluded_not_eligible_on_method
+GSE179640,GSM6102576,Endometriosis Patient 9 - Eutopic - bulk,,GSM6102576,excluded_not_eligible_on_method
+GSE179640,GSM6102577,Endometriosis Patient 10 - Ectopic Ovary - bulk,,GSM6102577,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102578,Endometriosis Patient 10 - Ectopic - bulk,,GSM6102578,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102579,Endometriosis Patient 13 - Ectopic Ovary - bulk,,GSM6102579,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102580,Endometriosis Patient 13 - Ectopic - bulk,,GSM6102580,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102581,Endometriosis Patient 13 - Eutopic - bulk,,GSM6102581,excluded_not_eligible_on_method
+GSE179640,GSM6102582,Endometriosis Patient 14 - Ectopic Ovary - bulk,,GSM6102582,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102583,Endometriosis Patient 14 - Ectopic - bulk,,GSM6102583,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102584,Endometriosis Patient 15 - Eutopic - bulk,,GSM6102584,excluded_not_eligible_on_method
+GSE179640,GSM6102585,Endometriosis Patient 16 - Ectopic Ovary - bulk,,GSM6102585,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102586,Endometriosis Patient 16 - Ectopic - bulk,,GSM6102586,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102587,Endometriosis Patient 16 - Eutopic - bulk,,GSM6102587,excluded_not_eligible_on_method
+GSE179640,GSM6102588,Endometriosis Patient 17 - Ectopic Ovary - bulk,,GSM6102588,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102589,Endometriosis Patient 17 - Ectopic - bulk,,GSM6102589,excluded_not_eligible_on_method_and_sample_location_and_tissue
+GSE179640,GSM6102590,Endometriosis Patient 17 - Eutopic - bulk,,GSM6102590,excluded_not_eligible_on_method
+GSE179640,GSM6595248,Endometriosis Patient 1 - Ectopic,,GSM6595248,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595249,Endometriosis Patient 1 - Ectopic Adjacent,,GSM6595249,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595250,Endometriosis Patient 2 - Ectopic,,GSM6595250,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595251,Endometriosis Patient 2 - Ectopic Adjacent,,GSM6595251,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595252,Endometriosis Patient 3 - Ectopic,,GSM6595252,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595253,Endometriosis Patient 3 - Ectopic Adjacent,,GSM6595253,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595254,Endometriosis Patient 4 - Ectopic,,GSM6595254,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595255,Endometriosis Patient 4 - Ectopic Adjacent,,GSM6595255,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595256,Endometriosis Patient 5 - Ectopic,,GSM6595256,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595257,Endometriosis Patient 5 - Ectopic Adjacent,,GSM6595257,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595258,Endometriosis Patient 9 - Ectopic,,GSM6595258,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595259,Endometriosis Patient 9 - Ectopic Adjacent-1,,GSM6595259,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595260,Endometriosis Patient 9 - Ectopic Adjacent-2,,GSM6595260,excluded_not_eligible_on_sample_location_and_tissue
+GSE179640,GSM6595261,Endometriosis Patient 10 - Ectopic Ovary,,GSM6595261,excluded_not_eligible_on_sample_location_and_tissue
+GSE198608,GSM5953461,sc-RNA seq batch Xin,control,GSM5953461,control_on_chars
+GSE198608,GSM5953462,sc-RNA seq batch S-2,case,GSM5953462,case_on_chars
+GSE198608,GSM5953463,sc-RNA seq batch S-3,case,GSM5953463,case_on_chars
+GSE198608,GSM5953464,sc-RNA seq batch 4,control,GSM5953464,control_on_chars
+GSE198608,GSM5953465,sc-RNA seq batch 8,case,GSM5953465,case_on_chars
+GSE198608,GSM5953466,sc-RNA seq batch 9,case,GSM5953466,case_on_chars
+GSE198608,GSM5953467,sc-RNA seq batch 10,control,GSM5953467,control_on_chars
+GSE198608,GSM5953468,sc-RNA seq batch 13,case,GSM5953468,case_on_chars
+GSE198608,GSM5953469,sc-RNA seq batch 14,case,GSM5953469,case_on_chars
+GSE198608,GSM5953470,sc-RNA seq batch 15,case,GSM5953470,case_on_chars
+GSE198608,GSM5953471,sc-RNA seq batch 16,case,GSM5953471,case_on_chars
+GSE198608,GSM5953472,sc-RNA seq batch 17-1,case,GSM5953472,case_on_chars
+GSE198608,GSM5953473,sc-RNA seq batch 17-2,case,GSM5953473,case_on_chars
+GSE198608,GSM5953474,sc-RNA seq batch 17-3,case,GSM5953474,case_on_chars
+GSE198608,GSM5953475,sc-RNA seq batch 18,control,GSM5953475,control_on_chars
+GSE198608,GSM5953476,sc-RNA seq batch 19-1,case,GSM5953476,case_on_chars
+GSE198608,GSM5953477,sc-RNA seq batch 19-2,case,GSM5953477,case_on_chars
+GSE198608,GSM7839292,sc-RNA seq S1,control,GSM7839292,control_on_chars
+GSE198608,GSM7839293,sc-RNA seq S2,control,GSM7839293,control_on_chars
+GSE198608,GSM7839294,sc-RNA seq S3,control,GSM7839294,control_on_chars
+GSE198608,GSM7839295,sc-RNA seq S4,control,GSM7839295,control_on_chars
+GSE198608,GSM7839296,sc-RNA seq S5,control,GSM7839296,control_on_chars
+GSE198608,GSM7839297,sc-RNA seq S6,control,GSM7839297,control_on_chars
+GSE198608,GSM7839298,sc-RNA seq S7,control,GSM7839298,control_on_chars
+GSE214411,GSM7277296,N5,,GSM7277296,excluded_matches_neither_arm
+GSE214411,GSM7277297,N6,,GSM7277297,excluded_matches_neither_arm
+GSE214411,GSM7277298,N7,,GSM7277298,excluded_matches_neither_arm
+GSE214411,GSM6605431,EMS1,case,GSM6605431,case_on_disease
+GSE214411,GSM6605432,EMS2,case,GSM6605432,case_on_disease
+GSE214411,GSM6605433,EMS3,case,GSM6605433,case_on_disease
+GSE214411,GSM6605434,EMS4,case,GSM6605434,case_on_disease
+GSE214411,GSM6605435,EMS5,case,GSM6605435,case_on_disease
+GSE214411,GSM6605436,EMS6,case,GSM6605436,case_on_disease
+GSE214411,GSM6605437,N1,control,GSM6605437,control_on_disease
+GSE214411,GSM6605438,N2,control,GSM6605438,control_on_disease
+GSE214411,GSM6605439,N3,control,GSM6605439,control_on_disease
+GSE214411,GSM6605440,N4,control,GSM6605440,control_on_disease
+GSE253345,GSM8019033,CCI_14day_pooled_GEX,case,GSM8019033,case_on_title
+GSE253345,GSM8019034,Control_pooled_GEX,control,GSM8019034,control_on_title
+GSE253345,GSM8019035,Control_female_pooled_GEX,control,GSM8019035,control_on_title
+GSE253345,GSM8019036,Control_male_pooled_GEX,control,GSM8019036,control_on_title
+GSE253345,GSM8019037,CCI_14day_pooled_ATAC,,GSM8019037,excluded_matches_neither_arm
+GSE253345,GSM8019038,Control_pooled_ATAC,,GSM8019038,excluded_matches_neither_arm
+GSE253345,GSM8019039,Control_female_pooled_ATAC,,GSM8019039,excluded_matches_neither_arm
+GSE253345,GSM8019040,Control_male_pooled_ATAC,,GSM8019040,excluded_matches_neither_arm
+GSE253345,GSM8019041,Control_pooled_smrt3,,GSM8019041,excluded_matches_neither_arm
+GSE254360,GSM8039489,Uninjured light touch biol rep 1,control,GSM8039489,control_on_injury_state
+GSE254360,GSM8039490,Uninjured light touch biol rep 2,control,GSM8039490,control_on_injury_state
+GSE254360,GSM8039491,Uninjured light touch biol rep 3,control,GSM8039491,control_on_injury_state
+GSE254360,GSM8039492,SNI light touch biol rep 1,case,GSM8039492,case_on_injury_state
+GSE254360,GSM8039493,SNI light touch biol rep 2,case,GSM8039493,case_on_injury_state
+GSE254360,GSM8039494,SNI light touch biol rep 3,case,GSM8039494,case_on_injury_state
+GSE254360,GSM8039495,Uninjured hot water drop biol rep 1,,GSM8039495,excluded_not_eligible_on_stimulation
+GSE254360,GSM8039496,Uninjured hot water drop biol rep 2,,GSM8039496,excluded_not_eligible_on_stimulation
+GSE254360,GSM8039497,Uninjured hot water drop biol rep 3,,GSM8039497,excluded_not_eligible_on_stimulation
+GSE254360,GSM8039498,Uninjured no stim biol rep 1,control,GSM8039498,control_on_injury_state
+GSE254360,GSM8039499,Uninjured no stim biol rep 2,control,GSM8039499,control_on_injury_state
+GSE254360,GSM8039500,Uninjured no stim biol rep 3,control,GSM8039500,control_on_injury_state
+GSE254360,GSM8039501,SNI no stim biol rep 1,case,GSM8039501,case_on_injury_state
+GSE254360,GSM8039502,SNI no stim biol rep 2,case,GSM8039502,case_on_injury_state
+GSE254360,GSM8039503,SNI no stim biol rep 3,case,GSM8039503,case_on_injury_state
+GSE283177,GSM8657252,"Mouse mesenchyme, 2 months post sham surgery, batch 1",control,GSM8657252,control_on_treatment
+GSE283177,GSM8657253,"Mouse mesenchyme, 2 months post nerve injury, batch 1",case,GSM8657253,case_on_treatment
+GSE283177,GSM8657254,"Mouse mesenchyme, 5 days post sham surgery, batch 2",control,GSM8657254,control_on_treatment
+GSE283177,GSM8657255,"Mouse mesenchyme, 5 days post SNL surgery, batch 2",case,GSM8657255,case_on_treatment
+GSE283177,GSM8657256,"Mouse mesenchyme, 2 months post sham surgery, batch 2",control,GSM8657256,control_on_treatment
+GSE283177,GSM8657257,"Mouse mesenchyme, 2 months post nerve injury, batch 2",case,GSM8657257,case_on_treatment
+GSE289659,GSM8796032,Control1,control,GSM8796032,control_on_sample_group
+GSE289659,GSM8796033,Control2,control,GSM8796033,control_on_sample_group
+GSE289659,GSM8796034,Control3,control,GSM8796034,control_on_sample_group
+GSE289659,GSM8796035,Control4,control,GSM8796035,control_on_sample_group
+GSE289659,GSM8796036,Control5,control,GSM8796036,control_on_sample_group
+GSE289659,GSM8796037,Control6,control,GSM8796037,control_on_sample_group
+GSE289659,GSM8796038,Control7,control,GSM8796038,control_on_sample_group
+GSE289659,GSM8796039,Control8,control,GSM8796039,control_on_sample_group
+GSE289659,GSM8796040,Sham1,control,GSM8796040,control_on_sample_group
+GSE289659,GSM8796041,Sham2,control,GSM8796041,control_on_sample_group
+GSE289659,GSM8796042,Sham3,control,GSM8796042,control_on_sample_group
+GSE289659,GSM8796043,Sham4,control,GSM8796043,control_on_sample_group
+GSE289659,GSM8796044,Injured1,case,GSM8796044,case_on_sample_group
+GSE289659,GSM8796045,Injured2,case,GSM8796045,case_on_sample_group
+GSE289659,GSM8796046,Injured3,case,GSM8796046,case_on_sample_group
+GSE289659,GSM8796047,Injured4,case,GSM8796047,case_on_sample_group
+GSE328175,GSM9674451,Sham1,control,GSM9674451,control_on_treatment
+GSE328175,GSM9674452,Sham2,control,GSM9674452,control_on_treatment
+GSE328175,GSM9674453,Sham3,control,GSM9674453,control_on_treatment
+GSE328175,GSM9674454,SNI1,case,GSM9674454,case_on_treatment
+GSE328175,GSM9674455,SNI2,case,GSM9674455,case_on_treatment
+GSE328175,GSM9674456,SNI3,case,GSM9674456,case_on_treatment
+GSE328175,GSM9674457,SNI+Transplant1,,GSM9674457,excluded_matches_neither_arm
+GSE328175,GSM9674458,SNI+Transplant2,,GSM9674458,excluded_matches_neither_arm

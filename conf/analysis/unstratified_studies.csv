@@ -1,0 +1,4 @@
+study_id,reason
+GSE11783,"Interstitial cystitis, bladder tissue. Admitted to the corpus and pooled in the whole-cohort and human species analyses, but assigned to no pain-model stratum: bladder pain syndrome is its own compartment, sampled by no other study in the transcriptomic arm apart from the two below. The three could pool at k>=3, and a stratum for them was considered and set aside on 2026-09-13 rather than overlooked; see plan/2026-09-12-manuscript-reconciliation.md."
+GSE28242,"Interstitial cystitis, urine sediment. Same decision as GSE11783. Urine sediment is a third tissue again, so even within this trio the compartment is not uniform."
+GSE621,"Interstitial cystitis with antiproliferative factor treatment. Same decision as GSE11783."
