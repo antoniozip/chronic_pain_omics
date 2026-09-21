@@ -15,6 +15,12 @@ regenerate rather than edit, or the next build silently reverts the edit.
 A table drawing on more than one CSV gets one sheet per source, named for the
 file it came from, because merging them would lose which record said what.
 
+It also writes all of them into one workbook, Supplementary_Tables.xlsx: an
+index sheet, then one sheet per table (or per source, named S8_workbench_...,
+where a table draws on several). That single file is what the journal receives;
+Brain Communications asks for at most ten supplementary files, and eighteen
+workbooks exceeded it.
+
 Usage:
     python scripts/build_supplementary_xlsx.py
     python scripts/build_supplementary_xlsx.py --only 12 --only 14
@@ -152,6 +158,32 @@ def build(table: Table) -> Path:
     return out
 
 
+COMBINED = OUT_DIR / "Supplementary_Tables.xlsx"
+
+
+def combined_sheet_names(table: Table) -> list[str]:
+    """Sheet names in the combined workbook: S{n}, or S{n}_{source} for several."""
+    if len(table.sources) == 1:
+        return [f"S{table.number}"]
+    return [f"S{table.number}_{name}"[:31] for name in table.sheet_names()]
+
+
+def build_combined(tables: tuple[Table, ...]) -> Path:
+    """Every table in one workbook, behind an index sheet."""
+    index = pd.DataFrame(
+        [{"Table": f"Supplementary Table {t.number}", "Title": t.title,
+          "Sheets": ", ".join(combined_sheet_names(t))} for t in tables])
+    with pd.ExcelWriter(COMBINED, engine="openpyxl") as writer:
+        index.to_excel(writer, sheet_name="Index", index=False)
+        _style(writer.sheets["Index"], index.shape[1])
+        for table in tables:
+            for src, sheet in zip(table.sources, combined_sheet_names(table)):
+                df = pd.read_csv(src, dtype=str, keep_default_na=False)
+                df.to_excel(writer, sheet_name=sheet, index=False)
+                _style(writer.sheets[sheet], df.shape[1])
+    return COMBINED
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--only", type=int, action="append",
@@ -170,6 +202,9 @@ def main() -> int:
         print(f"  S{table.number:<2} {out.name:<46} {size/1e6:6.2f} MB")
     print(f"{len(wanted)} workbook(s), {total/1e6:.1f} MB -> "
           f"{OUT_DIR.relative_to(REPO_ROOT)}")
+    if not args.only:          # the combined file needs every table
+        out = build_combined(TABLES)
+        print(f"combined: {out.name} {out.stat().st_size/1e6:.2f} MB")
     return 0
 
 

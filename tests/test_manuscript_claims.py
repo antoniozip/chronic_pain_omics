@@ -2146,7 +2146,7 @@ def test_the_title_still_describes_the_results():
     """
     title = re.search(r"\\title\{(.+?)\}\}", _manuscript(), re.S)
     assert title, "the title is no longer recognisable; update this test"
-    # "Disjoint evidence layers" since the Brain Communications title; the
+    # "reveals disjoint evidence" since the Brain Communications title; the
     # claim is the same one "non-overlapping gene sets" made.
     if not re.search(r"non-overlapping|disjoint", title.group(1), re.I):
         pytest.skip("the title no longer claims disjoint gene sets")
@@ -2874,3 +2874,25 @@ def test_every_checklist_location_names_a_real_heading():
     missing = sorted(c for c in cited if c not in headings)
     assert cited, "no italicised locations found; did the checklist format change?"
     assert not missing, f"the checklist cites headings that do not exist: {missing}"
+
+
+def test_combined_workbook_carries_every_cited_table_and_no_other():
+    """Supplementary_Tables.xlsx is the file the journal receives.
+
+    Brain Communications allows ten supplementary files and there are eighteen
+    tables, so they ship as one workbook. A table cited but missing from it, or
+    a sheet no text cites, is the same dead reference the per-table checks
+    above catch, one file further out.
+    """
+    from openpyxl import load_workbook
+
+    path = SUPPLEMENTARY_DIR / "Supplementary_Tables.xlsx"
+    if not path.exists():
+        pytest.skip("no combined workbook; run scripts/build_supplementary_xlsx.py")
+    sheets = load_workbook(path, read_only=True).sheetnames
+    assert sheets[0] == "Index", "the combined workbook should open on its index"
+    in_book = {int(m.group(1)) for s in sheets[1:] if (m := re.match(r"S(\d+)(?:_|$)", s))}
+    cited = _cited_supplementary_numbers()
+    assert cited == in_book, (
+        f"cited but absent: {sorted(cited - in_book)}; "
+        f"present but uncited: {sorted(in_book - cited)}")
