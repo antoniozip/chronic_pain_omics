@@ -12,11 +12,13 @@ Every count here is read from a tracked screening sheet, so the diagram cannot
 state a number the records do not support. Exclusion reason codes are mapped to
 display groups explicitly, and an unmapped code raises rather than falling into
 an "other" bucket: a new reason must be given a place in the diagram on purpose.
+Only once grouped are a source's smallest reasons folded together for drawing
+(:meth:`SourceFlow.condensed`), and the fold is recorded in the sidecar.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import pandas as pd
@@ -24,6 +26,15 @@ import pandas as pd
 PRISMA_DIR = Path("literature") / "prisma"
 SUPP_DIR = Path("manuscript") / "supplementary"
 META_DIR = Path("results") / "meta"
+
+# Exclusion reasons drawn per repository before the rest fold into one line.
+# Every reason still reaches the reader: Supplementary Tables 2, 6, 8 and 11
+# carry each screened record with its reason code. The diagram cannot carry
+# them all and print at a legible size: at 12 pt, 174 mm wide, the full
+# breakdown made it 389 mm tall against a page of about 229 mm. Three reasons
+# cost 20 mm more than two at any font size tried.
+MAX_REASONS = 2
+OTHER_REASONS = "Other reasons"
 
 
 @dataclass(frozen=True)
@@ -47,6 +58,10 @@ class SourceFlow:
     @property
     def n_awaiting(self) -> int:
         return sum(n for _, n in self.awaiting)
+
+    def condensed(self, keep: int = MAX_REASONS) -> SourceFlow:
+        """The flow as drawn: its `keep` largest exclusion reasons, the rest folded."""
+        return replace(self, excluded=top_reasons(self.excluded, keep))
 
     def check(self) -> None:
         """Identified must equal removed + excluded + awaiting + included."""
@@ -85,7 +100,7 @@ SINGLE_CELL_EXCLUDED = {
 }
 GWAS_EXCLUDED = {
     "excluded: cohort/phenotype overlap (kept larger N)":
-        "Cohort and phenotype overlap (larger kept)",
+        "Cohort/phenotype overlap (larger kept)",
     "excluded: gene-based burden study": "Gene-based burden study",
     "excluded: no harmonized file available": "No harmonized summary statistics",
 }
@@ -114,6 +129,19 @@ WORKBENCH_EXCLUDED = {
     "intervention_pre_post_not_case_control": "Other design or compartment",
     "faecal_scfa_panel_not_a_comparable_compartment": "Other design or compartment",
 }
+
+
+def top_reasons(items: tuple[tuple[str, int], ...],
+                keep: int) -> tuple[tuple[str, int], ...]:
+    """The `keep` largest reasons, largest first, the rest as one "other" line.
+
+    A single leftover reason keeps its own name: folding it saves no line and
+    would hide a reason for nothing.
+    """
+    ranked = sorted(items, key=lambda kv: (-kv[1], kv[0]))
+    if len(ranked) <= keep + 1:
+        return tuple(ranked)
+    return tuple(ranked[:keep]) + ((OTHER_REASONS, sum(n for _, n in ranked[keep:])),)
 
 
 def _group(codes: pd.Series, mapping: dict[str, str], source: str) -> tuple[tuple[str, int], ...]:

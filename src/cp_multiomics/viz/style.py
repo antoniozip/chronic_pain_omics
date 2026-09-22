@@ -39,7 +39,7 @@ def set_publication_style() -> None:
     )
 
 
-# Significance color palette (shared across volcano and heatmap)
+# Significance color palette (shared by the volcano and concordance plots)
 SIG_COLORS = {
     "ns":               "#AAAAAA",
     "sig":              "#2166AC",

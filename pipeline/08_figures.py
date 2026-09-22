@@ -5,7 +5,6 @@ all manuscript figures in manuscript/figures/.
 
 Figures produced:
     {modality}_volcano.pdf          — per-modality volcano plots (step 06 output)
-    cross_modal_heatmap.pdf         — top features × modality heatmap
     {modality}_concordance_{sp}.pdf — human vs animal concordance scatter plots
     prisma_flow.pdf                 — PRISMA 2020 flow diagram
     graphical_abstract.pdf          — front-page summary of the three findings
@@ -28,7 +27,6 @@ import yaml
 from cp_multiomics.prisma_flow import metabolomic_units, repository_flows
 from cp_multiomics.viz import (
     plot_concordance_scatter,
-    plot_cross_modal_heatmap,
     plot_graphical_abstract,
     plot_repository_flow,
     plot_volcano,
@@ -75,7 +73,7 @@ def repository_flow_summary(flows: list, metabolomic_units: int | None) -> list[
         f"Genomic: {gwas.included} genome-wide association studies",
         f"Proteomic: {pride.units} study units from {pride.included} PRIDE datasets",
         f"Metabolomic: {metabolomic_units} study units from {metab} studies "
-        "across MetaboLights and Metabolomics Workbench",
+        "in both repositories",
     ]
 
 
@@ -101,7 +99,6 @@ def main() -> None:
 
     padj  = cfg.get("da", {}).get("padj_threshold", 0.05)
     lfc   = cfg.get("da", {}).get("lfc_threshold", 0.5)
-    top_n = cfg.get("meta", {}).get("top_n_features", 50)
 
     # --- PRISMA flow ---
     # Datasets through the repositories that supplied them; see
@@ -130,25 +127,13 @@ def main() -> None:
     modalities = ALL_MODALITIES if args.modality == "all" else [args.modality]
 
     # --- Per-modality volcano plots ---
-    pooled_all: dict[str, pd.DataFrame] = {}
     for mod in modalities:
         df = load_pooled(args.meta_dir, mod)
-        pooled_all[mod] = df
         if df.empty:
             logger.info("[%s] No pooled effects — skipping volcano.", mod)
             continue
         plot_volcano(df, modality=mod, out_dir=args.figures_dir,
                      padj_threshold=padj, lfc_threshold=lfc, top_n_labels=15)
-
-    # --- Cross-modal heatmap ---
-    non_empty = {m: df for m, df in pooled_all.items() if not df.empty}
-    if len(non_empty) >= 2:
-        plot_cross_modal_heatmap(
-            non_empty, out_dir=args.figures_dir,
-            top_n=top_n, padj_threshold=padj,
-        )
-    else:
-        logger.info("Need ≥2 modalities with data for cross-modal heatmap — skipping.")
 
     # --- Cross-species concordance scatter ---
     for mod in [m for m in modalities if m != "genomics"]:

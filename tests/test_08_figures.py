@@ -10,7 +10,6 @@ import pytest
 matplotlib.use("Agg")  # non-interactive backend for tests
 
 from cp_multiomics.viz.concordance_plot import plot_concordance_scatter
-from cp_multiomics.viz.heatmap import _cluster_order, plot_cross_modal_heatmap
 from cp_multiomics.viz.style import SIG_COLORS, set_publication_style
 from cp_multiomics.viz.volcano import plot_volcano
 
@@ -73,42 +72,6 @@ def test_plot_volcano_all_ns(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# Cross-modal heatmap
-# ---------------------------------------------------------------------------
-
-def test_plot_cross_modal_heatmap_creates_pdf(tmp_path):
-    data = {
-        "transcriptomics": _pooled_df(seed=1),
-        "proteomics":      _pooled_df(seed=2),
-    }
-    out = plot_cross_modal_heatmap(data, out_dir=tmp_path, top_n=10, padj_threshold=0.05)
-    assert out.exists()
-
-
-def test_heatmap_no_significant_features_returns_path(tmp_path):
-    data = {
-        "transcriptomics": _pooled_df().assign(padj_pooled=1.0),
-        "proteomics":      _pooled_df().assign(padj_pooled=1.0),
-    }
-    out = plot_cross_modal_heatmap(data, out_dir=tmp_path)
-    # Returns path even when empty (may be a .txt sentinel)
-    assert out is not None
-
-
-def test_cluster_order_returns_correct_length():
-    data = np.random.rand(5, 3)
-    order = _cluster_order(data)
-    assert len(order) == 5
-    assert sorted(order) == list(range(5))
-
-
-def test_cluster_order_single_row():
-    data = np.array([[1.0, 2.0, 3.0]])
-    order = _cluster_order(data)
-    assert order == [0]
-
-
-# ---------------------------------------------------------------------------
 # Concordance scatter
 # ---------------------------------------------------------------------------
 
@@ -150,17 +113,24 @@ def test_repository_flows_add_up_and_match_the_drawn_figure():
 
     The figure is an image, so no claim can read it. Its sidecar records every
     number drawn; recomputing them here fails a figure left stale after a
-    screening decision changed.
+    screening decision changed. What is drawn is the condensed flow, with each
+    source's smallest reasons folded, so that is what is recomputed.
     """
     from cp_multiomics.prisma_flow import flow_table, repository_flows
 
     sidecar = REPO / "manuscript" / "figures" / "prisma_flow_counts.csv"
     if not sidecar.exists():
         pytest.skip("figure not drawn; run pipeline/08_figures.py --prisma-only")
-    current = flow_table(repository_flows(REPO))
+    current = flow_table([flow.condensed() for flow in repository_flows(REPO)])
     drawn = pd.read_csv(sidecar, keep_default_na=False)
-    if "units" in set(drawn["stage"]) - set(current["stage"]):
-        pytest.skip("results/ absent, so the pooled study units cannot be recomputed")
+    # A source's pooled study units may come from results/, which a fresh clone
+    # and the CI job lack; GEO's come from a tracked table and PRIDE's do not.
+    # Only those rows are left out, so every other count is still checked. The
+    # guard used to skip only when no source had units, which GEO's always
+    # prevented: the test failed in CI while passing wherever results/ existed.
+    unrecomputable = (drawn["stage"] == "units") & ~drawn["source"].isin(
+        current.loc[current["stage"] == "units", "source"])
+    drawn = drawn[~unrecomputable]
     pd.testing.assert_frame_equal(
         drawn.reset_index(drop=True), current.astype({"n": "int64"}).reset_index(drop=True),
         check_dtype=False, obj="prisma_flow_counts.csv (rerun 08_figures.py --prisma-only)")
@@ -182,14 +152,65 @@ def test_a_flow_that_does_not_add_up_raises():
                    excluded=(("reason", 3),), included=6).check()
 
 
+def test_top_reasons_folds_only_when_it_saves_a_line():
+    """Folding one leftover reason saves nothing and would hide its name."""
+    from cp_multiomics.prisma_flow import OTHER_REASONS, SourceFlow, top_reasons
+
+    items = (("a", 1), ("b", 9), ("c", 3), ("d", 2))
+    assert top_reasons(items, 2) == (("b", 9), ("c", 3), (OTHER_REASONS, 3))
+    assert top_reasons(items[:3], 2) == (("b", 9), ("c", 3), ("a", 1))
+    flow = SourceFlow("X", identified=20, identified_label="studies",
+                      excluded=items, included=5)
+    flow.condensed(2).check()
+
+
 def test_plot_repository_flow_writes_pdf_and_sidecar(tmp_path):
-    from cp_multiomics.prisma_flow import SourceFlow
+    from cp_multiomics.prisma_flow import OTHER_REASONS, SourceFlow
     from cp_multiomics.viz.prisma import plot_repository_flow
 
-    flow = SourceFlow("GEO", identified=10, identified_label="series",
-                      excluded=(("No contrast", 4),), awaiting=(("Pending", 1),),
-                      included=5, units=6)
+    flow = SourceFlow("GEO", identified=16, identified_label="series",
+                      excluded=(("No contrast", 4), ("No split", 3), ("Duplicate", 2),
+                                ("Unreadable", 1)),
+                      awaiting=(("Pending", 1),), included=5, units=6)
     out = plot_repository_flow([flow], ["Transcriptomic: 6 units"], out_dir=tmp_path)
     assert out.exists() and out.suffix == ".pdf"
     side = pd.read_csv(tmp_path / "prisma_flow_counts.csv", keep_default_na=False)
     assert set(side["stage"]) == {"identified", "excluded", "awaiting", "included", "units"}
+    # The sidecar records the fold as drawn, and the drawn counts still add up.
+    excluded = side[side["stage"] == "excluded"].set_index("label")["n"]
+    assert list(excluded.index) == ["No contrast", "No split", OTHER_REASONS]
+    assert excluded[OTHER_REASONS] == 3
+
+
+def test_a_word_wider_than_its_box_raises(tmp_path):
+    """Text printing over a box edge is refused, not drawn."""
+    from cp_multiomics.prisma_flow import SourceFlow
+    from cp_multiomics.viz.prisma import plot_repository_flow
+
+    flow = SourceFlow("Transcriptomicsrepositoryofrecords", identified=5,
+                      identified_label="series", included=5)
+    with pytest.raises(ValueError, match="wider than its box"):
+        plot_repository_flow([flow], [], out_dir=tmp_path)
+
+
+def test_flow_diagram_prints_at_full_width_on_one_page(tmp_path):
+    """Drawn from the current records, Fig. 1 needs no scaling at print.
+
+    It is laid out at the journal's print width with text at FONT. A screening
+    change that adds a reason or wraps a label makes it taller, and past a page
+    it is shrunk to fit, taking its text below FONT without any build noticing.
+    """
+    import re
+
+    from cp_multiomics.prisma_flow import SUPP_DIR, repository_flows
+    from cp_multiomics.viz.prisma import PAGE_HEIGHT, WIDTH, plot_repository_flow
+
+    if not (REPO / SUPP_DIR / "Table_S2_GWAS_studies.csv").exists():
+        pytest.skip("GWAS screening record absent: the code-only snapshot ships no manuscript/")
+    out = plot_repository_flow(repository_flows(REPO), ["Summary line"], out_dir=tmp_path)
+    box = re.search(rb"/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]",
+                    out.read_bytes())
+    assert box is not None
+    width, height = (float(v) / 72 for v in box.groups())
+    assert width == pytest.approx(WIDTH, abs=0.01)
+    assert height <= PAGE_HEIGHT, f"{height * 25.4:.0f} mm, over a page"
