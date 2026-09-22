@@ -454,12 +454,37 @@ def _sni_tissue_top_n() -> int:
 
 @cache
 def _q_permutation() -> pd.DataFrame:
-    """Permutation null for the between-model Q test (100 shuffles).
+    """Permutation null for the between-model Q test (1,000 shuffles).
 
     perm 0 is the observed statistic; perm > 0 the permuted ones. Written by
-    scripts/permute_between_model_q.R.
+    scripts/permute_between_model_q.R as 20 runs of 50, pooled by
+    scripts/pool_permutation_runs.py.
     """
     return _read(STRAT / "between_model_Q_permutation.csv")
+
+
+def _q_perm_tail() -> tuple[int, int]:
+    """Exceedances b of B: permuted rates reaching the observed one, and B."""
+    perm = _q_permutation()
+    null = perm.query("perm > 0")["pct"]
+    return int((null >= perm.query("perm == 0")["pct"].iloc[0]).sum()), len(null)
+
+
+def _q_perm_p() -> float:
+    b, n = _q_perm_tail()
+    return (b + 1) / (n + 1)
+
+
+def _q_perm_interval(bound: str) -> float:
+    """Clopper-Pearson 95% interval for the tail probability b/B estimates.
+
+    The Monte Carlo uncertainty of drawing B permutations rather than all of
+    them, as scripts/pool_permutation_runs.py prints it.
+    """
+    b, n = _q_perm_tail()
+    if bound == "lower":
+        return float(stats.beta.ppf(0.025, b, n - b + 1)) if b else 0.0
+    return float(stats.beta.ppf(0.975, b + 1, n - b)) if b < n else 1.0
 
 
 @cache
@@ -1147,20 +1172,28 @@ CLAIMS: list[Claim] = [
           r"differences, against ([\d.]+)\\%",
           lambda: float(_q_permutation().query("perm > 0")["pct"].mean()),
           tol=0.05),
+    # p is written to three decimals now that B = 1,000, so the tolerance is
+    # half a unit in the third: at the old 0.005 a one-digit mutation survived.
     Claim("q_null_p",
-          r"\(\\pval\\,=\\,([\d.]+), 100 permutations\)",
-          lambda: (int((_q_permutation().query("perm > 0")["pct"]
-                        >= _q_permutation().query("perm == 0")["pct"].iloc[0]).sum()) + 1)
-                  / (len(_q_permutation().query("perm > 0")) + 1),
-          tol=0.005),
+          r"\(\\pval\\,=\\,([\d.]+), [\d,]+ permutations\)",
+          _q_perm_p, tol=0.0005),
+    Claim("q_perm_count",
+          r"\(\\pval\\,=\\,[\d.]+, ([\d,]+) permutations\)",
+          lambda: _q_perm_tail()[1]),
     # The Results state the empirical p as well as the Abstract, and only the
-    # Abstract's copy was read: q_null_p needs the ", 100 permutations)" tail.
+    # Abstract's copy was read: q_null_p needs the ", N permutations)" tail.
     Claim("q_null_p_results",
-          r"exceeded by \w+ of 100 permutations \(\\pval\\,=\\,([\d.]+)\)",
-          lambda: (int((_q_permutation().query("perm > 0")["pct"]
-                        >= _q_permutation().query("perm == 0")["pct"].iloc[0]).sum()) + 1)
-                  / (len(_q_permutation().query("perm > 0")) + 1),
-          tol=0.005),
+          r"exceeded by [\w,]+ of [\d,]+ permutations \(\\pval\\,=\\,([\d.]+);",
+          _q_perm_p, tol=0.0005),
+    Claim("q_perm_count_results",
+          r"exceeded by [\w,]+ of ([\d,]+) permutations",
+          lambda: _q_perm_tail()[1]),
+    Claim("q_perm_interval_lower",
+          r"Monte Carlo 95\\% interval ([\d.]+)--",
+          lambda: _q_perm_interval("lower"), tol=0.0005),
+    Claim("q_perm_interval_upper",
+          r"Monte Carlo 95\\% interval [\d.]+--([\d.]+)\)",
+          lambda: _q_perm_interval("upper"), tol=0.0005),
     Claim("q_null_pct_results",
           r"still makes ([\d.]+)\\% of features \(95th percentile",
           lambda: float(_q_permutation().query("perm > 0")["pct"].mean()),
@@ -1185,9 +1218,8 @@ CLAIMS: list[Claim] = [
           lambda: float(_q_permutation().query("perm == 0")["pct"].iloc[0]),
           tol=0.05),
     Claim("q_perms_exceeding",
-          r"exceeded by (\w+) of 100 permutations",
-          lambda: int((_q_permutation().query("perm > 0")["pct"]
-                       >= _q_permutation().query("perm == 0")["pct"].iloc[0]).sum())),
+          r"exceeded by ([\w,]+) of [\d,]+ permutations",
+          lambda: _q_perm_tail()[0]),
     # The within-species positive control, which is what withdrew the species
     # reading of the cross-species null.
     Claim("hvh_random_pct",

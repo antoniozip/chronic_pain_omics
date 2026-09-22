@@ -130,8 +130,11 @@ obs <- q_hits(unit_model)
 message(sprintf("observed: %d/%d = %.2f%%", obs["hits"], obs["tested"],
                 100 * obs["hits"] / obs["tested"]))
 
-rows <- data.frame(perm = 0L, tested = obs["tested"], hits = obs["hits"],
-                   pct = 100 * obs["hits"] / obs["tested"], row.names = NULL)
+#' Each permuted row records its seed, so runs split across processes can be
+#' pooled (scripts/pool_permutation_runs.py) and checked for a repeated shuffle.
+rows <- data.frame(perm = 0L, seed = NA_integer_, tested = obs["tested"],
+                   hits = obs["hits"], pct = 100 * obs["hits"] / obs["tested"],
+                   row.names = NULL)
 for (p in seq_len(N_PERMS)) {
   set.seed(SEED * 1000L + p)
   perm <- unit_model
@@ -141,7 +144,8 @@ for (p in seq_len(N_PERMS)) {
     perm[idx] <- sample(unit_model[idx])
   }
   r <- q_hits(perm)
-  rows <- rbind(rows, data.frame(perm = p, tested = r["tested"], hits = r["hits"],
+  rows <- rbind(rows, data.frame(perm = p, seed = SEED * 1000L + p,
+                                 tested = r["tested"], hits = r["hits"],
                                  pct = 100 * r["hits"] / r["tested"],
                                  row.names = NULL))
   message(sprintf("  perm %2d: %d/%d = %.2f%%", p, r["hits"], r["tested"],
