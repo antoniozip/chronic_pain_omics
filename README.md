@@ -21,27 +21,31 @@ bookkeeping that makes those reproducible.
 
 | | |
 | --- | --- |
-| Transcriptomic study units pooled | 82 |
-| Features with a pooled estimate | 159,640 (88,966 in the correction family) |
+| Transcriptomic study units pooled | 93 |
+| Features with a pooled estimate | 161,284 (93,861 in the correction family) |
 | GWAS with harmonised summary statistics | 57 |
 | Proteomic datasets screened / poolable | 43 / 3 |
 | Metabolomic study units | 12 |
-| Cross-species ortholog pairs | 33,033 |
+| Cross-species ortholog pairs | 33,029 |
 
 Three results, all negative, and that is the point:
 
-- **Pain models are near-disjoint.** 14,267 of 67,352 testable features differ
-  significantly between pain models, roughly 8,600 of them beyond what a
-  permuted-label null produces. Pooling across models without stratification
-  averages away the signal.
-- **Rodent-to-human agreement is at chance.** Direction concordance is 49.6%
-  for mouse and 51.1% for rat. A within-species control, two halves of one
-  human condition through the same pipeline, agrees 51.5%, so the cross-species
-  number is not distinguishable from the measurement's own noise floor.
+- **Pain model adds modest structure, no more.** 11,043 of 72,236 testable
+  features differ significantly between pain models, but shuffling the model
+  label across studies still makes 7.8% of features look model-dependent. The
+  excess over that null, roughly 5,600 features, falls short of conventional
+  significance (p = 0.066, 1,000 permutations).
+- **Rodent-to-human agreement is at or below chance.** Direction concordance
+  is 51.0% for mouse and 52.2% for rat, falling to 49.0% and 50.7% when the
+  human pool is restricted to tissue-comparable studies. Two independent
+  halves of one human condition, through the same pipeline, agree 55.2%, so
+  the cross-species null measures the reproducibility floor of pooled bulk
+  transcriptomes rather than a fact about species.
 - **Genomic and transcriptomic evidence implicate disjoint genes.** None of the
-  25 genome-wide-significant genes is a cross-species concordant transcript,
-  and none of the most-replicated GWAS pain genes approaches significance in
-  the transcriptomic pool.
+  25 genome-wide-significant genes is significant in the human transcriptomic
+  pool or is a cross-species concordant transcript, and none of the 15
+  most-replicated GWAS pain genes approaches significance there (smallest
+  adjusted p 0.27).
 
 ## Layout
 
