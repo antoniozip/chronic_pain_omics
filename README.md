@@ -58,8 +58,8 @@ src/           Python package (ingestion, harmonisation, plotting)
 R/             R helpers (per-study DA, meta-analysis, shared statistics)
 scripts/       Manuscript artefacts and maintenance tools
 tests/         pytest and testthat suites
-manuscript/    LaTeX sources, figures, supplementary
-results/       Analysis outputs (gitignored: 12 GB, regenerable)
+results/       Analysis outputs (gitignored: 12 GB, regenerable;
+               manuscript sources are not shipped in this snapshot)
 ```
 
 ## Running it
@@ -85,15 +85,16 @@ python pipeline/08_figures.py
 ```
 
 Transcriptomics is the slow arm: steps 05 and 06 take roughly two hours each.
-`CLAUDE.md` documents the caveats that are easy to get wrong, and is worth
-reading before changing any analysis step.
+The project's `CLAUDE.md` (not shipped in this code-only snapshot) documents
+the caveats that are easy to get wrong, and is worth reading before changing
+any analysis step.
 
 ## The manuscript's numbers are tested
 
 Every numeric claim in the paper is bound to the results file that produces it.
 
 ```bash
-pytest tests/test_manuscript_claims.py          # 358 claims against results/
+pytest tests/test_manuscript_claims.py          # 358 claims (needs manuscript sources; skips here)
 python scripts/mutation_test_claims.py          # prove each claim can fail
 ```
 
@@ -109,6 +110,9 @@ number each one reads and checks that the claim fails. A claim that survives
 its own mutation reports green while checking nothing.
 
 ## Building the paper
+
+Building requires the manuscript sources, which are not shipped in this
+code-only snapshot.
 
 ```bash
 cd manuscript
@@ -127,13 +131,13 @@ four of them naming papers that do not exist under the title given.
 ## Tests
 
 ```bash
-pytest tests/                                         # 1,148
+pytest tests/                                         # 1,148 in the full repository
 Rscript -e 'testthat::test_dir("tests/testthat")'     # 421
 ruff check . && mypy src/
 ```
 
-CI runs all three on every push, plus the claim registry against a cached copy
-of `results/`. A cache miss fails the job by design: `results/` cannot be
+The full repository's CI runs all three on every push, plus the claim registry
+against a cached copy of `results/`. A cache miss fails the job by design: `results/` cannot be
 rebuilt inside a job, and an unverified manuscript should not be able to report
 green.
 
@@ -141,8 +145,8 @@ green.
 
 No primary data is generated here. Every dataset is retrieved by the pipeline
 from public repositories: GEO, the GWAS Catalog, PRIDE, MetaboLights and
-Metabolomics Workbench. Accessions for every included dataset are in
-`manuscript/supplementary/`, and every inclusion and exclusion decision is
+Metabolomics Workbench. Accessions for every included dataset are in the full
+repository's `manuscript/supplementary/`, and every inclusion and exclusion decision is
 recorded with a reason code in `literature/prisma/`.
 
 `results/` is gitignored as regenerable, with one deliberate exception:
