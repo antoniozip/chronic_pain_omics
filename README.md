@@ -149,6 +149,10 @@ Metabolomics Workbench. Accessions for every included dataset are in the full
 repository's `manuscript/supplementary/`, and every inclusion and exclusion decision is
 recorded with a reason code in `literature/prisma/`.
 
+The analysis is retrospectively registered: OSF DOI
+[10.17605/OSF.IO/M3YNG](https://doi.org/10.17605/OSF.IO/M3YNG). It was not
+prospectively registered.
+
 `results/` is gitignored as regenerable, with one deliberate exception:
 `results/meta/transcriptomics/egger_test.csv`, which the manuscript's
 publication-bias claims read.
