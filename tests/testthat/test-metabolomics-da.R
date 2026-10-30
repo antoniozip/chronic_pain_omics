@@ -51,6 +51,46 @@ test_that("compute_hedges_g handles NA values", {
 
 
 # ---------------------------------------------------------------------------
+# the SE must belong to the effect that is reported
+#
+# The backend reports Hedges' g but carried the limma SE of log2FC. 06/06b/06g
+# weight on 1/se^2 and pool effect_size, so every metabolomic feature was
+# weighted by the precision of a different quantity on a different scale.
+# ---------------------------------------------------------------------------
+
+test_that("compute_hedges_g returns the standard error of g on request", {
+  set.seed(11)
+  mat   <- matrix(rnorm(60, mean = rep(c(2, 0), each = 30)), nrow = 3, ncol = 20)
+  group <- factor(rep(c("case", "control"), each = 10))
+  n1 <- sum(group == "case"); n0 <- sum(group == "control")
+
+  out <- compute_hedges_g(mat, group, return_se = TRUE)
+  expect_type(out, "list")
+  expect_named(out, c("g", "se"))
+  expect_equal(out$g, compute_hedges_g(mat, group))
+
+  expected <- sqrt((n1 + n0) / (n1 * n0) + out$g^2 / (2 * (n1 + n0)))
+  expect_equal(unname(out$se), unname(expected))
+})
+
+test_that("the default return of compute_hedges_g is still the g vector", {
+  mat   <- matrix(rnorm(20), nrow = 2, ncol = 10)
+  group <- factor(rep(c("case", "control"), each = 5))
+  expect_type(compute_hedges_g(mat, group), "double")
+})
+
+test_that("compute_hedges_g's SE is not the SE of log2FC", {
+  set.seed(3)
+  mat   <- matrix(rnorm(40, mean = 1), nrow = 4, ncol = 10)
+  group <- factor(rep(c("case", "control"), each = 5))
+  out   <- compute_hedges_g(mat, group, return_se = TRUE)
+  # limma's SE is on the log2 concentration scale and is much smaller for
+  # well-measured features; the two must not be interchangeable.
+  expect_true(all(out$se > 0.3))
+})
+
+
+# ---------------------------------------------------------------------------
 # run_metabolomics_da (smoke test with synthetic data)
 # ---------------------------------------------------------------------------
 
@@ -87,4 +127,11 @@ test_that("run_metabolomics_da returns effect df with correct columns", {
   expect_equal(nrow(result), 3)
   expect_equal(result$id_space[1], "ChEBI")
   expect_equal(result$effect_unit[1], "SMD")
+  # SMD is only truthful if the SE is the SE of g. It was limma's abs(logFC/t)
+  # — the precision of a quantity on a different scale.
+  n1 <- sum(meta$group == "case")
+  n0 <- sum(meta$group == "control")
+  expected_se <- sqrt((n1 + n0) / (n1 * n0) +
+                        result$effect_size^2 / (2 * (n1 + n0)))
+  expect_equal(result$se, unname(expected_se), tolerance = 1e-8)
 })

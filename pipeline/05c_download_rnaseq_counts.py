@@ -19,7 +19,9 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import json
 import logging
+import os
 import re
 import time
 from pathlib import Path
@@ -121,24 +123,60 @@ def file_size(url: str) -> int | None:
         return None
 
 
+def _ok_path(dest: Path) -> Path:
+    """Verification marker written only after a complete, size-checked download."""
+    return dest.with_suffix(dest.suffix + ".ok")
+
+
+def _write_ok_marker(dest: Path, size: int) -> None:
+    marker = _ok_path(dest)
+    tmp = marker.with_suffix(marker.suffix + ".tmp")
+    tmp.write_text(json.dumps({"bytes": size}), encoding="utf-8")
+    os.replace(tmp, marker)
+
+
+def _is_verified(dest: Path) -> bool:
+    marker = _ok_path(dest)
+    if not marker.exists() or not dest.exists():
+        return False
+    try:
+        recorded = json.loads(marker.read_text(encoding="utf-8")).get("bytes")
+    except (OSError, ValueError):
+        return False
+    return recorded == dest.stat().st_size
+
+
 def download_file(url: str, dest: Path) -> bool:
-    """Download a file with progress logging. Returns True on success."""
+    """Download a file atomically. Returns True only after verification.
+
+    Bytes are streamed to `<dest>.part` and renamed into place once the
+    Content-Length (when the server sends one) matches. A killed process or a
+    reset connection therefore never leaves a truncated file at `dest`.
+    """
     https_url = ftp_to_https(url)
+    part = dest.with_suffix(dest.suffix + ".part")
     try:
         dest.parent.mkdir(parents=True, exist_ok=True)
         with requests.get(https_url, stream=True, timeout=120) as resp:
             resp.raise_for_status()
+            declared = resp.headers.get("Content-Length")
+            expected = int(declared) if declared and declared.isdigit() else None
             downloaded = 0
-            with open(dest, "wb") as fh:
+            with open(part, "wb") as fh:
                 for chunk in resp.iter_content(chunk_size=65536):
                     fh.write(chunk)
                     downloaded += len(chunk)
-            logger.info("    Downloaded %s (%.1f MB)", dest.name, downloaded / 1e6)
+        if expected is not None and downloaded != expected:
+            raise OSError(f"short read: {downloaded}/{expected} bytes")
+        os.replace(part, dest)
+        _write_ok_marker(dest, downloaded)
+        logger.info("    Downloaded %s (%.1f MB)", dest.name, downloaded / 1e6)
         return True
     except Exception as exc:
         logger.warning("    Download failed for %s: %s", dest.name, exc)
-        if dest.exists():
-            dest.unlink()
+        part.unlink(missing_ok=True)
+        if not _is_verified(dest):
+            dest.unlink(missing_ok=True)
         return False
 
 
@@ -187,13 +225,20 @@ def find_rna_seq_candidates(cache_dir: Path, per_study_dir: Path) -> list[str]:
 
 
 def already_downloaded(accession: str, cache_dir: Path) -> bool:
-    """Return True if a count-like file exists in the accession subdirectory."""
+    """True only if a count file exists *and* carries a matching `.ok` marker.
+
+    A `.part` file, a file without a marker, or one whose size disagrees with
+    its marker is not a completed download and must be retried.
+    """
     suppl_dir = cache_dir / accession
     if not suppl_dir.exists():
         return False
     for f in suppl_dir.iterdir():
-        if COUNT_PATTERNS.search(f.name) and not SKIP_PATTERNS.search(f.name):
-            return True
+        if f.name.endswith(".part") or f.name.endswith(".ok"):
+            continue
+        if f.is_file() and COUNT_PATTERNS.search(f.name) and not SKIP_PATTERNS.search(f.name):
+            if _is_verified(f):
+                return True
     return False
 
 

@@ -109,6 +109,9 @@ def test_cached_raw_is_reharmonized_without_redownloading(tmp_path):
     for acc in ("GCST001", "GCST003"):
         with gzip.open(raw_dir / f"{acc}.h.tsv.gz", "wb") as f:
             f.write(body)
+        # B5: a cached raw is only trusted when its verification sidecar exists
+        # (an interrupted stream leaves a short file that still decompresses).
+        pipeline_04b.write_verification(raw_dir / f"{acc}.h.tsv.gz")
 
     def http_get(url, params=None):
         return {"_embedded": {"studies": _REST.get(params["efoTrait"], [])}}
@@ -184,3 +187,70 @@ def test_limit_skipped_studies_marked_not_attempted(tmp_path):
     assert len(not_attempted) == 1               # the other kept study marked not_attempted
     # every resolved study still present exactly once
     assert set(rows) == {"GCST001", "GCST002", "GCST003"}
+
+
+# --- appended: integrity fixes (B8 dry-run isolation, B5 cache trust) -------
+
+def _good_stream(hdr):
+    import gzip
+
+    def http_stream(url):
+        body = (hdr + "1\t10177\tAC\tA\t-0.08\t0.20\t0.45\t0.66\tNA\tlo\t11\trs1\n").encode()
+        gz = gzip.compress(body)
+        return {"Content-Length": str(len(gz))}, [gz]
+    return http_stream
+
+
+_HDR = ("chromosome\tbase_pair_location\teffect_allele\tother_allele\tbeta\t"
+        "standard_error\teffect_allele_frequency\tp_value\tvariant_id\t"
+        "hm_coordinate_conversion\thm_code\trsid\n")
+
+
+def test_dry_run_never_overwrites_the_real_manifest(tmp_path):
+    """B8: --dry-run rewrote the PRISMA manifest with every study 'excluded'."""
+    cfg = _cfg(tmp_path)
+    real = Path(cfg["output"]["manifest"])
+    real.parent.mkdir(parents=True, exist_ok=True)
+    real.write_text("accession,disposition\nGCST999,fetched\n")
+
+    def http_get(url, params=None):
+        return {"_embedded": {"studies": _REST.get(params["efoTrait"], [])}}
+
+    written = pipeline_04b.run(cfg, http_get, lambda u: [], _good_stream(_HDR),
+                               dry_run=True, limit=None)
+
+    assert Path(written) != real
+    assert real.read_text() == "accession,disposition\nGCST999,fetched\n"
+
+
+def test_a_cached_raw_without_verification_is_redownloaded(tmp_path):
+    """B5: a truncated gzip left by an interrupted download must not be trusted."""
+    import gzip
+
+    raw_dir = tmp_path / "raw"
+    raw_dir.mkdir(parents=True)
+    body = (_HDR + "1\t10177\tAC\tA\t-0.08\t0.20\t0.45\t0.66\tNA\tlo\t11\trs1\n").encode()
+    complete = gzip.compress(body)
+    for acc in ("GCST001", "GCST003"):
+        (raw_dir / f"{acc}.h.tsv.gz").write_bytes(complete[:-6])   # truncated, no .ok
+
+    calls = {"n": 0}
+
+    def http_stream(url):
+        calls["n"] += 1
+        gz = gzip.compress(body)
+        return {"Content-Length": str(len(gz))}, [gz]
+
+    def http_get(url, params=None):
+        return {"_embedded": {"studies": _REST.get(params["efoTrait"], [])}}
+
+    manifest = pipeline_04b.run(
+        _cfg(tmp_path), http_get, lambda u: ["f.h.tsv.gz"], http_stream,
+        dry_run=False, limit=None)
+
+    import csv
+    rows = {r["accession"]: r for r in csv.DictReader(open(manifest))}
+    assert rows["GCST001"]["disposition"] == "fetched"
+    assert calls["n"] == 2, "both truncated files must be re-downloaded"
+    assert pipeline_04b.raw_is_verified(raw_dir / "GCST001.h.tsv.gz")
+

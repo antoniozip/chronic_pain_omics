@@ -102,17 +102,36 @@ class OmicsHarmonizer(ABC):
     ) -> list[HarmonizedRecord]:
         """Harmonize a list of raw DatasetRecord dicts into HarmonizedRecords."""
         results: list[HarmonizedRecord] = []
+        failures: list[str] = []
         for raw in raw_records:
             try:
                 rec = self._harmonize_one(raw, cfg)
                 results.append(rec)
             except Exception as exc:
+                failures.append(
+                    f"{raw.get('source', '?')}/{raw.get('accession', '?')}: {exc}"
+                )
                 logger.warning(
                     "Failed to harmonize %s/%s: %s",
                     raw.get("source", "?"), raw.get("accession", "?"), exc,
                 )
+        if failures:
+            logger.warning(
+                "[%s] %d / %d records failed harmonization; first failures: %s",
+                self.modality, len(failures), len(raw_records),
+                "; ".join(failures[:5]),
+            )
         logger.info("[%s] Harmonized %d / %d records",
                     self.modality, len(results), len(raw_records))
+        if raw_records and not results:
+            # An empty harmonized.jsonl is read downstream as "0 studies", the
+            # same shape as a genuinely empty cohort. A modality that produced
+            # records and harmonized none is a failure, not a result.
+            raise RuntimeError(
+                f"[{self.modality}] harmonized 0 of {len(raw_records)} records; "
+                "refusing to write an empty manifest. First failures: "
+                + "; ".join(failures[:5])
+            )
         return results
 
     @abstractmethod
@@ -145,7 +164,11 @@ class OmicsHarmonizer(ABC):
         flags: list[str] = []
         if raw.get("n_samples", 0) < min_samples:
             flags.append(f"low_n_samples(<{min_samples})")
-        if not raw.get("year") or raw.get("year", "0000")[:4] == "0000":
+        # Coerce before slicing: a provider that returns an integer year used
+        # to raise TypeError here, and the broad except in harmonize() then
+        # dropped the whole record without a trace.
+        year = str(raw.get("year") or "")
+        if not year or year[:4] == "0000":
             flags.append("missing_year")
         if not raw.get("description"):
             flags.append("no_description")

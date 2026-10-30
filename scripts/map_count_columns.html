@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Count column mapping</title>
+<style>
+:root{--bg:#fafaf8;--panel:#fff;--ink:#1d1d1b;--mute:#6b6b66;--line:#dcdcd6;--accent:#1f5f8b;
+--case:#b4541a;--case-bg:#fbeee4;--ctl:#1f5f8b;--ctl-bg:#e6f0f7;--ok:#2a7a3b;--bad:#b3261e;--warn:#8a6d00}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--panel:#1f1f1d;--ink:#ecebe6;--mute:#9b9a93;
+--line:#34332f;--accent:#6aa8d6;--case:#e59a66;--case-bg:#3a2619;--ctl:#7fb4dc;--ctl-bg:#18303f;
+--ok:#6cc47e;--bad:#f0877f;--warn:#d9b84a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:baseline}
+header h1{font-size:15px;margin:0}header span{color:var(--mute)}
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 44px)}
+nav{border-right:1px solid var(--line);padding:8px;overflow:auto}
+nav button{display:block;width:100%;text-align:left;background:none;border:1px solid transparent;
+color:inherit;padding:6px 8px;border-radius:6px;cursor:pointer;font:inherit}
+nav button.on{background:var(--panel);border-color:var(--line)}
+nav small{display:block;color:var(--mute)}
+main{padding:16px;max-width:1100px}
+.chip{font-size:11px;border:1px solid var(--line);border-radius:10px;padding:0 7px;margin-left:6px}
+.mapping_ok{color:var(--ok)}.ineligible{color:var(--bad)}.unclear{color:var(--warn)}
+h2{font-size:16px;margin:0 0 4px}h3{font-size:13px;margin:18px 0 6px;text-transform:uppercase;
+letter-spacing:.04em;color:var(--mute)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;margin:6px 0}
+details p{margin:4px 0;white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;background:var(--panel);border:1px solid var(--line)}
+th,td{border-bottom:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--mute);font-weight:600}
+tr.case td:first-child{border-left:4px solid var(--case)}tr.control td:first-child{border-left:4px solid var(--ctl)}
+.g-case{color:var(--case);background:var(--case-bg)}.g-control{color:var(--ctl);background:var(--ctl-bg)}
+.g{border-radius:4px;padding:0 6px;font-size:12px}
+select,textarea,input{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);
+border-radius:5px;padding:3px 5px}select{max-width:440px}textarea{width:100%;min-height:54px}
+.how{font-size:11px;color:var(--mute)}.how.positional{color:var(--warn)}
+.mono{font-family:ui-monospace,monospace;font-size:12px}.mute{color:var(--mute)}
+.row{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:8px 0}
+button.primary{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:7px 16px;
+font:inherit;cursor:pointer}button.sec{background:none;border:1px solid var(--line);color:inherit;
+border-radius:6px;padding:5px 10px;font:inherit;cursor:pointer}
+#msg{margin-left:8px}.err{color:var(--bad)}.okmsg{color:var(--ok)}
+#summary{font-weight:600}
+</style>
+</head>
+<body>
+<header><h1>Count column mapping</h1><span id="progress"></span></header>
+<div class="layout"><nav id="queue"></nav><main id="main"><p class="mute">Choose a series.</p></main></div>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, props = {}, ...kids) => {
+  const n = Object.assign(document.createElement(tag), props);
+  kids.flat().forEach(k => n.append(k));
+  return n;
+};
+let queue = [], current = null, state = null;
+
+async function api(path, body) {
+  const r = await fetch(path, body ? {method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body)} : {});
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || r.status);
+  return j;
+}
+
+async function loadQueue() {
+  queue = await api('/api/queue');
+  const done = queue.filter(q => q.review).length;
+  $('#progress').textContent = `${done} of ${queue.length} decided`;
+  const nav = $('#queue'); nav.replaceChildren();
+  for (const q of queue) {
+    const dec = q.review ? q.review.decision : '';
+    nav.append(el('button', {className: q.accession === current ? 'on' : '',
+      onclick: () => open(q.accession)},
+      q.accession, dec ? el('span', {className: `chip ${dec}`, textContent: dec}) : '',
+      el('small', {textContent: `${q.species} · ${q.year} · ${q.n_samples} samples`})));
+  }
+}
+
+async function open(acc) {
+  current = acc;
+  const d = await api('/api/study?acc=' + acc);
+  const prior = d.review;
+  state = {d, map: {}, how: {}, drop: new Set()};
+  if (prior && prior.mapping_json && prior.mapping_json !== '{}') {
+    state.map = JSON.parse(prior.mapping_json);
+    state.drop = new Set(JSON.parse(prior.drop_json || '[]'));
+    for (const c in state.map) state.how[c] = 'saved';
+  } else {
+    for (const [c, v] of Object.entries(d.proposal)) { state.map[c] = v.gsm; state.how[c] = v.how; }
+  }
+  state.gene = prior && prior.gene_col ? prior.gene_col : d.gene_col;
+  state.scale = prior && prior.scale ? prior.scale : d.table.scale_guess;
+  state.decision = prior ? prior.decision : 'mapping_ok';
+  state.reason = prior ? prior.reason_code : '';
+  state.note = prior ? prior.note : '';
+  render();
+  loadQueue();
+}
+
+function sampleLabel(s) { return `${s.gsm} · ${s.title} · ${s.group || 'unassigned'}`; }
+
+function render() {
+  const {d} = state, q = queue.find(x => x.accession === d.accession);
+  const main = $('#main'); main.replaceChildren();
+  main.append(el('h2', {textContent: `${d.accession} — ${q.title}`}),
+    el('div', {className: 'mute'}, `${q.species} · ${q.year} · file `, el('span', {className: 'mono', textContent: d.file}),
+      ' · ', el('a', {href: q.url, target: '_blank', rel: 'noopener', textContent: 'GEO'})));
+  for (const [k, v] of Object.entries(d.header)) {
+    main.append(el('details', {open: k === 'Series_overall_design' || k === 'Series_title'},
+      el('summary', {textContent: k.replace('Series_', '')}), el('p', {textContent: v})));
+  }
+
+  main.append(el('h3', {textContent: 'File columns → samples'}));
+  const byGsm = Object.fromEntries(d.samples.map(s => [s.gsm, s]));
+  const tbody = el('tbody');
+  for (const col of d.table.columns.filter(c => c.numeric)) {
+    const sel = el('select');
+    sel.append(el('option', {value: '', textContent: '— not used —'}));
+    for (const s of d.samples) sel.append(el('option', {value: s.gsm, textContent: sampleLabel(s)}));
+    sel.value = state.map[col.name] || '';
+    sel.onchange = () => {
+      if (sel.value) { state.map[col.name] = sel.value; state.how[col.name] = 'manual'; state.drop.delete(sel.value); }
+      else { delete state.map[col.name]; delete state.how[col.name]; }
+      render();
+    };
+    const g = state.map[col.name] ? byGsm[state.map[col.name]].group : '';
+    tbody.append(el('tr', {className: g},
+      el('td', {className: 'mono', textContent: col.name}),
+      el('td', {className: 'mono mute', textContent: col.preview.join(' · ')}),
+      el('td', {}, sel), el('td', {}, g ? el('span', {className: `g g-${g}`, textContent: g}) : ''),
+      el('td', {}, el('span', {className: `how ${state.how[col.name] || ''}`,
+        textContent: state.how[col.name] || ''}))));
+  }
+  main.append(el('table', {}, el('thead', {}, el('tr', {},
+    ...['column', 'first values', 'sample', 'group', 'how'].map(t => el('th', {textContent: t})))), tbody));
+  main.append(el('div', {className: 'row'},
+    el('button', {className: 'sec', textContent: 'Reset to proposal', onclick: () => {
+      state.map = {}; state.how = {}; state.drop = new Set();
+      for (const [c, v] of Object.entries(d.proposal)) { state.map[c] = v.gsm; state.how[c] = v.how; }
+      render(); }}),
+    el('button', {className: 'sec', textContent: 'Clear all', onclick: () => {
+      state.map = {}; state.how = {}; render(); }}),
+    el('span', {className: 'mute', textContent: 'positional pairings are a guess: check the group colour against the column label'})));
+
+  main.append(el('h3', {textContent: 'Samples'}));
+  const colOf = Object.fromEntries(Object.entries(state.map).map(([c, g]) => [g, c]));
+  const rows = el('tbody');
+  for (const s of d.samples) {
+    const col = colOf[s.gsm], assigned = s.group === 'case' || s.group === 'control';
+    const drop = el('input', {type: 'checkbox', checked: state.drop.has(s.gsm), disabled: !!col || !assigned,
+      onchange: e => { e.target.checked ? state.drop.add(s.gsm) : state.drop.delete(s.gsm); summary(); }});
+    rows.append(el('tr', {className: s.group},
+      el('td', {className: 'mono', textContent: s.gsm}), el('td', {textContent: s.title}),
+      el('td', {className: 'mute', textContent: s.details.join('; ')}),
+      el('td', {}, s.group ? el('span', {className: `g g-${s.group}`, textContent: s.group}) : ''),
+      el('td', {className: 'mono', textContent: col || (assigned ? 'NO COLUMN' : '')}),
+      el('td', {}, assigned && !col ? el('label', {}, drop, ' drop from groups') : '')));
+  }
+  main.append(el('table', {}, el('thead', {}, el('tr', {},
+    ...['GSM', 'title', 'characteristics', 'group', 'column', ''].map(t => el('th', {textContent: t})))), rows));
+  main.append(el('p', {id: 'summary'}));
+
+  main.append(el('h3', {textContent: 'Decision'}));
+  const gene = el('select', {onchange: e => state.gene = e.target.value});
+  for (const n of d.table.columns.map(c => c.name)) gene.append(el('option', {value: n, textContent: n}));
+  gene.value = state.gene;
+  const scale = el('select', {onchange: e => state.scale = e.target.value});
+  for (const s of ['counts', 'linear', 'log2']) scale.append(el('option', {value: s, textContent: s}));
+  scale.value = state.scale;
+  main.append(el('div', {className: 'row'}, 'Gene column ', gene, ' Values are ', scale,
+    el('span', {className: 'mute', textContent: `guess: ${d.table.scale_guess} (min ${d.table.min.toFixed(2)}, max ${d.table.max.toFixed(1)})`})));
+
+  const reason = el('select', {onchange: e => state.reason = e.target.value});
+  for (const r of ['', 'in_vitro_stimulus_not_patient_contrast', 'in_vitro_hormone_treatment_not_patient_contrast',
+    'cultured_cells_across_passage_and_cell_type', 'no_pain_versus_control_contrast', 'no_pain_phenotype'])
+    reason.append(el('option', {value: r, textContent: r || '— reason if ineligible —'}));
+  reason.value = state.reason;
+  const radios = el('div', {className: 'row'});
+  for (const [v, t] of [['mapping_ok', 'Mapping is right — keep the series'],
+    ['ineligible', 'Ineligible — exclude it'], ['unclear', 'Unclear — leave it pending']])
+    radios.append(el('label', {}, el('input', {type: 'radio', name: 'dec', value: v, checked: state.decision === v,
+      onchange: () => state.decision = v}), ' ' + t));
+  main.append(radios, el('div', {className: 'row'}, reason));
+  const note = el('textarea', {placeholder: 'Note (required when ineligible)', value: state.note,
+    oninput: e => state.note = e.target.value});
+  const msg = el('span', {id: 'msg'});
+  main.append(note, el('div', {className: 'row'}, el('button', {className: 'primary', textContent: 'Save',
+    onclick: save}), msg));
+  summary();
+}
+
+function summary() {
+  const {d} = state, byGsm = Object.fromEntries(d.samples.map(s => [s.gsm, s]));
+  const mapped = Object.values(state.map).filter(g => !state.drop.has(g));
+  const n = arm => mapped.filter(g => byGsm[g].group === arm).length;
+  const want = d.samples.filter(s => (s.group === 'case' || s.group === 'control') && !state.drop.has(s.gsm)).length;
+  const missing = want - mapped.filter(g => byGsm[g].group).length;
+  $('#summary').textContent = `${Object.keys(state.map).length} columns paired · ${n('case')} case / ${n('control')} control` +
+    (missing > 0 ? ` · ${missing} case/control samples still without a column` : '');
+}
+
+async function save() {
+  const msg = $('#msg');
+  try {
+    const r = await api('/api/review', {accession: state.d.accession, decision: state.decision,
+      reason_code: state.reason, gene_col: state.gene, scale: state.scale, mapping: state.map,
+      drop: [...state.drop], note: state.note});
+    msg.className = 'okmsg';
+    msg.textContent = `saved (${r.decision}${r.n_case ? `, ${r.n_case} v ${r.n_control}` : ''})`;
+    loadQueue();
+  } catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+}
+
+loadQueue();
+</script>
+</body>
+</html>

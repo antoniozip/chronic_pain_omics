@@ -48,18 +48,25 @@ STUDY_UI = "https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Stu
 # enumerate-everything query.
 STUDY_PREFIX = "ST"
 
-# Pain vocabulary, as stems. Each alternative is anchored at its start only:
-# a trailing \b after a truncated stem never matches, so `\barthrit\b` silently
-# excludes "arthritis" — which cut a first screen of this repository from 23
-# candidates to 7 before it was caught.
-PAIN_PATTERN = re.compile(
-    r"(?i)\b("
+# Pain vocabulary, as stems. A trailing \b after a truncated stem never matches,
+# so `\barthrit\b` silently excludes "arthritis" — which cut a first screen of
+# this repository from 23 candidates to 7 before it was caught. A *leading* \b
+# has the opposite defect: it requires the stem to start a word, so "arthrit"
+# matched "arthritis" but not "osteoarthritis" — an in-scope phenotype
+# (conf/analysis/phenotype_scope.csv) that the metabolomic arm already pools.
+# The stems that take a qualifier are therefore matched inside the word; the
+# rest keep the word boundary so "spain"/"explain" do not match "pain".
+_WORD_START_STEMS = (
     r"pain|nocicept|noxious|analges|allodyn|hyperalges|neuralgi|migrain|"
-    r"fibromyalg|arthrit|neuropath|sciatic|nerve injur|nerve ligat|"
+    r"fibromyalg|sciatic|nerve injur|nerve ligat|"
     r"complete freund|endometrios|cystitis|irritable bowel|dysmenorrh|"
     r"headache|crps|causalgi|chemotherapy.induced periph|cipn|low back|"
     r"disc degener|trigemin|temporomandib"
-    r")"
+)
+_EMBEDDED_STEMS = r"arthrit|neuropath"
+
+PAIN_PATTERN = re.compile(
+    rf"(?i)(?:\b(?:{_WORD_START_STEMS})|\w*(?:{_EMBEDDED_STEMS})\w*)"
 )
 
 # Species accepted by the study's inclusion criteria. Workbench reports one

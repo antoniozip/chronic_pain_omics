@@ -19,7 +19,7 @@ Panel B is model specificity. SNL dominates, and the Results explain why: it is
 the best-covered stratum, so this is depth rather than biology.
 
 Panel C is cross-species concordance against the 50% line. Both species sit
-just below chance.
+just above chance, and tissue matching does not change the estimate.
 
 The genomic-transcriptomic disjointness, the title's third axis, is *not* drawn.
 `results/meta/genomics/gwas_tx_overlap.csv` counts GWAS genes present in each
@@ -170,7 +170,7 @@ def _panel_species(ax, summary: Path) -> None:
             fontsize=7.5, color=CHANCE_COLOUR)
     ax.set_ylim(40, 53)
     ax.set_ylabel("directional concordance (%)")
-    ax.set_title("C  Species agree at chance", loc="left", fontweight="bold")
+    ax.set_title("C  Concordance just above chance", loc="left", fontweight="bold")
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="y", color="0.9", zorder=0)
     ax.set_axisbelow(True)
@@ -217,7 +217,7 @@ def plot_graphical_abstract(results_dir: Path, out_path: Path,
     fig.text(0.045, band * 0.13,
              "Evidence layers in chronic pain do not converge: pain models share "
              "few significant features, and rodent and human\ntranscriptomes agree "
-             "no better than chance.",
+             "only slightly above chance.",
              fontsize=8.5, color="0.25", transform=fig.transFigure)
 
     fig.tight_layout(rect=(0, band, 1, 1))

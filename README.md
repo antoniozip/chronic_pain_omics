@@ -1,6 +1,6 @@
 # chronic_pain_omics
 
-Analysis code for **"Meta-analysis of chronic pain multi-omics datasets reveals disjoint evidence"** (A. G. Zippo, 2026): a systematic, PRISMA-style multi-omics meta-analysis of
+Analysis code for **"Systematic multi-omics meta-analysis of public chronic pain datasets reveals disjoint evidence"** (A. G. Zippo, 2026): a systematic, PRISMA-reported multi-omics meta-analysis of
 **chronic pain**, integrating genomics, transcriptomics, proteomics and
 metabolomics across human cohorts and rodent models.
 
@@ -15,44 +15,45 @@ literature screening, data harmonisation across heterogeneous omics
 repositories, statistical pooling, cross-species integration, and the
 bookkeeping that makes those reproducible.
 
-**Paper:** *Meta-analysis of chronic pain multi-omics datasets reveals disjoint evidence* (`manuscript/manuscript.pdf`).
+**Paper:** *Systematic multi-omics meta-analysis of public chronic pain datasets reveals disjoint evidence* (`manuscript/manuscript.pdf`).
 
 ## What it found
 
 | | |
 | --- | --- |
-| Transcriptomic study units pooled | 93 |
-| Features with a pooled estimate | 161,284 (93,861 in the correction family) |
+| Transcriptomic study units pooled | 103 |
+| Features with a pooled estimate | 207,691 (96,790 in the correction family) |
 | GWAS with harmonised summary statistics | 57 |
 | Proteomic datasets screened / poolable | 43 / 3 |
 | Metabolomic study units | 12 |
-| Cross-species ortholog pairs | 33,029 |
+| Cross-species ortholog pairs | 33,000 |
 
 Three results, all negative, and that is the point:
 
-- **Pain model adds modest structure, no more.** 11,043 of 72,236 testable
+- **Pain model adds modest structure, no more.** 10,707 of 75,978 testable
   features differ significantly between pain models, but shuffling the model
-  label across studies still makes 7.8% of features look model-dependent. The
-  excess over that null, roughly 5,600 features, falls short of conventional
-  significance (p = 0.066, 1,000 permutations).
-- **Rodent-to-human agreement is at or below chance.** Direction concordance
-  is 51.0% for mouse and 52.2% for rat, falling to 49.0% and 50.7% when the
-  human pool is restricted to tissue-comparable studies. Two independent
-  halves of one human condition, through the same pipeline, agree 55.2%, so
-  the cross-species null measures the reproducibility floor of pooled bulk
-  transcriptomes rather than a fact about species.
+  label across studies still makes 8.1% of features look model-dependent. The
+  excess over that null, roughly 4,500 features, falls short of conventional
+  significance (p = 0.109, 1,000 permutations).
+- **Rodent-to-human agreement is slightly above chance, not below it.**
+  Direction concordance is 51.5% for mouse and 51.7% for rat, and remains
+  51.8% for both when the human pool is restricted to tissue-comparable
+  studies. Two independent halves of one human condition, through the same
+  pipeline, agree 55.2%, so the cross-species figure sits below the
+  reproducibility floor of pooled bulk transcriptomes rather than supporting a
+  compartment effect.
 - **Genomic and transcriptomic evidence implicate disjoint genes.** None of the
   25 genome-wide-significant genes is significant in the human transcriptomic
   pool or is a cross-species concordant transcript, and none of the 15
   most-replicated GWAS pain genes approaches significance there (smallest
-  adjusted p 0.27).
+  adjusted p 0.396).
 
 ## Layout
 
 ```
 conf/          YAML configuration: search queries, inclusion criteria, analysis knobs
 literature/    PRISMA records: every screening decision with a reason code
-pipeline/      Numbered orchestration scripts, 01 through 15
+pipeline/      Numbered orchestration scripts, 01 through 20
 src/           Python package (ingestion, harmonisation, plotting)
 R/             R helpers (per-study DA, meta-analysis, shared statistics)
 scripts/       Manuscript artefacts and maintenance tools
@@ -92,7 +93,7 @@ reading before changing any analysis step.
 Every numeric claim in the paper is bound to the results file that produces it.
 
 ```bash
-pytest tests/test_manuscript_claims.py          # 326 claims against results/
+pytest tests/test_manuscript_claims.py          # 358 claims against results/
 python scripts/mutation_test_claims.py          # prove each claim can fail
 ```
 
@@ -105,8 +106,7 @@ numbers behind; the registry caught all four in one run.
 
 Claims are themselves mutation-tested: `mutation_test_claims.py` perturbs the
 number each one reads and checks that the claim fails. A claim that survives
-its own mutation reports green while checking nothing. **326 of 326 are
-killed.**
+its own mutation reports green while checking nothing.
 
 ## Building the paper
 
@@ -127,8 +127,8 @@ four of them naming papers that do not exist under the title given.
 ## Tests
 
 ```bash
-pytest tests/                                         # 782
-Rscript -e 'testthat::test_dir("tests/testthat")'     # 306
+pytest tests/                                         # 1,148
+Rscript -e 'testthat::test_dir("tests/testthat")'     # 421
 ruff check . && mypy src/
 ```
 

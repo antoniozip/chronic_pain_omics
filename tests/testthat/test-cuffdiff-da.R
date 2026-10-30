@@ -20,6 +20,8 @@ base_rows <- function() {
     q_value             = c(0.10, 0.02),
     test_stat           = c(3.3, 7.7),   # deliberately NOT logFC/SE
     status              = c("OK", "OK"),
+    sample_1            = c("control", "control"),
+    sample_2            = c("case", "case"),
     check.names         = FALSE,
     stringsAsFactors    = FALSE
   )
@@ -49,18 +51,90 @@ test_that("placeholder gene names are dropped", {
   expect_equal(df$feature_id, "Cd36")
 })
 
-test_that("isoform rows are deduplicated keeping the minimum p-value", {
+test_that("isoform rows are deduplicated to one row per gene", {
   rows <- base_rows()
   rows <- rbind(rows, data.frame(
     gene = "Bdnf", `log2(fold_change)` = 3.0, p_value = 0.001,
     q_value = 0.002, test_stat = 9.9, status = "OK",
+    sample_1 = "control", sample_2 = "case",
     check.names = FALSE, stringsAsFactors = FALSE
   ))
   df <- run_cuffdiff_output(write_cuffdiff(rows), "GSE1", list())
 
   expect_equal(sum(df$feature_id == "Bdnf"), 1)
-  expect_equal(df$pval[df$feature_id == "Bdnf"], 0.001)
-  expect_equal(df$effect_size[df$feature_id == "Bdnf"], 3.0)
+})
+
+# The rule used to be `order(pval)` + `duplicated(gene)`: the retained isoform
+# was the most significant one, which is selection on the outcome (05b removed
+# the identical rule from aggregate_to_gene for the same reason -- the minimum
+# of n p-values is not uniform under the null and the effect is biased away
+# from zero). The rule is now largest |log2FC|, pre-specified and independent
+# of the p-value.
+test_that("isoforms are not chosen by smallest p-value", {
+  rows <- base_rows()
+  rows[1, "log2(fold_change)"] <- 2.5      # Bdnf: strong effect, p = 0.001
+  rows[1, "p_value"]           <- 0.001
+  rows <- rbind(rows, data.frame(
+    gene = "Bdnf", `log2(fold_change)` = 3.0,   # larger effect, weaker p
+    p_value = 0.05, q_value = 0.10, test_stat = 1.9, status = "OK",
+    sample_1 = "control", sample_2 = "case",
+    check.names = FALSE, stringsAsFactors = FALSE
+  ))
+  df <- run_cuffdiff_output(write_cuffdiff(rows), "GSE1", list())
+
+  bdnf <- df[df$feature_id == "Bdnf", ]
+  expect_equal(nrow(bdnf), 1)
+  expect_equal(bdnf$effect_size, 3.0)
+  expect_equal(bdnf$pval, 0.05)            # not the min-p row
+})
+
+# ---------------------------------------------------------------------------
+# Y-04: Cuffdiff's log2(fold_change) is log2(sample_2 / sample_1), so the sign
+# is established by the file's own sample names. Every other backend fixes
+# case-as-positive (limma coef "groupcase", m1 - m0, contrast case-control);
+# a flipped Cuffdiff study cancels the others on a shared feature instead of
+# reinforcing them, and se_from_pvalue() is symmetric so nothing notices.
+# ---------------------------------------------------------------------------
+
+test_that("a control-as-sample_1 file keeps its sign (case minus control)", {
+  rows <- base_rows()   # sample_1 = control, sample_2 = case
+  df <- run_cuffdiff_output(write_cuffdiff(rows), "GSE1", list())
+  expect_equal(df$effect_size[df$feature_id == "Bdnf"], 1.0)
+})
+
+test_that("a case-as-sample_1 file is flipped to case minus control", {
+  rows <- base_rows()
+  rows$sample_1 <- "case"
+  rows$sample_2 <- "control"
+  df <- run_cuffdiff_output(write_cuffdiff(rows), "GSE1", list())
+  expect_equal(df$effect_size[df$feature_id == "Bdnf"], -1.0)
+  expect_equal(df$effect_size[df$feature_id == "Cd36"], -2.0)
+})
+
+test_that("the contrast is resolved from the configured arm vocabulary too", {
+  rows <- base_rows()
+  rows$sample_1 <- "healthy control"     # control arm is the denominator
+  rows$sample_2 <- "fibromyalgia"        # case arm is the numerator: keep sign
+  cfg <- list(da = list(case_labels = "fibromyalgia",
+                        control_labels = c("healthy", "control")))
+  df <- run_cuffdiff_output(write_cuffdiff(rows), "GSE1", cfg)
+  expect_equal(df$effect_size[df$feature_id == "Bdnf"], 1.0)
+})
+
+test_that("a file whose sample names match neither arm is refused", {
+  rows <- base_rows()
+  rows$sample_1 <- "treated"
+  rows$sample_2 <- "vehicle"
+  expect_error(run_cuffdiff_output(write_cuffdiff(rows), "GSE1", list()),
+               "contrast direction")
+})
+
+test_that("a file without sample_1/sample_2 cannot establish the sign", {
+  rows <- base_rows()
+  rows$sample_1 <- NULL
+  rows$sample_2 <- NULL
+  expect_error(run_cuffdiff_output(write_cuffdiff(rows), "GSE1", list()),
+               "sample_1")
 })
 
 test_that("zero-effect rows are dropped because SE is undefined", {

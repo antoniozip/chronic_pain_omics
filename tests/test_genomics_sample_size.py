@@ -55,7 +55,30 @@ def test_parse_ignores_digits_embedded_in_alphanumeric_tokens():
 def test_parse_extracts_standalone_number_next_to_words():
     # A genuine standalone integer token must still be summed.
     assert parse_sample_size("45409 European ancestry individuals") == 45409
-    assert parse_sample_size("UKB data field 3773") == 3773
+
+
+# ---------------------------------------------------------------------------
+# N is the METAL SAMPLESIZE weight and the cohort tie-break, so a parse error
+# is a 2x weight error on one study rather than a cosmetic one. The parser used
+# to sum every integer in the string.
+# ---------------------------------------------------------------------------
+
+def test_parse_prefers_a_leading_total_over_a_parenthetical_breakdown():
+    # 12,345 total, broken down as 6,789 + 5,556: the old sum was 24,690.
+    text = "12,345 European ancestry individuals (6,789 cases and 5,556 controls)"
+    assert parse_sample_size(text) == 12345
+
+
+def test_parse_ignores_an_age_range_and_a_cohort_count():
+    # "aged 40-69" and "from 3 cohorts" contributed 40, 69 and 3: 2,112.
+    assert parse_sample_size("2,000 individuals aged 40-69 from 3 cohorts") == 2000
+
+
+def test_parse_ignores_a_ukb_data_field_id():
+    # A field id is not a sample size. Returning -1 makes harmonize_sumstats
+    # refuse the study (recorded as harmonize_failed) instead of weighting it by
+    # 3,773. The old test asserted 3773, i.e. blessed the defect.
+    assert parse_sample_size("UKB data field 3773") == -1
 
 
 def test_detect_cohort_precedence_is_deterministic():

@@ -326,6 +326,50 @@ def study_verdict(rows: list[dict]) -> tuple[str, str, int, int]:
     return "include", "usable_case_control_contrast", n_case, n_control
 
 
+def write_groups(accession: str, placed: list[dict], verdict: str,
+                 groups_dir: Path = GROUPS_DIR) -> Path | None:
+    """Write (or remove) one study's groups file.
+
+    Downstream step 19 gates solely on the file's existence, so a study that
+    moves from `include` to `exclude` must lose its old assignment file or the
+    pseudobulk arm keeps analysing a study the screening record excludes.
+    """
+    target = groups_dir / f"{accession}_groups.csv"
+    if verdict != "include":
+        if target.exists():
+            target.unlink()
+            logger.info("%-10s removed stale %s", accession, target.name)
+        return None
+    frame = pd.DataFrame(placed)[["sample_id", "group", "subject", "title"]]
+    frame.to_csv(target, index=False)
+    return target
+
+
+def merge_sheet(path: Path, frame: pd.DataFrame, replaced: set[str]) -> pd.DataFrame:
+    """Merge a shard run into the existing corpus sheet (see step 16).
+
+    Rows belonging to *replaced* accessions are dropped even when this run
+    produced none for them, so an excluded study cannot leave a stale decision.
+    """
+    if path.exists():
+        try:
+            old = pd.read_csv(path)
+        except pd.errors.EmptyDataError:
+            old = None
+        if old is not None and "accession" in old.columns and not old.empty:
+            old = old[~old["accession"].isin(replaced)]
+            frame = pd.concat([old, frame], ignore_index=True)
+    if frame.empty:
+        return frame
+    return frame.sort_values("accession", kind="stable").reset_index(drop=True)
+
+
+def _write_sheet(path: Path, frame: pd.DataFrame) -> None:
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    frame.to_csv(tmp, index=False)
+    tmp.replace(path)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--accession", action="append",
@@ -384,18 +428,21 @@ def main() -> int:
                     accession, verdict, n_case, n_control, len(placed),
                     f" ({merged} summed into a repeated subject)" if merged else "")
 
-        if verdict == "include":
-            frame = pd.DataFrame(placed)[["sample_id", "group", "subject", "title"]]
-            frame.to_csv(GROUPS_DIR / f"{accession}_groups.csv", index=False)
+        write_groups(accession, placed, verdict)
 
+    replaced = set(wanted)
     if all_rows:
         record = PRISMA / "single_cell_group_assignments.csv"
-        pd.DataFrame(all_rows).to_csv(record, index=False)
+        merged = merge_sheet(record, pd.DataFrame(all_rows), replaced)
+        if not merged.empty:
+            _write_sheet(record, merged)
         logger.info("%d GSM decisions -> %s", len(all_rows), record)
 
     if candidates:
         sheet = PRISMA / "single_cell_candidates.csv"
-        pd.DataFrame(candidates).to_csv(sheet, index=False)
+        merged = merge_sheet(sheet, pd.DataFrame(candidates), replaced)
+        if not merged.empty:
+            _write_sheet(sheet, merged)
         included = [c for c in candidates if c["verdict"] == "include"]
         logger.info("%d of %d studies included -> %s",
                     len(included), len(candidates), sheet)

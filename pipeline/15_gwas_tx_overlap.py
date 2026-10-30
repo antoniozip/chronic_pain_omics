@@ -36,6 +36,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.colors import Normalize
+from matplotlib.patches import Patch
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,8 @@ PADJ_THRESH = 0.05
 
 COL_UP = "#d73027"
 COL_DOWN = "#4575b4"
+COL_ZERO = "#969696"     # measured exactly at zero: neither direction
+COL_ABSENT = "#999999"   # never measured in the pooled transcriptomic table
 
 # Sizes are the points they should measure on the manuscript page; the authored
 # size follows from the width the figure is placed at, as in
@@ -101,14 +104,37 @@ def _panel_replication(ax: plt.Axes, rep: pd.DataFrame) -> None:
 
 def _panel_transcriptomic(ax: plt.Axes, rep: pd.DataFrame,
                           eff: pd.DataFrame) -> int:
-    """Pooled log2FC of the same genes. Returns how many are missing."""
-    order = rep.iloc[::-1]
+    """Pooled log2FC of the same genes. Returns how many are missing.
+
+    A gene the pool never measured is drawn as a hatched, empty marker with its
+    own legend entry, not as a zero-height bar. It used to be `fillna(0.0)` and
+    therefore coloured down-regulated: indistinguishably from a measured zero
+    and from an effect in the opposite direction, in the one figure that
+    carries the "disjoint layers" claim.
+    """
+    order = rep.iloc[::-1]                       # largest at the top
     values = eff.loc[order["gene"], "yi_pooled"]
     absent = int(values.isna().sum())
-    plotted = values.fillna(0.0)
-    colours = [COL_UP if v > 0 else COL_DOWN for v in plotted]
-    ax.barh(order["gene"], plotted, color=colours, edgecolor="none")
+    if len(values) == 0 or absent == len(values):
+        raise RuntimeError(
+            f"panel B has no gene measured in the pooled transcriptomic table "
+            f"({absent}/{len(values)} absent); refusing to draw an empty panel"
+        )
+
+    for gene, v in zip(order["gene"], values):
+        if pd.isna(v):
+            ax.barh(gene, 0, color="none", edgecolor=COL_ABSENT,
+                    hatch="///", linewidth=0.6)
+        else:
+            colour = COL_UP if v > 0 else COL_DOWN if v < 0 else COL_ZERO
+            ax.barh(gene, v, color=colour, edgecolor="none")
+
     ax.axvline(0, color="#333333", lw=0.6)
+    if absent:
+        marker = Patch(facecolor="none", edgecolor=COL_ABSENT,
+                       hatch="///", linewidth=0.6)
+        ax.legend([marker], [f"not in pooled table (n={absent})"],
+                  loc="lower right", fontsize=pt("tick"), frameon=False)
     ax.set_xlabel("log$_2$FC (pooled transcriptomic meta-analysis)",
                   fontsize=pt("axis"))
     ax.set_title("Transcriptomic effect of the same genes",

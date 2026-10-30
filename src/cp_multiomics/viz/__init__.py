@@ -8,6 +8,7 @@ from .concordance_plot import plot_concordance_scatter
 from .graphical_abstract import plot_graphical_abstract
 from .prisma import plot_repository_flow
 from .style import set_publication_style
+from .toc_graphic import plot_toc_graphic
 from .volcano import plot_volcano
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "plot_concordance_scatter",
     "plot_repository_flow",
     "plot_graphical_abstract",
+    "plot_toc_graphic",
 ]

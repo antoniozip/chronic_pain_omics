@@ -83,15 +83,20 @@ def main() -> int:
             f"The table to map against has {df['feature_id'].nunique()} distinct "
             "peptides."
         )
-        return 0
+        # Never leave a previous gene table behind for 06_meta_analysis.R to
+        # prefer over the per-study tables: absence must be visible.
+        OUT.unlink(missing_ok=True)
+        return 1
 
     df["gene_symbol"] = df["feature_id"].map(mapping)
     mapped = df[df["gene_symbol"].notna()].copy()
     print(f"\n{mapped['feature_id'].nunique()} of {df['feature_id'].nunique()} "
           f"peptides mapped, covering {mapped['gene_symbol'].nunique()} genes")
     if mapped.empty:
-        print("no peptide in the table matched an assignment; nothing written")
-        return 0
+        print("no peptide in the table matched an assignment; refusing to leave "
+              "a stale gene table behind")
+        OUT.unlink(missing_ok=True)
+        return 1
 
     # One peptide per gene per study unit: the most significant. See module
     # docstring for why pooling peptides of a precursor is not an option.
@@ -103,7 +108,8 @@ def main() -> int:
 
     best.to_csv(OUT, index=False)
     per_unit = best.groupby("study_id")["feature_id"].nunique().to_dict()
-    print(f"-> {OUT.relative_to(REPO_ROOT)}  {len(best)} rows")
+    shown = OUT.relative_to(REPO_ROOT) if OUT.is_relative_to(REPO_ROOT) else OUT
+    print(f"-> {shown}  {len(best)} rows")
     print(f"   genes per study unit: {per_unit}")
     print("\nThese genes reach k=3 only if PXD054342 and PXD055816 also measured "
           "them; CALCA is the one worth checking first.")

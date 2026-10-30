@@ -55,3 +55,55 @@ def test_download_aborts_when_too_large(tmp_path):
     with pytest.raises(FileTooLargeError):
         download_file("http://x", dest, stream, max_bytes=1_500_000_000)
     assert not dest.exists()  # nothing written on abort
+
+
+# --- appended: R1 -- enforce the cap on bytes actually written --------------
+
+def test_download_aborts_a_stream_without_content_length_past_the_cap(tmp_path):
+    dest = tmp_path / "chunked.tsv.gz"
+    def stream(url):
+        return {}, [b"x" * 6_000, b"x" * 6_000]   # no header: 12 kB written
+    with pytest.raises(FileTooLargeError):
+        download_file("http://x", dest, stream, max_bytes=10_000)
+    assert not dest.exists()
+    assert not (tmp_path / "chunked.tsv.gz.part").exists()
+
+
+def test_download_aborts_when_the_server_underreports_content_length(tmp_path):
+    dest = tmp_path / "lying.tsv.gz"
+    def stream(url):
+        return {"Content-Length": "5"}, [b"x" * 6_000, b"x" * 6_000]
+    with pytest.raises(FileTooLargeError):
+        download_file("http://x", dest, stream, max_bytes=10_000)
+    assert not dest.exists()
+
+
+def test_non_numeric_content_length_is_treated_as_unknown(tmp_path):
+    dest = tmp_path / "text.tsv.gz"
+    def stream(url):
+        return {"Content-Length": "abc"}, [b"abc", b"def"]
+    assert download_file("http://x", dest, stream, max_bytes=1_000) == 6
+    assert dest.read_bytes() == b"abcdef"
+
+
+def test_a_mid_stream_failure_leaves_no_file(tmp_path):
+    dest = tmp_path / "aborted.tsv.gz"
+    def stream(url):
+        def chunks():
+            yield b"abc"
+            raise OSError("connection reset")
+        return {}, chunks()
+    with pytest.raises(OSError):
+        download_file("http://x", dest, stream, max_bytes=1_000)
+    assert not dest.exists()
+    assert not (tmp_path / "aborted.tsv.gz.part").exists()
+
+
+def test_a_short_read_is_rejected(tmp_path):
+    dest = tmp_path / "short.tsv.gz"
+    def stream(url):
+        return {"Content-Length": "100"}, [b"abc"]
+    with pytest.raises(OSError):
+        download_file("http://x", dest, stream, max_bytes=1_000)
+    assert not dest.exists()
+

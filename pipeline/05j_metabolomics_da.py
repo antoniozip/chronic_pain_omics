@@ -84,6 +84,23 @@ SCHEMA = ["feature_id", "effect_size", "se", "pval", "control_mean",
           "treatment_mean", "n_control", "n_treatment", "study_id",
           "region", "condition", "cohort", "padj"]
 
+
+def bh_adjust(pvals) -> np.ndarray:
+    """Benjamini-Hochberg over the finite p-values, NA elsewhere.
+
+    `multipletests(p, method="fdr_bh")` given a single NaN returns an all-NaN
+    adjusted vector: `fdrcorrection` sorts NaN last and `np.minimum.accumulate`
+    then propagates it across the whole array. One non-finite p-value would
+    otherwise nullify every `padj` in the study while `reject` still calls the
+    finite rows significant.
+    """
+    p = np.asarray(pvals, dtype=float)
+    out = np.full(p.shape, np.nan, dtype=float)
+    ok = np.isfinite(p)
+    if ok.any():
+        out[ok] = multipletests(p[ok], method="fdr_bh")[1]
+    return out
+
 MAF_FIXED = {
     "database_identifier", "chemical_formula", "smiles", "inchi",
     "metabolite_identification", "mass_to_charge", "fragmentation",
@@ -443,7 +460,7 @@ def finalise(df: pd.DataFrame, study_id: str, region: str, condition: str,
     df["region"] = region
     df["condition"] = condition
     df["cohort"] = ""
-    df["padj"] = multipletests(df["pval"], method="fdr_bh")[1]
+    df["padj"] = bh_adjust(df["pval"])
     return df[SCHEMA + ["assay"]].sort_values("pval")
 
 

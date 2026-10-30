@@ -14,7 +14,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
+import json
 import logging
+import os
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
@@ -64,6 +67,44 @@ def _default_http_stream(url: str) -> tuple[dict, Iterable[bytes]]:
     resp = requests.get(url, stream=True, timeout=300)
     resp.raise_for_status()
     return dict(resp.headers), resp.iter_content(chunk_size=1 << 20)
+
+
+def _verification_path(raw_path: Path) -> Path:
+    """Sidecar recording that a cached raw file is a complete download."""
+    return raw_path.with_suffix(raw_path.suffix + ".ok")
+
+
+def write_verification(raw_path: Path) -> Path:
+    """Write `{bytes, sha256}` for a freshly downloaded raw file."""
+    digest = hashlib.sha256()
+    with open(raw_path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    payload = {"bytes": raw_path.stat().st_size, "sha256": digest.hexdigest()}
+    marker = _verification_path(raw_path)
+    tmp = marker.with_suffix(marker.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload), encoding="utf-8")
+    os.replace(tmp, marker)
+    return marker
+
+
+def raw_is_verified(raw_path: Path) -> bool:
+    """True only when a prior download recorded matching verification metadata.
+
+    A non-empty file is not proof of a complete download: an interrupted stream
+    leaves a short but syntactically valid GWAS-SSF file, and re-runs used to
+    harmonize it as if it were the whole deposit.
+    """
+    if not raw_path.exists() or raw_path.stat().st_size == 0:
+        return False
+    marker = _verification_path(raw_path)
+    if not marker.exists():
+        return False
+    try:
+        payload = json.loads(marker.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    return payload.get("bytes") == raw_path.stat().st_size
 
 
 def build_manifest(kept, dropped, fetch_results: dict[str, dict]) -> list[dict]:
@@ -117,13 +158,14 @@ def run(config, http_get=None, list_dir=None, http_stream=None,
             fetch_results[study.accession] = {"reason": "no_harmonised_file"}
             continue
         raw_path = raw_dir / f"{study.accession}.h.tsv.gz"
-        # download_file writes nothing on abort (Task 4), so any raw already on
-        # disk is a complete prior download. Skip re-fetching it: re-runs after a
-        # harmonizer fix then cost only local re-harmonization, not a ~20 GB
-        # re-download over slow EBI FTP.
-        if raw_path.exists() and raw_path.stat().st_size > 0:
-            logger.info("[%s] using cached raw, skipping download", study.accession)
+        if raw_is_verified(raw_path):
+            logger.info("[%s] using verified cached raw, skipping download",
+                        study.accession)
         else:
+            if raw_path.exists():
+                logger.warning(
+                    "[%s] cached raw is truncated or has no verification marker — "
+                    "re-downloading", study.accession)
             try:
                 download_file(url, raw_path, http_stream, max_bytes)
             except (FileTooLargeError, requests.RequestException, OSError) as exc:
@@ -131,6 +173,7 @@ def run(config, http_get=None, list_dir=None, http_stream=None,
                 fetch_results[study.accession] = {
                     "reason": "download_failed", "harmonised_url": url}
                 continue
+            write_verification(raw_path)
         interim_path = interim_dir / f"{study.accession}.tsv"
         try:
             # A malformed real-world GWAS-SSF file (unexpected column set) is a
@@ -154,13 +197,19 @@ def run(config, http_get=None, list_dir=None, http_stream=None,
             fetch_results.setdefault(study.accession, {"reason": "not_attempted"})
 
     rows = build_manifest(kept, dropped, fetch_results)
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(manifest_path, "w", newline="") as f:
+    # A dry run is a cheap resolve+dedup probe, not a fetch: it must not
+    # overwrite the PRISMA manifest with every study marked "excluded".
+    write_path = (manifest_path.with_suffix(".dryrun.csv")
+                  if dry_run else manifest_path)
+    write_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = write_path.with_suffix(write_path.suffix + ".tmp")
+    with open(tmp_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=MANIFEST_COLUMNS)
         writer.writeheader()
         writer.writerows(rows)
-    logger.info("Manifest written -> %s (%d rows)", manifest_path, len(rows))
-    return manifest_path
+    os.replace(tmp_path, write_path)
+    logger.info("Manifest written -> %s (%d rows)", write_path, len(rows))
+    return write_path
 
 
 def main() -> None:

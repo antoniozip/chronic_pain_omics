@@ -47,3 +47,53 @@ test_that("standardize_gwas uses beta for beta effect unit", {
   result <- standardize_gwas(df, "beta")
   expect_equal(result$effect_size, 0.42, tolerance = 1e-6)
 })
+
+
+# ---------------------------------------------------------------------------
+# se and padj
+#
+# Every row used to be emitted with se = NA_real_ and a comment about an
+# imputation from the CI that was never written. 06/06b/06g all drop
+# `is.na(se) | se <= 0`, so a genomics run produced a *successful* empty pool.
+# And padj was the raw p-value, so the effect table claimed padj == pval.
+# ---------------------------------------------------------------------------
+
+test_that("standardize_gwas emits a real se derived from the effect and p", {
+  df <- data.frame(
+    rsid = "rs123", beta_or = 0.05, or_per_copy = NA_real_, pval = 5e-8,
+    stringsAsFactors = FALSE
+  )
+  result <- standardize_gwas(df, "beta")
+  expect_equal(result$se, 0.05 / qnorm(1 - 5e-8 / 2), tolerance = 1e-10)
+})
+
+test_that("standardize_gwas derives se for the log(OR) effect as well", {
+  df <- data.frame(
+    rsid = "rs123", beta_or = NA_real_, or_per_copy = 1.5, pval = 1e-6,
+    stringsAsFactors = FALSE
+  )
+  result <- standardize_gwas(df, "OR")
+  expect_equal(result$se, abs(log(1.5)) / qnorm(1 - 1e-6 / 2), tolerance = 1e-10)
+})
+
+test_that("standardize_gwas drops rows that cannot yield a usable se", {
+  df <- data.frame(
+    rsid = c("rs_ok", "rs_p1", "rs_nop", "rs_zero"),
+    beta_or = c(0.2, 0.2, 0.2, 0.0),
+    or_per_copy = NA_real_,
+    pval = c(1e-4, 1.0, NA_real_, 1e-4),
+    stringsAsFactors = FALSE
+  )
+  result <- standardize_gwas(df, "beta")
+  # p == 1 gives se = 0, p = NA gives se = NA, a zero effect gives se = 0:
+  # all three are dropped rather than emitted with an unusable weight.
+  expect_equal(result$feature_id, "rs_ok")
+  expect_true(all(is.finite(result$se) & result$se > 0))
+})
+
+test_that("the per-study padj is BH through the shared FDR helper, never raw p", {
+  df <- data.frame(pval = c(0.001, 0.01, 0.02, 0.5))
+  out <- gwas_padj(df)
+  expect_equal(out$padj, p.adjust(df$pval, method = "BH"))
+  expect_false(isTRUE(all.equal(out$padj, out$pval)))
+})

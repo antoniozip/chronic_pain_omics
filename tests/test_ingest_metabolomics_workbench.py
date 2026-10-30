@@ -155,3 +155,37 @@ class TestScreen:
         m, _ = wb.screen(studies, modality="metabolomics")
         lp, _ = wb.screen(studies, modality="lipidomics")
         assert set(s["study_id"] for s in m) & set(s["study_id"] for s in lp) == set()
+
+
+class TestPainStemAnchoring:
+    """A leading \\b before a stem only matches when the stem starts a word.
+
+    "arthrit" therefore matched "arthritis" and missed "osteoarthritis", the
+    in-scope phenotype already pooled in the metabolomic arm. The stem has to
+    match inside a compound word; the boundary must still reject a stem
+    embedded in an unrelated word.
+    """
+
+    def test_compound_disease_names_match(self):
+        for title in ("Osteoarthritis of the knee",
+                      "osteoarthritis",
+                      "Spondyloarthritis cohort",
+                      "Polyarthritis in rats",
+                      "Painful osteoarthritis of the knee",
+                      "Polyneuropathy in db/db mice",
+                      "Serum metabolomics of knee osteoarthritis"):
+            assert wb.is_pain_related(title), title
+
+    def test_terms_at_the_start_of_the_string_match(self):
+        for title in ("Arthritis study", "Neuropathic pain cohort",
+                      "Painful bladder syndrome", "Sciatica outcomes"):
+            assert wb.is_pain_related(title), title
+
+    def test_terms_in_the_middle_of_the_string_match(self):
+        assert wb.is_pain_related("Metabolites in chronic low back pain")
+        assert wb.is_pain_related("Serum profile of knee osteoarthritis pain")
+
+    def test_boundary_semantics_are_kept_for_unrelated_words(self):
+        for title in ("spain", "explain the variance",
+                      "Metabolomics of hepatic steatosis"):
+            assert not wb.is_pain_related(title), title

@@ -36,6 +36,11 @@ suppressPackageStartupMessages({
 }
 
 if (!exists("assign_groups")) source(file.path(.sibling_dir(), "da_utils.R"))
+# se_from_pvalue() and adjust_pooled_fdr() are the project's single definitions
+# of "a standard error from a p-value" and "the BH family"; neither may be
+# re-implemented here.
+if (!exists("se_from_pvalue")) source(file.path(.sibling_dir(), "se_utils.R"))
+if (!exists("adjust_pooled_fdr")) source(file.path(.sibling_dir(), "meta_utils.R"))
 
 GWAS_API <- "https://www.ebi.ac.uk/gwas/rest/api"
 
@@ -66,10 +71,29 @@ run_genomics_da <- function(accession, effect_unit, cfg) {
   df <- standardize_gwas(associations, effect_unit)
   if (nrow(df) == 0) return(NULL)
 
+  df <- gwas_padj(df)
+
   build_effect_df(df$feature_id, df$effect_size, df$se,
-                  df$pval, df$pval,  # GWAS Catalog has no padj; use pval twice
+                  df$pval, df$padj,
                   n_case, n_control, accession,
                   "genomics", "rsID", effect_unit)
+}
+
+
+#' Attach a BH-adjusted p-value within the study's own set of associations.
+#'
+#' The GWAS Catalog publishes no adjusted p-value, and writing the raw p into
+#' `padj` makes the effect table claim `padj == pval` — a reader cannot tell an
+#' adjusted value from an uncorrected one. Adjustment goes through
+#' `adjust_pooled_fdr()` so there is one BH implementation in the project; a
+#' per-study table is a one-study family, hence `k = 1`.
+#'
+#' @param df data.frame with a `pval` column.
+#' @return `df` with `padj` added.
+gwas_padj <- function(df) {
+  df$k <- 1L
+  adjust_pooled_fdr(df, pval_col = "pval", k_col = "k", min_k = 1L,
+                    out_col = "padj")
 }
 
 
@@ -123,13 +147,24 @@ standardize_gwas <- function(df, effect_unit) {
 
   if (effect_unit == "OR") {
     df$effect_size <- log(df$or_per_copy)          # log(OR) for meta-analysis
-    df$se <- NA_real_                               # GWAS Catalog lacks SE; imputed from CI if available
   } else {
     df$effect_size <- df$beta_or
-    df$se <- NA_real_
   }
 
-  # Flag rows with missing SE — meta-analysis will use p-value-derived SE if needed
+  # The REST payload carries no standard error, but the effect and its p-value
+  # determine one under the Normal approximation. Emitting `se = NA` here (with
+  # a comment about an imputation that did not exist) meant 06/06b/06g dropped
+  # every genomics row and wrote an empty pool without an error.
+  df$se <- se_from_pvalue(df$effect_size, df$pval)
+
+  # A zero effect, p == 1 or a missing p gives se == 0/NA/Inf. Those rows cannot
+  # be weighted, so they are dropped here rather than silently reaching the
+  # pool, where usable_se() would remove them one stage later with no record of
+  # which backend lost them.
+  ok <- is.finite(df$effect_size) & is.finite(df$se) & df$se > 0 &
+        !is.na(df$pval)
+  df <- df[ok, ]
+
   df$feature_id <- df$rsid
   df[c("feature_id", "effect_size", "se", "pval")]
 }

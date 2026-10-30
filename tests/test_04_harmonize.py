@@ -211,3 +211,42 @@ def test_dry_run_returns_zero(pipeline_04, tmp_path):
         "transcriptomics", cfg, tmp_path, tmp_path / "interim", dry_run=True
     )
     assert count == 0
+
+
+# ---------------------------------------------------------------------------
+# Year coercion and the zero-output guard
+# ---------------------------------------------------------------------------
+
+def test_flag_quality_tolerates_an_integer_year():
+    flags = OmicsHarmonizer.flag_quality(
+        {"n_samples": 50, "year": 2022, "description": "test"}, min_samples=5
+    )
+    assert "missing_year" not in flags
+
+
+def test_integer_year_does_not_drop_the_record():
+    """`raw["year"][:4]` raised TypeError for an int year; the broad except in
+    harmonize() then dropped the record without a trace."""
+    out = TranscriptomicsHarmonizer().harmonize([_raw(year=2022)], CFG)
+    assert len(out) == 1
+
+
+class _AlwaysFailingHarmonizer(OmicsHarmonizer):
+    modality = "test"
+
+    def _harmonize_one(self, raw, cfg):
+        raise ValueError("boom")
+
+
+def test_total_failure_raises_instead_of_writing_an_empty_manifest(caplog):
+    """An empty harmonized.jsonl is consumed as "0 studies", not as a failure."""
+    with caplog.at_level("WARNING"):
+        with pytest.raises(RuntimeError, match="0 of 2"):
+            _AlwaysFailingHarmonizer().harmonize(
+                [{"accession": "A"}, {"accession": "B"}], {}
+            )
+    assert "2 / 2 records failed" in caplog.text
+
+
+def test_empty_input_is_not_a_failure():
+    assert _AlwaysFailingHarmonizer().harmonize([], {}) == []

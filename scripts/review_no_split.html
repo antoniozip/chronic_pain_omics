@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No-split review</title>
+<style>
+:root {
+  --bg: #f6f6f3; --panel: #ffffff; --ink: #1d1f21; --muted: #6b7075; --line: #dcdcd6;
+  --case: #f6d9b8; --case-ink: #7a4300; --ctrl: #c9defa; --ctrl-ink: #0b3f8c;
+  --bad: #f4c4c0; --bad-ink: #8a1f17; --ok: #2e7d4f; --warn: #b26a00; --accent: #2457c5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17181a; --panel: #1f2124; --ink: #e6e6e3; --muted: #9aa0a6; --line: #34373b;
+    --case: #5a3a14; --case-ink: #ffd9a8; --ctrl: #1c3a66; --ctrl-ink: #bcd6ff;
+    --bad: #5e2623; --bad-ink: #ffc9c4; --ok: #5fc08a; --warn: #e0a043; --accent: #7aa2ff;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  padding: 5px 10px; cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible
+  { outline: 2px solid var(--accent); outline-offset: 1px; }
+input, select, textarea { background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; padding: 5px 8px; }
+.app { display: grid; grid-template-columns: 300px 1fr; height: 100vh; }
+aside { border-right: 1px solid var(--line); background: var(--panel); display: flex;
+  flex-direction: column; min-height: 0; }
+aside .tools { padding: 10px; display: grid; gap: 6px; border-bottom: 1px solid var(--line); }
+#progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+#progress > div { height: 100%; background: var(--ok); width: 0; }
+#list { overflow: auto; flex: 1; }
+.item { padding: 7px 10px; border-bottom: 1px solid var(--line); cursor: pointer;
+  display: grid; grid-template-columns: 10px 1fr; gap: 8px; }
+.item:hover { background: var(--bg); }
+.item.sel { background: var(--bg); box-shadow: inset 3px 0 var(--accent); }
+.dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: var(--line); }
+.dot.contrast_exists { background: var(--ok); }
+.dot.no_contrast { background: var(--bad-ink); }
+.dot.unclear { background: var(--warn); }
+.item .t { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; }
+main { overflow: auto; padding: 14px 18px 90px; min-width: 0; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  padding: 12px 14px; margin-bottom: 12px; }
+h1 { font-size: 18px; margin: 0 0 4px; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+  margin: 0 0 8px; font-weight: 600; }
+.meta { color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.tag { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 12px;
+  border: 1px solid var(--line); color: var(--muted); }
+.tag.warn { color: var(--warn); border-color: var(--warn); }
+.tag.case { background: var(--case); color: var(--case-ink); border-color: transparent; }
+.tag.control { background: var(--ctrl); color: var(--ctrl-ink); border-color: transparent; }
+.text { white-space: pre-wrap; max-height: 9.5em; overflow: auto; }
+.fields { display: grid; gap: 6px; }
+.field { border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; cursor: pointer;
+  display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+.field.sel { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.field.constant { opacity: .55; }
+.field b { min-width: 11em; }
+.values { display: grid; gap: 2px; max-height: 300px; overflow: auto; margin-bottom: 8px; }
+.vrow { display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; align-items: center;
+  padding: 2px 4px; border-radius: 4px; }
+.vrow:hover { background: var(--bg); }
+.vrow code { overflow-wrap: anywhere; }
+.vrow .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+.role { padding: 1px 8px; font-size: 12px; }
+.role.on.case { background: var(--case); color: var(--case-ink); border-color: transparent; }
+.role.on.control { background: var(--ctrl); color: var(--ctrl-ink); border-color: transparent; }
+.rx { display: grid; grid-template-columns: auto 1fr; gap: 6px 8px; align-items: center; }
+#counts { margin-top: 8px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+#err { color: var(--bad-ink); }
+.tablewrap { overflow: auto; max-height: 52vh; border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: max-content; min-width: 100%; }
+th, td { padding: 3px 8px; border-bottom: 1px solid var(--line); text-align: left;
+  vertical-align: top; max-width: 28em; overflow-wrap: anywhere; }
+th { position: sticky; top: 0; background: var(--panel); z-index: 1; font-size: 12px; }
+th.active { color: var(--accent); }
+tr.case td { background: var(--case); color: var(--case-ink); }
+tr.control td { background: var(--ctrl); color: var(--ctrl-ink); }
+tr.conflict td { background: var(--bad); color: var(--bad-ink); }
+td.active { font-weight: 600; }
+.bar { position: fixed; left: 300px; right: 0; bottom: 0; background: var(--panel);
+  border-top: 1px solid var(--line); padding: 10px 18px; display: flex; gap: 8px;
+  align-items: center; flex-wrap: wrap; }
+.bar textarea { flex: 1; min-width: 200px; height: 34px; resize: vertical; }
+.go { font-weight: 600; }
+.go.contrast_exists { border-color: var(--ok); color: var(--ok); }
+.go.no_contrast { border-color: var(--bad-ink); color: var(--bad-ink); }
+.go.unclear { border-color: var(--warn); color: var(--warn); }
+kbd { border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; font-size: 11px;
+  color: var(--muted); }
+.hint { color: var(--muted); font-size: 12px; }
+@media (max-width: 800px) { .app { grid-template-columns: 1fr; } aside { display: none; }
+  .bar { left: 0; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="tools">
+      <div><b id="done">0</b> of <b id="total">0</b> reviewed</div>
+      <div id="progress"><div></div></div>
+      <select id="f-audit" aria-label="Re-audit status">
+        <option value="">All re-audit states</option>
+        <option value="not_audited">Never re-audited</option>
+        <option value="no_control_like_value">Audit: no control-like value</option>
+        <option value="candidate_contrast_found">Audit: candidate contrast found</option>
+      </select>
+      <select id="f-species" aria-label="Species"><option value="">All species</option></select>
+      <select id="f-review" aria-label="Review state">
+        <option value="">All</option><option value="open">Not yet reviewed</option>
+        <option value="contrast_exists">Contrast exists</option>
+        <option value="no_contrast">No contrast</option><option value="unclear">Unclear</option>
+      </select>
+      <input id="f-text" type="search" placeholder="Accession or title" aria-label="Search">
+      <div class="hint"><kbd>j</kbd>/<kbd>k</kbd> next/previous &middot;
+        <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> decide</div>
+    </div>
+    <div id="list"></div>
+  </aside>
+  <main id="main"><p class="hint">Loading…</p></main>
+</div>
+<div class="bar" id="bar" hidden>
+  <span id="barcounts"></span>
+  <button class="go contrast_exists" data-d="contrast_exists">1 &middot; Contrast exists</button>
+  <button class="go no_contrast" data-d="no_contrast">2 &middot; No contrast</button>
+  <button class="go unclear" data-d="unclear">3 &middot; Unclear</button>
+  <textarea id="note" placeholder="Note (what you saw, why)" aria-label="Note"></textarea>
+  <span id="msg" class="hint"></span>
+</div>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const state = { queue: [], view: [], cur: null, detail: null, field: null,
+  rule: { case: { values: [], regex: "" }, control: { values: [], regex: "" } },
+  result: null, timer: null };
+
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "class") el.className = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const kid of kids.flat()) if (kid != null) el.append(kid);
+  return el;
+}
+async function api(path, body) {
+  const res = await fetch(path, body ? { method: "POST",
+    headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : undefined);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+const status = (q) => (q.review && q.review.decision) || "";
+
+function applyFilters() {
+  const a = $("#f-audit").value, s = $("#f-species").value, r = $("#f-review").value;
+  const t = $("#f-text").value.trim().toLowerCase();
+  state.view = state.queue.filter((q) =>
+    (!a || q.audit_status === a) && (!s || q.species === s) &&
+    (!r || (r === "open" ? !status(q) : status(q) === r)) &&
+    (!t || q.accession.toLowerCase().includes(t) || q.title.toLowerCase().includes(t)));
+  renderList();
+}
+function renderList() {
+  const done = state.queue.filter((q) => status(q)).length;
+  $("#done").textContent = done; $("#total").textContent = state.queue.length;
+  $("#progress > div").style.width = (100 * done / Math.max(1, state.queue.length)) + "%";
+  $("#list").replaceChildren(...state.view.map((q) => h("div",
+    { class: "item" + (q.accession === state.cur ? " sel" : ""), tabindex: 0,
+      onclick: () => select(q.accession),
+      onkeydown: (e) => { if (e.key === "Enter") select(q.accession); } },
+    h("span", { class: "dot " + status(q), title: status(q) || "not reviewed" }),
+    h("div", {}, h("div", {}, h("b", {}, q.accession), " · " + q.n_samples + " samples"),
+      h("div", { class: "t" }, q.title)))));
+}
+
+async function select(acc) {
+  state.cur = acc; renderList();
+  const q = state.queue.find((x) => x.accession === acc);
+  $("#main").replaceChildren(h("p", { class: "hint" }, "Reading series matrix…"));
+  try { state.detail = await api("/api/series?acc=" + encodeURIComponent(acc)); }
+  catch (e) { $("#main").replaceChildren(h("p", { id: "err" }, e.message)); return; }
+  const saved = q.review && q.review.rule_json ? JSON.parse(q.review.rule_json) : null;
+  const fields = state.detail.fields;
+  if (saved && fields.some((f) => f.id === saved.field_id)) {
+    state.field = saved.field_id;
+    state.rule = { case: { values: [], regex: "", ...saved.case },
+                   control: { values: [], regex: "", ...saved.control } };
+  } else {
+    const pick = fields.find((f) => !f.constant && !f.skipped_by.length) ||
+      fields.find((f) => !f.constant) || fields[0];
+    state.field = pick.id;
+    state.rule = { case: { values: [], regex: "" }, control: { values: [], regex: "" } };
+  }
+  $("#note").value = (q.review && q.review.note) || "";
+  $("#bar").hidden = false; $("#msg").textContent = "";
+  render(); preview();
+}
+
+function render() {
+  const q = state.queue.find((x) => x.accession === state.cur), d = state.detail;
+  const a = q.audit;
+  const head = h("section", {},
+    h("h1", {}, d.accession + " ",
+      h("a", { href: q.url, target: "_blank", rel: "noopener" }, "GEO ↗")),
+    h("div", {}, q.title),
+    h("div", { class: "meta" }, h("span", {}, q.species), h("span", {}, q.year),
+      h("span", {}, d.gsm.length + " samples"), h("span", {}, d.file),
+      d.variants.length > 1 ? h("span", { class: "tag warn" },
+        d.variants.length + " platform matrices, largest shown") : null,
+      h("span", { class: "tag" + (q.audit_status === "candidate_contrast_found" ? " warn" : "") },
+        "re-audit: " + q.audit_status)),
+    a && a.status === "candidate_contrast_found" ? h("div", { class: "hint" },
+      `Re-audit found “${a.field}”: ${a.n_case} “${a.case_label}” vs ${a.n_control} ` +
+      `“${a.control_label}”` + (a.field_looks_non_disease === "yes"
+        ? " — flagged as looking non-disease" : "")) : null);
+  const hd = d.header;
+  const design = h("section", {}, h("h2", {}, "What the deposit says"),
+    ...["Series_summary", "Series_overall_design"].map((k) => hd[k] ?
+      h("div", {}, h("b", {}, k.replace("Series_", "").replace("_", " ") + ": "),
+        h("div", { class: "text" }, hd[k])) : null),
+    h("div", { class: "meta" }, hd.Series_type ? h("span", {}, hd.Series_type) : null,
+      hd.Series_platform_id ? h("span", {}, hd.Series_platform_id.replace(/\n/g, ", ")) : null,
+      hd.Series_pubmed_id ? h("span", {}, "PMID " + hd.Series_pubmed_id) : null));
+  const fields = h("section", {}, h("h2", {}, "Metadata fields (click one to assign groups)"),
+    h("div", { class: "fields" }, d.fields.map((f) => h("div",
+      { class: "field" + (f.id === state.field ? " sel" : "") + (f.constant ? " constant" : ""),
+        tabindex: 0, onclick: () => chooseField(f.id),
+        onkeydown: (e) => { if (e.key === "Enter") chooseField(f.id); } },
+      h("b", {}, f.label), h("span", { class: "hint" }, f.n_distinct + " distinct"),
+      f.constant ? h("span", { class: "tag" }, "no variation") : null,
+      f.skipped_by.length ? h("span", { class: "tag warn" },
+        "parser skips: key has “" + f.skipped_by.join("”, “") + "”") : null,
+      f.parser.case || f.parser.control ? h("span", { class: "tag" },
+        "parser: " + f.parser.case + " case / " + f.parser.control + " control") : null))));
+  $("#main").replaceChildren(head, design, fields, h("section", { id: "assign" }),
+    h("section", {}, h("h2", {}, "Samples"), h("div", { class: "tablewrap", id: "tbl" })));
+  renderAssign(); renderTable();
+}
+
+function chooseField(id) {
+  state.field = id;
+  state.rule = { case: { values: [], regex: "" }, control: { values: [], regex: "" } };
+  render(); preview();
+}
+function toggle(role, value) {
+  const other = role === "case" ? "control" : "case";
+  state.rule[other].values = state.rule[other].values.filter((v) => v !== value);
+  const vals = state.rule[role].values, i = vals.indexOf(value);
+  if (i >= 0) vals.splice(i, 1); else vals.push(value);
+  renderAssign(); preview();
+}
+function renderAssign() {
+  const f = state.detail.fields.find((x) => x.id === state.field);
+  const rows = f.distinct.map((d) => h("div", { class: "vrow" },
+    h("code", {}, d.value === "" ? "(empty)" : d.value),
+    h("span", { class: "n" }, "×" + d.n),
+    d.parser ? h("span", { class: "tag " + d.parser, title: "what the parser makes of this value" },
+      "parser: " + d.parser) : h("span", { class: "tag" }, "parser: —"),
+    h("span", {}, ...["case", "control"].map((role) => h("button",
+      { class: "role " + role + (state.rule[role].values.includes(d.value) ? " on" : ""),
+        onclick: () => toggle(role, d.value) }, role)))));
+  const rx = (role) => h("input", { type: "text", placeholder: "regex, case-insensitive",
+    value: state.rule[role].regex, "aria-label": role + " regex",
+    oninput: (e) => { state.rule[role].regex = e.target.value; preview(); } });
+  $("#assign").replaceChildren(
+    h("h2", {}, "Assign groups in “" + f.label + "”"),
+    h("div", { class: "values" }, rows),
+    f.n_distinct > f.distinct.length ? h("div", { class: "hint" },
+      "Showing the " + f.distinct.length + " most frequent of " + f.n_distinct +
+      " values; use a regex for the rest.") : null,
+    h("div", { class: "rx" }, h("span", { class: "tag case" }, "case"), rx("case"),
+      h("span", { class: "tag control" }, "control"), rx("control")),
+    h("div", { id: "counts" }), h("div", { id: "err" }));
+}
+function renderTable() {
+  const d = state.detail, labels = (state.result && state.result.labels) || [];
+  const fi = d.fields.findIndex((f) => f.id === state.field);
+  const head = h("tr", {}, h("th", {}, "GSM"), d.fields.map((f, j) =>
+    h("th", { class: j === fi ? "active" : "" }, f.label)));
+  const body = d.gsm.map((g, i) => h("tr", { class: labels[i] || "" },
+    h("td", {}, g), d.fields.map((f, j) => h("td", { class: j === fi ? "active" : "" },
+      f.values[i]))));
+  $("#tbl").replaceChildren(h("table", {}, h("thead", {}, head), h("tbody", {}, body)));
+}
+
+function preview() {
+  clearTimeout(state.timer);
+  state.timer = setTimeout(async () => {
+    const acc = state.cur;
+    try {
+      const r = await api("/api/preview", { accession: acc, field: state.field,
+        rule: state.rule });
+      if (acc !== state.cur) return;
+      state.result = r; $("#err") && ($("#err").textContent = "");
+      renderTable(); renderCounts();
+    } catch (e) { state.result = null; $("#err") && ($("#err").textContent = e.message);
+      renderCounts(); }
+  }, 120);
+}
+function renderCounts() {
+  const r = state.result;
+  const ok = r && r.n_case >= 2 && r.n_control >= 2 && !r.n_conflict;
+  const text = r ? [h("span", { class: "tag case" }, r.n_case + " case"),
+    h("span", { class: "tag control" }, r.n_control + " control"),
+    h("span", { class: "tag" }, r.n_unassigned + " unassigned"),
+    r.n_conflict ? h("span", { class: "tag warn" }, r.n_conflict + " match both") : null] : [];
+  if ($("#counts")) $("#counts").replaceChildren(...text);
+  $("#barcounts").replaceChildren(...text);
+  document.querySelector('[data-d="contrast_exists"]').disabled = !ok;
+}
+
+async function decide(decision) {
+  if (!state.cur) return;
+  const btn = document.querySelector(`[data-d="${decision}"]`);
+  if (btn.disabled) return;
+  try {
+    const row = await api("/api/review", { accession: state.cur, decision,
+      field: state.field, rule: state.rule, note: $("#note").value });
+    state.queue.find((q) => q.accession === state.cur).review = row;
+    $("#msg").textContent = "saved";
+    applyFilters();
+    step(1, true);
+  } catch (e) { $("#msg").textContent = e.message; }
+}
+function step(dir, onlyOpen) {
+  const i = state.view.findIndex((q) => q.accession === state.cur);
+  for (let n = i + dir; n >= 0 && n < state.view.length; n += dir) {
+    if (!onlyOpen || !status(state.view[n])) return select(state.view[n].accession);
+  }
+}
+
+document.querySelectorAll(".bar .go").forEach((b) =>
+  b.addEventListener("click", () => decide(b.dataset.d)));
+for (const id of ["#f-audit", "#f-species", "#f-review"])
+  $(id).addEventListener("change", applyFilters);
+$("#f-text").addEventListener("input", applyFilters);
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches("input, textarea, select") || e.metaKey || e.ctrlKey) return;
+  if (e.key === "j") step(1); else if (e.key === "k") step(-1);
+  else if (e.key === "1") decide("contrast_exists");
+  else if (e.key === "2") decide("no_contrast");
+  else if (e.key === "3") decide("unclear");
+});
+
+(async () => {
+  state.queue = await api("/api/queue");
+  const sp = [...new Set(state.queue.map((q) => q.species))].sort();
+  $("#f-species").append(...sp.map((s) => h("option", { value: s }, s)));
+  applyFilters();
+  const first = state.view.find((q) => !status(q)) || state.view[0];
+  if (first) select(first.accession);
+})();
+</script>
+</body>
+</html>

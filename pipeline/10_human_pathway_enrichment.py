@@ -277,8 +277,19 @@ def build_threeway_comparison(
     human_results:  list[pd.DataFrame],
     concordant_results: list[pd.DataFrame],
     out_path: Path,
+    unavailable: dict[str, str] | None = None,
 ) -> pd.DataFrame:
-    """Merge Enrichr results across three arms and flag pathway presence."""
+    """Merge Enrichr results across three arms and flag pathway presence.
+
+    ``unavailable`` names arms whose Enrichr call failed. An error is not a
+    result: writing the table anyway would state that every term was absent
+    from that arm, which is exactly what the manuscript's central claim reads.
+    """
+    if unavailable:
+        detail = "; ".join(f"{arm} unavailable ({reason})"
+                           for arm, reason in sorted(unavailable.items()))
+        raise ValueError(f"refusing to write a three-way comparison: {detail}")
+
     def sig_terms(dfs: list[pd.DataFrame]) -> pd.DataFrame:
         if not dfs:
             return pd.DataFrame(columns=["library", "term", "adjusted_pval",
@@ -327,9 +338,76 @@ def build_threeway_comparison(
 
     df_out["arm"] = df_out.apply(arm, axis=1)
     df_out = df_out.sort_values(["arm", "padj_human", "padj_rodent"])
-    df_out.to_csv(out_path, index=False)
+    tmp = out_path.with_suffix(out_path.suffix + ".tmp")
+    df_out.to_csv(tmp, index=False)
+    tmp.replace(out_path)
     logger.info("Three-way comparison: %d terms saved → %s", len(df_out), out_path.name)
     return df_out
+
+
+def run_enrichr_arm(
+    list_name: str,
+    gene_list: list[str],
+    out_prefix: str,
+    *,
+    libs: list[str] | None = None,
+    out_dir: Path | None = None,
+) -> list[pd.DataFrame]:
+    """Run Enrichr for one gene-list arm and return the frames with terms.
+
+    An arm under five genes is skipped (returns empty), which is a deliberate
+    selection decision. A library that raises is *not* a result: failures are
+    collected and raised, so an outage can never be written out as "this arm
+    found nothing". An empty frame from the service is a genuine no-overlap
+    and is logged as such.
+    """
+    libs = list(LIBRARIES if libs is None else libs)
+    out_dir = OUT_DIR if out_dir is None else out_dir
+
+    if len(gene_list) < 5:
+        logger.info("\n=== %s: only %d genes — skipping Enrichr ===",
+                    list_name, len(gene_list))
+        return []
+
+    logger.info("\n===== Enrichr: %s (%d genes) =====", list_name, len(gene_list))
+    results: list[pd.DataFrame] = []
+    pending: list[tuple[str, pd.DataFrame]] = []
+    failed: list[str] = []
+    for lib in libs:
+        logger.info("  %s", lib)
+        res = enrichr_run(gene_list, lib, list_name=f"{list_name}_{lib}")
+        if res is None:
+            failed.append(lib)
+            time.sleep(0.5)
+            continue
+        if res.empty:
+            logger.info("    no terms returned (no overlap) for %s", lib)
+            time.sleep(0.5)
+            continue
+
+        sig_count = (res["adjusted_pval"] < 0.05).sum()
+        logger.info("    %d terms (padj<0.05: %d)", len(res), sig_count)
+        pending.append((lib, res))
+        time.sleep(0.5)
+
+    if failed:
+        raise SystemExit(
+            f"Enrichr failed for {len(failed)} library/libraries in arm "
+            f"{list_name!r}: {failed}. Refusing to write a partial three-way "
+            "comparison."
+        )
+
+    # Write only after every library in the arm succeeded, so an outage leaves
+    # no per-library CSV that a later run could mistake for this one's result.
+    for lib, res in pending:
+        res.to_csv(out_dir / f"{out_prefix}_{lib}.csv", index=False)
+        dot_plot(
+            res,
+            title=f"{list_name} — {lib}",
+            out_path=out_dir / f"{out_prefix}_{lib}_top{TOP_N}.pdf",
+        )
+        results.append(res)
+    return results
 
 
 # ---------------------------------------------------------------------------
@@ -416,38 +494,12 @@ def main() -> None:
         OUT_DIR / "gene_list_concordant.csv", index=False)
 
     # ---- Enrichr ORA --------------------------------------------------------
-    rodent_results:     list[pd.DataFrame] = []
-    human_results:      list[pd.DataFrame] = []
-    concordant_results: list[pd.DataFrame] = []
-
-    for list_name, gene_list, result_bucket, out_prefix in [
-        ("rodent_strong", strong_rod_human,  rodent_results,     "rodent"),
-        ("human_all",     human_genes,        human_results,      "human"),
-        ("concordant",    concordant_genes,   concordant_results, "concordant"),
-    ]:
-        if len(gene_list) < 5:
-            logger.info("\n=== %s: only %d genes — skipping Enrichr ===", list_name, len(gene_list))
-            continue
-        logger.info("\n===== Enrichr: %s (%d genes) =====", list_name, len(gene_list))
-        for lib in LIBRARIES:
-            logger.info("  %s", lib)
-            res = enrichr_run(gene_list, lib, list_name=f"{list_name}_{lib}")
-            if res is None or res.empty:
-                time.sleep(0.5)
-                continue
-            sig_count = (res["adjusted_pval"] < 0.05).sum()
-            logger.info("    %d terms (padj<0.05: %d)", len(res), sig_count)
-
-            out_csv = OUT_DIR / f"{out_prefix}_{lib}.csv"
-            res.to_csv(out_csv, index=False)
-
-            dot_plot(
-                res,
-                title=f"{list_name} — {lib}",
-                out_path=OUT_DIR / f"{out_prefix}_{lib}_top{TOP_N}.pdf",
-            )
-            result_bucket.append(res)
-            time.sleep(0.5)
+    # Each arm aborts on an Enrichr error rather than returning an empty list:
+    # a failed call and "no term reached padj<0.05" must not look the same in
+    # the comparison table below.
+    rodent_results     = run_enrichr_arm("rodent_strong", strong_rod_human, "rodent")
+    human_results      = run_enrichr_arm("human_all", human_genes, "human")
+    concordant_results = run_enrichr_arm("concordant", concordant_genes, "concordant")
 
     # ---- Three-way comparison -----------------------------------------------
     logger.info("\n=== Three-way comparison ===")

@@ -314,3 +314,82 @@ def test_sparse_rsid_column_no_longer_loses_the_rows_hm_rsid_covers(tmp_path):
     n = harmonize_sumstats(gz, _study(), out)
     assert n == 3
     assert pd.read_csv(out, sep="\t")["rsid"].tolist() == ["rs1", "rs2", "rs3"]
+
+
+# ---------------------------------------------------------------------------
+# R2: N is written to `n` and consumed as WEIGHT in the METAL script. -1 is a
+# legal return from parse_sample_size (and was blessed by a test), and nothing
+# in the chain filtered it: METAL either aborts the group or inverts that
+# study's contribution. harmonize_sumstats now refuses the study, which 04b
+# records as harmonize_failed with a reason.
+# ---------------------------------------------------------------------------
+
+def _study_with_n(n, accession="GCST90091914"):
+    return SumstatsStudy(accession=accession, trait="Fibromyalgia",
+                         sample_size_text="", n=n, cohort="",
+                         is_burden=False, phenotype="fibromyalgia")
+
+
+@pytest.mark.parametrize("bad_n", [-1, 0, 12.5, None, "45409"])
+def test_harmonize_refuses_a_non_positive_or_non_integer_n(tmp_path, bad_n):
+    gz = _write_gz(tmp_path, _HEADER, [
+        "1\t10177\tAC\tA\t-0.0877\t0.2043\t0.4573\t0.6678\tNA\tlo\t11\trs1",
+    ])
+    out = tmp_path / "out.tsv"
+    with pytest.raises(ValueError, match="sample size"):
+        harmonize_sumstats(gz, _study_with_n(bad_n), out)
+    assert not out.exists()
+
+
+def test_harmonize_accepts_a_positive_integer_n(tmp_path):
+    gz = _write_gz(tmp_path, _HEADER, [
+        "1\t10177\tAC\tA\t-0.0877\t0.2043\t0.4573\t0.6678\tNA\tlo\t11\trs1",
+    ])
+    out = tmp_path / "out.tsv"
+    assert harmonize_sumstats(gz, _study_with_n(12345), out) == 1
+    assert pd.read_csv(out, sep="\t")["n"].iloc[0] == 12345
+
+
+# ---------------------------------------------------------------------------
+# R3: a CI whose bounds are inverted (or equal) in the deposit yields a
+# negative or zero SE. `dropna` cannot see either, so both were written to the
+# output and then entered METAL: a negative SE flips the variance sign, a zero
+# SE is an infinite weight.
+# ---------------------------------------------------------------------------
+
+def test_inverted_ci_bounds_do_not_yield_a_negative_se(tmp_path):
+    gz = _write_gz(tmp_path, _BETA_CI_HEADER, [
+        "1\t10177\tA\tG\t0.10\tNA\t0.30\t1e-4\tNA\tlo\t11\trs_inverted\t0.05\t0.15",
+        "1\t10178\tA\tG\t0.10\tNA\t0.30\t1e-4\tNA\tlo\t11\trs_ok\t0.15\t0.05",
+    ])
+    out = tmp_path / "out.tsv"
+    n = harmonize_sumstats(gz, _study(), out)
+    assert n == 1
+    df = pd.read_csv(out, sep="\t")
+    assert df["rsid"].tolist() == ["rs_ok"]
+    assert (df["se"] > 0).all()
+
+
+def test_equal_ci_bounds_do_not_yield_a_zero_se(tmp_path):
+    gz = _write_gz(tmp_path, _BETA_CI_HEADER, [
+        "1\t10177\tA\tG\t0.10\tNA\t0.30\t1e-4\tNA\tlo\t11\trs_zero\t0.10\t0.10",
+        "1\t10178\tA\tG\t0.10\tNA\t0.30\t1e-4\tNA\tlo\t11\trs_ok\t0.15\t0.05",
+    ])
+    out = tmp_path / "out.tsv"
+    n = harmonize_sumstats(gz, _study(), out)
+    assert n == 1
+    assert pd.read_csv(out, sep="\t")["rsid"].tolist() == ["rs_ok"]
+
+
+def test_se_losses_are_logged_separately_from_missing_identifier_losses(tmp_path, caplog):
+    gz = _write_gz(tmp_path, _BETA_CI_HEADER, [
+        "1\t10177\tA\tG\t0.10\tNA\t0.30\t1e-4\tNA\tlo\t11\trs_inverted\t0.05\t0.15",
+        "1\t10178\tA\tG\t0.10\tNA\t0.30\t1e-4\tNA\tlo\t11\tNA\tNA\tNA",
+        "1\t10179\tA\tG\t0.10\tNA\t0.30\t1e-4\tNA\tlo\t11\trs_ok\t0.15\t0.05",
+    ])
+    out = tmp_path / "out.tsv"
+    with caplog.at_level("INFO"):
+        n = harmonize_sumstats(gz, _study(), out)
+    assert n == 1
+    assert "1 without an identifier" in caplog.text
+    assert "1 with a non-finite or non-positive se" in caplog.text

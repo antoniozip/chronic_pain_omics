@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import re
 from dataclasses import asdict
 from pathlib import Path
 
@@ -109,6 +110,32 @@ def load_species_pooled(
     return df
 
 
+def _resolve_derived_ids(study_ids: object) -> set[str]:
+    """Resolve each contributing study id to itself and its `_<token>` parents.
+
+    `pooled_effects.csv` names the analysis unit (`GSE241361_DRG`,
+    `ST000676_Dorsal_root_ganglia`); the manifest carries the retrieved parent
+    accession. R's `accession_screened_in()` strips one suffix at a time for
+    exactly this reason: a plain intersection assigns every derived unit to
+    neither arm, silently and with no error. Stripping repeatedly lets a unit
+    derived twice (`GSE180627_PAG_S1`) still resolve.
+    """
+    resolved: set[str] = set()
+    for token in str(study_ids).split(";"):
+        token = token.strip()
+        if not token:
+            continue
+        resolved.add(token)
+        candidate = token
+        while True:
+            parent = re.sub(r"_[^_]+$", "", candidate)
+            if parent == candidate:
+                break
+            resolved.add(parent)
+            candidate = parent
+    return resolved
+
+
 def split_by_species(
     pooled_df: pd.DataFrame,
     harmonized_dir: Path,
@@ -158,7 +185,7 @@ def split_by_species(
         # such rows contaminate. Attribute a row to a species only when every
         # contributing study is of that species; a genuinely cross-species row
         # is not evidence about either and is dropped from both subsets.
-        study_sets = pooled_df["study_ids"].apply(lambda ids: set(str(ids).split(";")))
+        study_sets = pooled_df["study_ids"].apply(_resolve_derived_ids)
         human_mask = study_sets.apply(
             lambda s: bool(s & human_accessions) and not (s & any_animal_accessions)
         )
@@ -168,12 +195,20 @@ def split_by_species(
         mixed = study_sets.apply(
             lambda s: bool(s & human_accessions) and bool(s & any_animal_accessions)
         )
+        neither = ~(human_mask | animal_mask)
         logger.info(
             "[%s/%s] %d human-only, %d animal-only rows "
-            "(%d rows pool both species and are excluded from both sides)",
+            "(%d rows pool both species and are excluded from both sides; "
+            "%d rows match neither arm)",
             modality, target_species, int(human_mask.sum()), int(animal_mask.sum()),
-            int(mixed.sum()),
+            int(mixed.sum()), int(neither.sum()),
         )
+        if int(neither.sum()):
+            logger.warning(
+                "[%s/%s] %d rows match neither arm: their study ids resolve to "
+                "no manifest accession (human or %s)",
+                modality, target_species, int(neither.sum()), target_species,
+            )
         return pooled_df[human_mask], pooled_df[animal_mask]
 
     # No per-row study_ids: return full df for human; empty for animal

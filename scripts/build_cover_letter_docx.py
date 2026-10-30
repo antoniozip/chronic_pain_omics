@@ -12,13 +12,18 @@ and this script only renders it. Regenerate rather than edit the .docx.
 Build-time only: pypandoc is not a project dependency, so run this with the
 system python3 rather than .venv/bin/python.
 
-Also renders the PRISMA 2020 checklist, which is Markdown for the same reason.
+Also renders the PRISMA 2020 checklist and the table-of-contents entry, which
+are Markdown for the same reason. Images resolve against the source's own
+directory, so the entry's `figures/toc_graphic.png` is found from any working
+directory.
 
 Usage:
     python3 scripts/build_cover_letter_docx.py
     python3 scripts/build_cover_letter_docx.py \\
         --source manuscript/prisma_2020_checklist.md \\
         --out manuscript/prisma_2020_checklist.docx
+    python3 scripts/build_cover_letter_docx.py \\
+        --source manuscript/toc_entry.md --out manuscript/toc_entry.docx
 """
 
 from __future__ import annotations
@@ -57,7 +62,8 @@ def main() -> int:
         pypandoc.convert_text(
             text, "docx", format="markdown",
             outputfile=str(args.out),
-            extra_args=["--reference-doc", str(reference)],
+            extra_args=["--reference-doc", str(reference),
+                        "--resource-path", str(args.source.resolve().parent)],
         )
     logger.info("wrote %s (%.1f kB)",
                 args.out.relative_to(REPO_ROOT), args.out.stat().st_size / 1e3)

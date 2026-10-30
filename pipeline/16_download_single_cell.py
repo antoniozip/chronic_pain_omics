@@ -23,7 +23,7 @@ import re
 import time
 import urllib.error
 import urllib.request
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import pandas as pd
 
@@ -49,14 +49,38 @@ def series_url(accession: str) -> str:
             f"{accession}/suppl/")
 
 
+def safe_name(name: str) -> str | None:
+    """Return a plain filename, or None if the name could escape its directory.
+
+    A GEO listing is third-party input: an absolute path, a `..` segment or a
+    multi-component path must never be joined onto the target directory.
+    """
+    if not name:
+        return None
+    candidate = PurePosixPath(name)
+    if candidate.is_absolute() or ".." in candidate.parts or len(candidate.parts) != 1:
+        return None
+    if candidate.name in ("", "."):
+        return None
+    return candidate.name
+
+
 def list_files(accession: str) -> list[str]:
     req = urllib.request.Request(series_url(accession), headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(req, timeout=60) as response:
         html = response.read().decode(errors="replace")
     # The listing links every file relative to the directory; absolute hrefs
     # are the parent-directory and sort links, which are not files.
-    return sorted({f for f in re.findall(r'href="([^"?/][^"]*)"', html)
-                   if not f.startswith("http")})
+    names: set[str] = set()
+    for raw in re.findall(r'href="([^"?/][^"]*)"', html):
+        if raw.startswith("http"):
+            continue
+        clean = safe_name(raw)
+        if clean is None:
+            logger.warning("%s: refusing unsafe listing entry %r", accession, raw)
+            continue
+        names.add(clean)
+    return sorted(names)
 
 
 def remote_size(url: str) -> int | None:
@@ -69,8 +93,20 @@ def remote_size(url: str) -> int | None:
         return None
 
 
-def fetch(url: str, dest: Path, expected: int | None) -> tuple[str, int]:
-    """Download one file. Returns (outcome, bytes on disk)."""
+def fetch(url: str, target: Path, name: str, expected: int | None) -> tuple[str, int]:
+    """Download one file into `target`. Returns (outcome, bytes on disk).
+
+    The name is re-validated here even though `list_files` already filtered it,
+    and the resolved destination must stay under the resolved target.
+    """
+    clean = safe_name(name)
+    if clean is None:
+        raise ValueError(f"refusing unsafe remote filename {name!r}")
+    root = target.resolve()
+    dest = (root / clean).resolve()
+    if not dest.is_relative_to(root):
+        raise ValueError(f"refusing path escaping {root}: {name!r}")
+
     if dest.exists() and expected is not None and dest.stat().st_size == expected:
         return "skipped", dest.stat().st_size
     if dest.exists():
@@ -89,6 +125,37 @@ def fetch(url: str, dest: Path, expected: int | None) -> tuple[str, int]:
         raise OSError(f"{dest.name}: got {size} bytes, expected {expected}")
     tmp.rename(dest)
     return "downloaded", size
+
+
+def merge_manifest(path: Path, frame: pd.DataFrame, replaced: set[str]) -> pd.DataFrame:
+    """Keep rows for accessions this run did not process.
+
+    `--accession` is advertised as the normal way to re-run one study; writing
+    only that study's rows would silently narrow the shared manifest.
+    """
+    if path.exists():
+        try:
+            old = pd.read_csv(path)
+        except pd.errors.EmptyDataError:
+            old = None
+        if old is not None and "accession" in old.columns and not old.empty:
+            old = old[~old["accession"].isin(replaced)]
+            frame = pd.concat([old, frame], ignore_index=True)
+    if frame.empty:
+        return frame
+    sort_cols = [c for c in ("accession", "file") if c in frame.columns]
+    return frame.sort_values(sort_cols, kind="stable").reset_index(drop=True)
+
+
+def write_manifest(path: Path, frame: pd.DataFrame) -> bool:
+    """Write atomically; refuse to replace the corpus with an empty table."""
+    if frame.empty:
+        logger.error("refusing to write an empty manifest to %s", path)
+        return False
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    frame.to_csv(tmp, index=False)
+    tmp.replace(path)
+    return True
 
 
 def main() -> int:
@@ -134,7 +201,7 @@ def main() -> int:
                 time.sleep(POLITE_DELAY_S)
                 continue
             try:
-                outcome, size = fetch(url, target / name, expected)
+                outcome, size = fetch(url, target, name, expected)
             except Exception as exc:                   # noqa: BLE001
                 logger.error("  %s/%s failed: %s", accession, name, exc)
                 rows.append({"accession": accession, "file": name, "bytes": 0,
@@ -149,9 +216,12 @@ def main() -> int:
         grand_total += series_total
         logger.info("%s: %d file(s), %.2f GB", accession, len(files), series_total / 1e9)
 
-    pd.DataFrame(rows).to_csv(MANIFEST, index=False)
+    frame = merge_manifest(
+        MANIFEST, pd.DataFrame(rows), replaced=set(registry["accession"]))
+    if not write_manifest(MANIFEST, frame):
+        return 1
     logger.info("%d file(s) over %d series, %.2f GB total -> %s",
-                len(rows), registry["accession"].nunique(), grand_total / 1e9, MANIFEST)
+                len(frame), registry["accession"].nunique(), grand_total / 1e9, MANIFEST)
     return 0
 
 

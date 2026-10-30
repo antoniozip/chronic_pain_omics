@@ -63,6 +63,22 @@ def unpack(archive: Path, target: Path) -> list[str]:
     return written
 
 
+def merge_manifest(path: Path, frame: pd.DataFrame, replaced: set[str]) -> pd.DataFrame:
+    """Keep rows for accessions this run did not process (see step 16)."""
+    if path.exists():
+        try:
+            old = pd.read_csv(path)
+        except pd.errors.EmptyDataError:
+            old = None
+        if old is not None and "accession" in old.columns and not old.empty:
+            old = old[~old["accession"].isin(replaced)]
+            frame = pd.concat([old, frame], ignore_index=True)
+    if frame.empty:
+        return frame
+    sort_cols = [c for c in ("accession", "gsm") if c in frame.columns]
+    return frame.sort_values(sort_cols, kind="stable").reset_index(drop=True)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--accession", action="append")
@@ -97,8 +113,14 @@ def main() -> int:
                          "n_files": sum(1 for n in members if gsm and gsm in n),
                          "outcome": "unpacked"})
 
-    frame = pd.DataFrame(rows)
-    frame.to_csv(MANIFEST, index=False)
+    frame = merge_manifest(MANIFEST, pd.DataFrame(rows),
+                           replaced={a.parent.name for a in archives})
+    if frame.empty:
+        logger.error("refusing to write an empty manifest to %s", MANIFEST)
+        return 1
+    tmp = MANIFEST.with_suffix(MANIFEST.suffix + ".tmp")
+    frame.to_csv(tmp, index=False)
+    tmp.replace(MANIFEST)
     ok = frame[frame["outcome"] == "unpacked"]
     logger.info("%d archive(s), %d GSM(s) with files -> %s",
                 frame["accession"].nunique(), len(ok[ok["gsm"] != ""]), MANIFEST)

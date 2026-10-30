@@ -318,3 +318,231 @@ def test_mapping_stats_on_empty_input(tmp_path, pipeline_07):
     assert stats["n_mapped_to_human"] == 0
     import math
     assert math.isnan(stats["pct_mapped_to_human"])
+
+
+# ---------------------------------------------------------------------------
+# split_by_species — derived study ids resolve to their parent accession
+# ---------------------------------------------------------------------------
+
+def test_split_by_species_resolves_derived_study_ids(tmp_path, pipeline_07):
+    """pooled_effects names the unit (GSE241361_DRG), the manifest the parent.
+
+    A plain set intersection assigns every derived id to neither arm: measured
+    on the current corpus that was 28 transcriptomic rows, silently dropped.
+    """
+    mod_dir = tmp_path / "transcriptomics"
+    mod_dir.mkdir(parents=True)
+    rows = [
+        {"accession": "GSE241361", "has_human": True, "has_animal": False,
+         "species_canonical": ["Homo sapiens"]},
+        {"accession": "GSE180627", "has_human": False, "has_animal": True,
+         "species_canonical": ["Mus musculus"]},
+    ]
+    with open(mod_dir / "harmonized.jsonl", "w") as f:
+        for r in rows:
+            f.write(json.dumps(r) + "\n")
+
+    pooled = _pooled_with_studies(
+        ["HUMAN_DERIVED", "ANIMAL_DERIVED", "ANIMAL_DERIVED_TWICE"],
+        ["GSE241361_DRG", "GSE180627_PAG", "GSE180627_PAG_S1"],
+    )
+
+    human_df, animal_df = pipeline_07.split_by_species(
+        pooled, tmp_path, "transcriptomics", "Mus musculus"
+    )
+
+    assert list(human_df["feature_id"]) == ["HUMAN_DERIVED"]
+    assert list(animal_df["feature_id"]) == ["ANIMAL_DERIVED", "ANIMAL_DERIVED_TWICE"]
+
+
+def test_split_by_species_reports_rows_matching_neither_arm(
+        tmp_path, pipeline_07, caplog):
+    mod_dir = tmp_path / "transcriptomics"
+    mod_dir.mkdir(parents=True)
+    with open(mod_dir / "harmonized.jsonl", "w") as f:
+        f.write(json.dumps({"accession": "HUM1", "has_human": True,
+                            "has_animal": False,
+                            "species_canonical": ["Homo sapiens"]}) + "\n")
+
+    pooled = _pooled_with_studies(
+        ["HUMAN_ONLY", "ORPHANED_1", "ORPHANED_2"],
+        ["HUM1", "PXD999999_X", "ST000676_Plasma"],
+    )
+
+    with caplog.at_level("INFO"):
+        human_df, animal_df = pipeline_07.split_by_species(
+            pooled, tmp_path, "transcriptomics", "Mus musculus"
+        )
+
+    assert list(human_df["feature_id"]) == ["HUMAN_ONLY"]
+    assert animal_df.empty
+    assert "2 rows match neither arm" in caplog.text
+
+
+# ---------------------------------------------------------------------------
+# OrthologMapper — transient failures must not become "no ortholog"
+# ---------------------------------------------------------------------------
+
+import requests  # noqa: E402  (grouped with the tests that need it)
+
+
+class _Resp:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def raise_for_status(self):
+        return None
+
+    def json(self):
+        return self._payload
+
+
+def _no_sleep(monkeypatch):
+    monkeypatch.setattr("cp_multiomics.ortholog.hcop.time.sleep", lambda _s: None)
+
+
+def test_transient_failure_is_not_cached_as_no_ortholog(tmp_path, monkeypatch):
+    """A timeout used to write None into the cache, permanently removing the
+    symbol from every later cross-species run."""
+    cache_path = tmp_path / "cache.json"
+    mapper = OrthologMapper(cache_path)
+    _no_sleep(monkeypatch)
+
+    with patch("cp_multiomics.ortholog.hcop.requests.post",
+               side_effect=requests.ConnectionError("reset by peer")):
+        with pytest.raises(RuntimeError, match="after 3 attempts"):
+            mapper.map_to_human(["Tnf"], from_species="Mus musculus")
+
+    assert "Tnf:10090" not in mapper._cache
+    assert not cache_path.exists(), "a failed fetch must not be persisted"
+
+
+def test_transient_failure_is_retried_then_cached(tmp_path, monkeypatch):
+    cache_path = tmp_path / "cache.json"
+    mapper = OrthologMapper(cache_path)
+    _no_sleep(monkeypatch)
+
+    replies = [
+        requests.ConnectionError("reset by peer"),
+        _Resp([{"query": "Tnf",
+                "homologene": {"genes": [[10090, 21926], [9606, 7124]]}}]),
+        _Resp([{"_id": 7124, "taxid": 9606, "symbol": "TNF"}]),
+    ]
+
+    def fake_post(url, data=None, timeout=None):
+        reply = replies.pop(0)
+        if isinstance(reply, Exception):
+            raise reply
+        return reply
+
+    with patch("cp_multiomics.ortholog.hcop.requests.post", side_effect=fake_post):
+        result = mapper.map_to_human(["Tnf"], from_species="Mus musculus")
+
+    assert result["Tnf"].human_symbol == "TNF"
+    assert OrthologMapper(cache_path)._cache["Tnf:10090"].human_symbol == "TNF"
+
+
+def test_query_size_never_exceeds_the_api_hit_cap(tmp_path, monkeypatch):
+    """MyGene rejects a large `size` with 400 Too Many Hits Requested.
+
+    The payload used a fixed size of BATCH_SIZE, so the first uncached rebuild
+    aborted before a single batch was saved. The size must equal the number of
+    symbols actually being asked about, and the batch must stay under the cap.
+    """
+    cache_path = tmp_path / "cache.json"
+    mapper = OrthologMapper(cache_path)
+    _no_sleep(monkeypatch)
+    seen = []
+
+    def fake_post(url, data=None, timeout=None):
+        seen.append(data)
+        if "query" in url:
+            return _Resp([{"query": s, "notfound": True}
+                          for s in data["q"].split(",")])
+        return _Resp([])
+
+    with patch("cp_multiomics.ortholog.hcop.requests.post", side_effect=fake_post):
+        mapper.map_to_human([f"Gene{i}" for i in range(450)],
+                            from_species="Mus musculus")
+
+    query_payloads = [p for p in seen if "size" in p]
+    assert query_payloads, "no query payload captured"
+    for p in query_payloads:
+        terms = len(p["q"].split(","))
+        assert int(p["size"]) == terms, (p["size"], terms)
+        assert int(p["size"]) <= 200, p["size"]
+
+
+def test_explicit_absence_is_cached(tmp_path, monkeypatch):
+    cache_path = tmp_path / "cache.json"
+    mapper = OrthologMapper(cache_path)
+    _no_sleep(monkeypatch)
+
+    with patch("cp_multiomics.ortholog.hcop.requests.post",
+               return_value=_Resp([{"query": "Nope", "notfound": True}])):
+        result = mapper.map_to_human(["Nope"], from_species="Mus musculus")
+
+    assert result["Nope"] is None
+    assert "Nope:10090" in OrthologMapper(cache_path)._cache
+
+
+def test_unversioned_legacy_cache_is_ignored(tmp_path):
+    """Old caches may hold None entries written by a failed fetch."""
+    cache_path = tmp_path / "cache.json"
+    cache_path.write_text(json.dumps({
+        "Tnf:10090": {"source_symbol": "Tnf", "source_species": "Mus musculus",
+                      "human_symbol": "TNF", "human_entrez": 7124,
+                      "confidence": "high", "sources": ["homologene"]},
+    }))
+
+    assert OrthologMapper(cache_path)._cache == {}
+
+
+def test_cache_with_a_different_version_is_ignored(tmp_path):
+    cache_path = tmp_path / "cache.json"
+    cache_path.write_text(json.dumps({
+        "__meta__": {"version": 1},
+        "Tnf:10090": None,
+    }))
+
+    assert OrthologMapper(cache_path)._cache == {}
+
+
+def test_unanswered_symbols_are_logged(tmp_path, monkeypatch, caplog):
+    """A symbol the service never answers must be reported, not read as absent."""
+    import logging
+    cache_path = tmp_path / "cache.json"
+    mapper = OrthologMapper(cache_path)
+    _no_sleep(monkeypatch)
+
+    def fake_post(url, data=None, timeout=None):
+        if "query" in url:
+            return _Resp([{"query": "Known", "notfound": True}])
+        return _Resp([])
+
+    with patch("cp_multiomics.ortholog.hcop.requests.post", side_effect=fake_post):
+        with caplog.at_level(logging.WARNING):
+            result = mapper.map_to_human(["Known", "Missing"], from_species="Mus musculus")
+
+    assert result["Known"] is None and result["Missing"] is None
+    assert "not answered" in caplog.text
+    assert "Missing:10090" not in mapper._cache
+
+
+def test_corrupt_entry_is_skipped_without_truncating_the_cache(tmp_path):
+    """One malformed record must not stop the load and leave a prefix cache."""
+    cache_path = tmp_path / "cache.json"
+    cache_path.write_text(json.dumps({
+        "__meta__": {"version": 2},
+        "A:10090": {
+            "source_symbol": "A", "source_species": "Mus musculus",
+            "human_symbol": "A", "human_entrez": 1,
+            "confidence": "high", "sources": ["A"],
+        },
+        "B:10090": {"source_symbol": 1},
+        "C:10090": None,
+    }))
+    mapper = OrthologMapper(cache_path)
+    assert "A:10090" in mapper._cache
+    assert "C:10090" in mapper._cache
+    assert "B:10090" not in mapper._cache

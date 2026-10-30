@@ -40,6 +40,7 @@ GSE214204,4,4,3,1,no,sample title,,
 GSE217932,4,4,4,2,no,treatment | sample title,,
 GSE221921,96,93,5,3,yes,cell type | disease state | sample title,separates_on_cell_type,cell type -> blood cells from fibromylagia patient (fma)=case; blood cells from healthy patient (control)=control
 GSE224814,3,3,5,0,no,,,
+GSE225224,12,11,4,2,no,diet | sample title,separates_on_diet,diet -> high-fat-diet=case; standard-diet=control
 GSE232713,7,7,6,2,yes,disease state | sample title,,
 GSE23339,10,9,3,3,yes,disease state | patient | sample title,arms_merge_levels_of_patient,patient -> 1=control; 12=control; 14=case; 18=control; 19=case; 2=case
 GSE235287,3,3,3,2,no,treatment | sample title,,
@@ -58,6 +59,7 @@ GSE272517,4,4,4,0,no,,,
 GSE276193,8,10,2,1,no,sample title,,
 GSE278827,3,3,2,2,no,tissue | sample title,separates_on_tissue,tissue -> human endometrium of control women=control; human endometrium of endometriosis patients=case
 GSE28242,8,5,4,3,yes,age | disease state | sample title,arms_merge_levels_of_disease_state;separates_on_age,age -> 20=case; 30=case; 36=case; 38=control; 51=control; 55=case || disease state -> normal=control; pbs with lesions=case; pbs without lesions=case
+GSE286026,3,3,3,1,no,sample title,,
 GSE289097,3,3,5,2,no,treatment | sample title,treatment_values_in_treatment,treatment -> cfa=case; saline=control
 GSE295863,24,8,5,2,no,treatment | sample title,,
 GSE301439,5,5,3,2,no,treatment | sample title,treatment_values_in_treatment,treatment -> 10 mg/kg oxaliplatin=case; control (5% dextrose)=control
@@ -69,6 +71,10 @@ GSE318938,6,6,4,2,no,treatment | sample title,treatment_values_in_sample_title;t
 GSE322631,3,3,5,2,yes,sample group | sample title,,
 GSE325961,24,24,2,1,no,sample title,,
 GSE326825,6,6,4,2,no,treatment | sample title,,
+GSE332999,3,3,6,2,no,treatment | sample title,treatment_values_in_treatment,treatment -> no treatment=control; t10 sci model induction=case
+GSE334369,57,58,4,2,no,treatment | sample title,arms_merge_levels_of_treatment,treatment -> e02nnar_case=case; e04nnar_case=case; e05nnar_case=case; e08nnar_case=case; e10nnar_case=case; e11nnar_case=case
+GSE34000,3,3,6,2,no,stz injection | sample title,treatment_values_in_sample_title,"sample title -> normal vehicle-treated, 1 week=control; normal vehicle-treated, 2 week=control; normal vehicle-treated, 3 week=control; stz-injected, vehicle-treated, 1 week=case; stz-injected, vehicle-treated, 2 week=case; stz-injected, vehicle-treated, 3 week=case"
+GSE342076,3,3,2,1,no,sample title,,
 GSE35287,40,40,8,3,yes,individual identifier | disease | sample title,arms_merge_levels_of_individual_identifier;n_inflated_8x;repeated_subjects_in_individual_identifier,"individual identifier -> 233=case; 236=control; 243=case; 267=case; 270=case; 310=control || treatment duration: 4 distinct values, each appearing a multiple of 8 times, so 80 samples are ~10 subjects || individual identifier: 80 samples, 8 subjects"
 GSE38038,4,4,4,1,no,sample title,,
 GSE47603,4,5,4,2,yes,disease status | sample title,,
@@ -89,3 +95,7 @@ GSE7846,5,5,1,1,no,sample title,,
 GSE89224,33,7,7,3,yes,treatment | timepoint (days post sni) | sample title,arms_merge_levels_of_timepoint_days_post_sni_,timepoint (days post sni) -> 0=control; 120=case; 144=case; 16=case; 168=case; 192=case
 GSE91396,18,18,7,2,no,treatment | sample title,,
 GSE92718,12,12,6,2,no,treatment | sample title,,
+GSE308534,6,4,3,2,yes,tissue | treatment,separates_on_tissue,tissue -> pIC kept; PVT dropped (same animals); treatment -> STZ=case; vehicle=control
+GSE168902,3,3,3,3,yes,tissue | disease state | sample title,separates_on_tissue,tissue -> ectopic endometrium=case; normal endometrium=control
+GSE174299,4,4,4,2,no,treatment | sample title,,
+GSE221957,4,4,3,1,no,sample title,treatment_values_in_sample_title,sample title -> contralateral vehicle sample 1=control; contralateral vehicle sample 2=control; contralateral vehicle sample 3=control; contralateral vehicle sample 4=control; mia vehicle sample 1=case; mia vehicle sample 2=case

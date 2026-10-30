@@ -265,11 +265,158 @@ test_that("map_ensembl_via_orgdb declines when nothing resolves", {
 test_that("the keep-native-ids branch writes a normalized table", {
   at <- grep("Could not obtain ID map", CODE)
   expect_length(at, 1)
+  writes <- grep("^\\s*(write\\.csv|write_or_unlink_normalized)\\(", CODE)
+  expect_true(any(writes > at),
+              info = "keep-native-ids must write, or 06 reads a stale file")
+})
+
+# The other two exits out of the per-study loop had the same defect: the
+# nrow(df)==0 early `next` and the "no features mapped" branch wrote nothing,
+# so the study kept whatever _effects_normalized.csv it had last time and 06
+# pooled that instead of the current effects. Every exit now goes through one
+# write-or-delete helper (CLAUDE.md: "if you ever add a path that skips the
+# write, delete the old file instead").
+test_that("a study that maps nothing falls through to the write, not to `next`", {
+  at <- grep("No features mapped to gene symbols", CODE)
+  expect_length(at, 1)
   nxt <- grep("^\\s*next\\s*$", CODE)
-  branch_end <- min(nxt[nxt > at])
-  writes <- grep("write.csv", CODE)
-  expect_true(any(writes > at & writes < branch_end),
-              info = "keep-native-ids must write before `next`, or 06 reads a stale file")
+  writes <- grep("^\\s*(write\\.csv|write_or_unlink_normalized)\\(", CODE)
+  after <- writes[writes > at]
+  expect_true(length(after) > 0)
+  expect_false(any(nxt > at & nxt < after[1]),
+               info = paste("the no-map branch must fall through to the write,",
+                            "not `next`, or the study's stale normalized table",
+                            "shadows this run"))
+})
+
+test_that("an empty effect table removes its stale normalized file", {
+  at <- grep("if \\(is\\.null\\(df\\) \\|\\| nrow\\(df\\) == 0\\) next", CODE)
+  expect_length(at, 0)
+})
+
+test_that("write_or_unlink_normalized deletes a stale table when given nothing", {
+  lift("write_or_unlink_normalized")
+  dir <- withr::local_tempdir()
+  path <- file.path(dir, "GSE1_effects_normalized.csv")
+  write.csv(data.frame(feature_id = "OLD"), path, row.names = FALSE)
+
+  expect_false(write_or_unlink_normalized(NULL, path))
+  expect_false(file.exists(path))
+
+  write.csv(data.frame(feature_id = "OLD"), path, row.names = FALSE)
+  expect_false(write_or_unlink_normalized(data.frame(), path))
+  expect_false(file.exists(path))
+})
+
+test_that("write_or_unlink_normalized rewrites the table it is given", {
+  lift("write_or_unlink_normalized")
+  dir <- withr::local_tempdir()
+  path <- file.path(dir, "GSE1_effects_normalized.csv")
+  write.csv(data.frame(feature_id = "OLD"), path, row.names = FALSE)
+
+  df <- data.frame(feature_id = "NEW", stringsAsFactors = FALSE)
+  expect_true(write_or_unlink_normalized(df, path))
+  expect_equal(read.csv(path, stringsAsFactors = FALSE)$feature_id, "NEW")
+})
+
+
+# ---------------------------------------------------------------------------
+# The id-space dispatch table.
+#
+# Every space detect_id_space() can return must route to a mapper that looks
+# the ids up under *that* space's keytype. mouse_ensembl_transcript was wired
+# to map_ensembl_gene(), which queries keytype "ENSEMBL" (genes) with ENSMUST
+# accessions: the map comes back all-NA, aggregate_to_gene() returns nothing,
+# and the study lands in the pool in transcript space -- the defect that put
+# 215,320 of 371,856 pooled features into the resp. GSE153739/GSE153740 arm
+# and contributed 0 to the BH family, fixed for human and not for mouse.
+# ---------------------------------------------------------------------------
+
+#' Parse the real `switch(id_space, ...)` block out of 05b, so the test runs
+#' the shipped dispatch rather than a copy of it.
+dispatch_block <- function() {
+  at <- grep("^\\s*id_map <- switch\\(id_space,$", SRC)
+  stopifnot(length(at) == 1)
+  close <- grep("^\\s*\\)\\s*$", SRC)
+  close <- close[close > at][1]
+  parse(text = SRC[at:close])
+}
+
+#' Which mapper each space must use, and the keytype that mapper looks up.
+id_space_mapper <- list(
+  rat_ensembl_transcript   = c("map_rat_ensembl_transcript", "ENSRNOT"),
+  mouse_mta10              = c("map_mouse_mta10",            "TC*.mm.*"),
+  mouse_ensembl_transcript = c("map_ensembl_transcript",     "ENSMUST"),
+  mouse_ensembl_gene       = c("map_ensembl_gene",           "ENSMUSG"),
+  rat_ensembl_gene         = c("map_ensembl_gene",           "ENSRNOG"),
+  human_ensembl_gene       = c("map_ensembl_gene",           "ENSG"),
+  human_ensembl_transcript = c("map_ensembl_transcript",     "ENST"),
+  entrez                   = c("map_entrez",                 "Entrez"),
+  refseq                   = c("map_refseq",                 "RefSeq"),
+  unknown                  = c(NA_character_,                NA_character_)
+)
+
+#' Evaluate the shipped switch with recording stubs in place of the mappers.
+run_dispatch <- function(space) {
+  recorded <- new.env(parent = emptyenv())
+  recorded$fn <- NA_character_
+  recorded$species <- NA_character_
+  rec <- function(fn, species = NA_character_) {
+    recorded$fn <- fn
+    recorded$species <- species
+    "MAP"
+  }
+
+  env <- new.env(parent = environment())
+  env$id_space    <- space
+  env$df          <- data.frame(feature_id = "X", stringsAsFactors = FALSE)
+  env$interim_dir <- tempdir()
+  env$accession   <- "GSE_TEST"
+  env$species_for <- function(acc) "Mus musculus"
+  env$map_rat_ensembl_transcript <- function(ids, interim_dir)
+    rec("map_rat_ensembl_transcript")
+  env$map_mouse_mta10 <- function(ids, interim_dir)
+    rec("map_mouse_mta10")
+  env$map_ensembl_transcript <- function(ids, species_tag, interim_dir)
+    rec("map_ensembl_transcript", species_tag)
+  env$map_ensembl_gene <- function(ids, species, interim_dir)
+    rec("map_ensembl_gene", species)
+  env$map_entrez <- function(ids, species, min_match = 0.5)
+    rec("map_entrez", species)
+  env$map_refseq <- function(ids, species, min_match = 0.5)
+    rec("map_refseq", species)
+
+  eval(dispatch_block(), envir = env)
+  list(fn = recorded$fn, species = recorded$species, map = env$id_map)
+}
+
+test_that("every detected id space routes to a mapper for its own keytype", {
+  lift(ID_SPACE_FUNCTIONS)
+  expect_setequal(names(id_space_mapper), c(names(ID_SPACE_PATTERNS), "unknown"))
+
+  for (space in names(id_space_mapper)) {
+    got <- run_dispatch(space)
+    expect_equal(got$fn, id_space_mapper[[space]][[1]],
+                 info = paste0(space, " must be mapped by ",
+                               id_space_mapper[[space]][[1]],
+                               ", not by ", got$fn))
+    if (is.na(id_space_mapper[[space]][[1]])) {
+      expect_null(got$map)
+    }
+  }
+})
+
+test_that("the Ensembl mappers are called with the space's own species", {
+  species_for_space <- c(
+    mouse_ensembl_transcript = "mouse", mouse_ensembl_gene = "mouse",
+    rat_ensembl_transcript = NA, rat_ensembl_gene = "rat",
+    human_ensembl_transcript = "human", human_ensembl_gene = "human"
+  )
+  for (space in names(species_for_space)) {
+    expected <- species_for_space[[space]]
+    if (is.na(expected)) next
+    expect_equal(run_dispatch(space)$species, expected, info = space)
+  }
 })
 
 

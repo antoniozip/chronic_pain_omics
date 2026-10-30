@@ -342,6 +342,105 @@ def test_cut_and_run_spelled_out_is_left_for_a_human(pipeline_02):
     assert (decision, reason) == ("", "")
 
 
+# --- appended: integrity fixes (B1 orphan union, B2 atomic write) -----------
+
+def _write_hits(raw_dir, *hits):
+    import json
+
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    with open(raw_dir / "run_hits.jsonl", "w", encoding="utf-8") as f:
+        for hit in hits:
+            f.write(json.dumps(hit) + "\n")
+
+
+def test_default_refresh_preserves_curated_orphans(pipeline_02, tmp_path):
+    """B1: a curated source=manual row with no JSONL counterpart must survive a
+    default refresh; previously the sheet was rebuilt only from the hits."""
+    raw_dir = tmp_path / "raw"
+    _write_hits(raw_dir, _make_hit("111", doi="10.1/abc"))
+
+    sheet = tmp_path / "screening.csv"
+    hit_row = pipeline_02.ScreeningRecord.from_hit(_make_hit("111", doi="10.1/abc"))
+    curated = pipeline_02.ScreeningRecord.from_hit(
+        _make_hit("manual-1", source="manual"))
+    curated.screening_decision = "include"
+    curated.screened_by = "AG Zippo"
+    pipeline_02.write_screening_csv([curated], sheet)
+
+    pipeline_02.refresh_screening_sheet(raw_dir, sheet)
+
+    loaded = pipeline_02.load_existing_screening(sheet)
+    assert set(loaded) == {"doi:10.1/abc", "manual:manual-1"}
+    assert loaded["manual:manual-1"].screening_decision == "include"
+    assert loaded["manual:manual-1"].screened_by == "AG Zippo"
+
+
+def test_prune_orphans_removes_them_and_logs_each_dropped(pipeline_02, tmp_path, caplog):
+    raw_dir = tmp_path / "raw"
+    _write_hits(raw_dir, _make_hit("111", doi="10.1/abc"))
+
+    sheet = tmp_path / "screening.csv"
+    curated = pipeline_02.ScreeningRecord.from_hit(
+        _make_hit("manual-1", source="manual"))
+    curated.screening_decision = "exclude"
+    curated.exclusion_reason = "wrong_condition"
+    pipeline_02.write_screening_csv([curated], sheet)
+
+    with caplog.at_level("WARNING"):
+        pipeline_02.refresh_screening_sheet(raw_dir, sheet, prune_orphans=True)
+
+    loaded = pipeline_02.load_existing_screening(sheet)
+    assert set(loaded) == {"doi:10.1/abc"}
+    text = caplog.text
+    assert "source=manual uid=manual-1 decision='exclude'" in text
+
+
+def test_failed_rewrite_leaves_the_previous_sheet_intact(pipeline_02, tmp_path, monkeypatch):
+    """B2: a crash during the rewrite must not truncate the master sheet."""
+    import csv as _csv
+
+    sheet = tmp_path / "screening.csv"
+    original = [pipeline_02.ScreeningRecord.from_hit(
+        _make_hit(str(i), doi=f"10.1/{i}")) for i in range(3)]
+    pipeline_02.write_screening_csv(original, sheet)
+    before = sheet.read_bytes()
+
+    real_writerow = _csv.DictWriter.writerow
+    calls = {"n": 0}
+
+    def exploding_writerow(self, rowdict):
+        calls["n"] += 1
+        if calls["n"] == 2:
+            raise RuntimeError("disk full")
+        return real_writerow(self, rowdict)
+
+    monkeypatch.setattr(_csv.DictWriter, "writerow", exploding_writerow)
+
+    replacement = [pipeline_02.ScreeningRecord.from_hit(
+        _make_hit(str(i), doi=f"20.1/{i}")) for i in range(3)]
+    try:
+        pipeline_02.write_screening_csv(replacement, sheet)
+    except RuntimeError:
+        pass
+    else:                                 # pragma: no cover - RED path
+        raise AssertionError("the failed write must propagate")
+
+    assert sheet.read_bytes() == before
+    assert not (tmp_path / "screening.csv.tmp").exists()
+
+
+def test_atomic_write_keeps_a_backup_of_the_previous_sheet(pipeline_02, tmp_path):
+    sheet = tmp_path / "screening.csv"
+    first = [pipeline_02.ScreeningRecord.from_hit(_make_hit("1", doi="10.1/1"))]
+    pipeline_02.write_screening_csv(first, sheet)
+    second = [pipeline_02.ScreeningRecord.from_hit(_make_hit("2", doi="10.1/2"))]
+    pipeline_02.write_screening_csv(second, sheet)
+
+    backup = tmp_path / "screening.bak"
+    assert backup.exists()
+    assert len(pipeline_02.load_existing_screening(backup)) == 1
+
+
 def test_reset_then_reapply_rescues_previously_excluded_epigenomics_row(pipeline_02, tmp_path):
     csv_path = tmp_path / "screening.csv"
     rec = _rec(pipeline_02, "ATAC-seq of dorsal root ganglion after chronic constriction injury")

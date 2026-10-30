@@ -85,6 +85,7 @@ GEO_EXCLUDED = {
     "in_vitro_hormone_treatment_not_patient_contrast": NO_CONTRAST,
     "in_vitro_stimulus_not_patient_contrast": NO_CONTRAST,
     "cultured_cells_across_passage_and_cell_type": NO_CONTRAST,
+    "genotype_contrast_not_pain_versus_control": NO_CONTRAST,
     "control_arm_is_pain_without_endometriosis": NO_CONTRAST,
     "superseries_duplicates_subseries": "SuperSeries duplicating pooled SubSeries",
     "single_cell_not_bulk_expression": "Single-cell deposit (own arm)",

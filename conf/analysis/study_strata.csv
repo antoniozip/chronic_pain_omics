@@ -52,3 +52,13 @@ GSE11839,other_human_amendment,Homo sapiens,6,6,Differentiation associated chang
 GSE47603,other_human_amendment,Homo sapiens,4,5,Genome-wide expression profiling of complex regional pain syndrome
 GSE57560,other_human_amendment,Homo sapiens,13,3,Correlation of gene expression with bladder capacity in interstitial cystitis/bladder pain syndrome
 GSE305138,other_rodent_amendment,Mus musculus,6,6,Microglial TIA1 in Lateral Septum Facilitates Chronic Inflammatory Pain via Regulating NF-κB Signaling Pathway
+GSE286026,neuropathy_rodent,Rattus norvegicus,3,3,Microbial-derived Hyodeoxycholic Acid Ameliorates Painful Diabetic Neuropathy by Modulating Dorsal Root Ganglion TLR4-Mediated Neuroinflammation Signaling Pathway
+GSE34000,neuropathy_rodent,Rattus norvegicus,3,3,Expression data from the dorsal root ganglia during streptozotocin-induced painful diabetic neuropathy in rats
+GSE332999,neuropathy_rodent,Rattus norvegicus,3,3,Early high-frequency spinal cord stimulation modulates the ROS/p38 MAPK/NF-κB and CXCL10/CXCR3 pathways to alleviate neuropathic pain and promote spinal cord injury repair
+GSE342076,neuropathy_rodent,Mus musculus,3,3,Urocortin 1 promotes trigeminal neuropathic pain by enhancing HSPB1-mediated interactions between neurons and non-neuronal cells in the trigeminal ganglion
+GSE225224,neuropathy_rodent,Mus musculus,12,11,Transcriptomic analysis of peripheral neuropathy in a high-fat diet-induced mouse model of type 2 diabetes
+GSE334369,fibromyalgia_human,Homo sapiens,100,105,Paradoxical Phenotype of Fibromyalgia Neutrophils: Elevated Baseline Inflammation but Blunted Response to Stimulation
+GSE308534,neuropathy_rodent,Mus musculus,6,4,"RNA-seq of paraventricular thalamus (PVT) and posterior insular cortex (pIC) in a mouse model of STZ-induced painful diabetic neuropathy with anxiety-like behavior"
+GSE168902,endometriosis_human,Homo sapiens,3,3,"Estrogen receptor beta promotes endometriosis progression by up-regulating CD47 expression in ectopic endometrial stromal cells"
+GSE174299,other_rodent_amendment,Rattus norvegicus,4,4,"Expression profiling of contralateral dorsal root ganglia of a rat model of complex regional pain syndrome type-I uncovers potential mechanisms involved in mirror-image pain"
+GSE221957,other_rodent_amendment,Rattus norvegicus,4,4,"Fatty acid binding protein 5 inhibition attenuates pronociceptive cytokine/chemokine expression and suppresses osteoarthritis pain: A comparative human and rat study"

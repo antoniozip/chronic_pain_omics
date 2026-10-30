@@ -101,6 +101,8 @@ SCRNA_SIGNATURES = re.compile(
 HTSEQ_SKIP = re.compile(r"^__[a-z_]+$", re.IGNORECASE)
 
 # Ensembl version suffix e.g. ENSMUSG00000000001.4 → ENSMUSG00000000001
+# Header names of the raw-count column in tools that also write a length column.
+COUNT_COLUMN_NAMES = ("expected_count", "numreads", "est_counts")
 ENSEMBL_VERSION = re.compile(r"^(ENS[A-Z]+G\d+)\.\d+$")
 
 
@@ -115,7 +117,13 @@ def raw_tar_url(accession: str) -> str:
 
 
 def fetch_tarball(url: str, max_bytes: int = DISK_MAX_BYTES) -> str | bytes | None:
-    """Download a tarball; returns bytes for small ones, tempfile path for large ones, or None."""
+    """Download a tarball; returns bytes for small ones, tempfile path for large ones, or None.
+
+    The temp file is owned by this function until it is returned: any failure
+    after `mkstemp` unlinks it, so a 404 on a candidate accession cannot leak a
+    multi-gigabyte file into /tmp.
+    """
+    tmp_path: str | None = None
     try:
         head = requests.head(url, timeout=15, allow_redirects=True)
         size = head.headers.get("Content-Length")
@@ -144,10 +152,14 @@ def fetch_tarball(url: str, max_bytes: int = DISK_MAX_BYTES) -> str | bytes | No
                         fh.write(chunk)
                         downloaded += len(chunk)
             logger.info("  Downloaded %.1f MB (to disk)", downloaded / 1e6)
-            return tmp_path
+            path, tmp_path = tmp_path, None      # ownership transferred to caller
+            return path
     except Exception as exc:
         logger.warning("  Fetch failed: %s", exc)
         return None
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
 
 
 # ---------------------------------------------------------------------------
@@ -209,10 +221,13 @@ def parse_sample_content(text: str) -> pd.Series | None:
     first = data_lines[0]
     fields = first.split("\t")
 
-    # --- RSEM detection: header contains "expected_count" ---
-    if any("expected_count" in f.lower() for f in fields):
-        header = [f.lower() for f in fields]
-        ec_idx = next(i for i, h in enumerate(header) if "expected_count" in h)
+    # --- Named count column: RSEM "expected_count", Salmon "NumReads",
+    #     kallisto "est_counts". These files carry Length / EffectiveLength
+    #     beside the count, and the generic branch below would take Length. ---
+    header = [f.lower() for f in fields]
+    ec_idx = next((i for i, h in enumerate(header)
+                   if any(name in h for name in COUNT_COLUMN_NAMES)), None)
+    if ec_idx is not None:
         # gene ID is first column
         rows: dict[str, float] = {}
         for line in data_lines[1:]:

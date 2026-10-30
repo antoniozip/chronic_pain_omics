@@ -833,6 +833,37 @@ aggregate_to_gene <- function(df, id_map) {
 }
 
 
+#' Persist one study's normalized table, or delete the stale one.
+#'
+#' `06` and `06g` glob `*_effects_normalized.csv` and prefer it over
+#' `_effects.csv`, so for a study that writes nothing they do not fall back to
+#' the raw effects — they keep whatever normalized table the study had last
+#' time, which then shadows the current results. After the 2026-08-28 re-run
+#' that was 19 studies still serving May tables to the meta-analysis.
+#'
+#' Every exit from the per-study loop therefore goes through this function:
+#' a table to keep is written, and "nothing to write" removes the file rather
+#' than leaving it behind. Encoding it once is what keeps the two early `next`
+#' branches (unreadable effects, no features mapped) from quietly re-opening
+#' the hole.
+#'
+#' @param df       Normalized (or native-id) effect table, or NULL/0-row.
+#' @param out_path Path of the study's `_effects_normalized.csv`.
+#' @return Invisibly TRUE if written, FALSE if any stale file was removed.
+write_or_unlink_normalized <- function(df, out_path) {
+  if (is.null(df) || nrow(df) == 0) {
+    if (file.exists(out_path)) {
+      unlink(out_path)
+      message(sprintf("  Removed stale normalized table → %s", basename(out_path)))
+    }
+    return(invisible(FALSE))
+  }
+  write.csv(df, out_path, row.names = FALSE)
+  message(sprintf("  %d rows saved → %s", nrow(df), basename(out_path)))
+  invisible(TRUE)
+}
+
+
 # ---------------------------------------------------------------------------
 # Main loop
 # ---------------------------------------------------------------------------
@@ -870,7 +901,15 @@ for (eff_path in effect_files) {
     read.csv(eff_path, stringsAsFactors = FALSE),
     error = function(e) { message("  Read error: ", e$message); NULL }
   )
-  if (is.null(df) || nrow(df) == 0) next
+  out_path <- file.path(in_dir, paste0(accession, "_effects_normalized.csv"))
+  if (is.null(df) || nrow(df) == 0) {
+    # Nothing current to normalize. Delete rather than skip: an unreadable or
+    # empty effects table leaves the study's previous normalized table in
+    # place otherwise, and 06 prefers that file over the current (empty) one.
+    message("  Empty or unreadable effect table — removing any previous normalized table")
+    write_or_unlink_normalized(NULL, out_path)
+    next
+  }
   # Some platforms use bare numeric probe ids (e.g. 6602010), which read.csv
   # types as double while every other study yields character. bind_rows then
   # refuses to combine the per-study frames, so pin the type on read.
@@ -913,7 +952,9 @@ for (eff_path in effect_files) {
       rat_ensembl_transcript  = map_rat_ensembl_transcript(df$feature_id, interim_dir),
       mouse_mta10             = map_mouse_mta10(df$feature_id, interim_dir),
       mouse_ensembl_transcript = {
-        map_ensembl_gene(df$feature_id, "mouse", interim_dir)
+        # ENSMUST accessions, not ENSMUSG: map_ensembl_gene() looks them up
+        # under keytype "ENSEMBL" and returns an all-NA map here.
+        map_ensembl_transcript(df$feature_id, "mouse", interim_dir)
       },
       mouse_ensembl_gene      = map_ensembl_gene(df$feature_id, "mouse", interim_dir),
       rat_ensembl_gene        = map_ensembl_gene(df$feature_id, "rat",   interim_dir),
@@ -931,32 +972,27 @@ for (eff_path in effect_files) {
 
   if (is.null(id_map)) {
     message("  Could not obtain ID map — keeping native IDs")
-    df$original_feature_id <- df$feature_id
-    df <- canonicalize_study_symbols(df, accession)$df
-    all_normalized[[accession]] <- df
-    # Write it anyway. 06 and 06g glob *_effects_normalized.csv and prefer it
-    # over _effects.csv, so skipping the write does not make them fall back --
-    # it leaves whatever normalized file the study had last time, which then
-    # shadows the current effects. After the 2026-08-28 re-run that was 19
-    # studies still serving May tables to the meta-analysis. Writing every run
-    # also carries the symbol canonicalisation through to 06, which previously
-    # reached only the combined file for these studies.
-    out_path <- file.path(in_dir, paste0(accession, "_effects_normalized.csv"))
-    write.csv(df, out_path, row.names = FALSE)
-    message(sprintf("  %d rows saved (native ids) → %s", nrow(df), basename(out_path)))
-    next
+    norm_df <- df
+    norm_df$original_feature_id <- norm_df$feature_id
+  } else {
+    norm_df <- aggregate_to_gene(df, id_map)
+    if (is.null(norm_df) || nrow(norm_df) == 0) {
+      # The map resolved nothing (a wrong keytype returns an all-NA vector).
+      # Fall through to the native-id write instead of `next`: a study that
+      # writes nothing keeps its previous normalized table, which 06 then
+      # prefers over these effects.
+      message("  No features mapped to gene symbols — keeping native ids ",
+              "(and rewriting, so no stale table shadows this run)")
+      norm_df <- df
+      norm_df$original_feature_id <- norm_df$feature_id
+    }
   }
 
-  norm_df <- aggregate_to_gene(df, id_map)
-  if (is.null(norm_df) || nrow(norm_df) == 0) {
-    message("  No features mapped to gene symbols — skipping")
-    next
-  }
+  # Canonicalisation runs on both paths: the normalized table is what 06 pools,
+  # and a study left in `March7` space joins nothing even if the map behind it
+  # was right.
   norm_df <- canonicalize_study_symbols(norm_df, accession)$df
-
-  out_path <- file.path(in_dir, paste0(accession, "_effects_normalized.csv"))
-  write.csv(norm_df, out_path, row.names = FALSE)
-  message(sprintf("  %d genes saved → %s", nrow(norm_df), basename(out_path)))
+  write_or_unlink_normalized(norm_df, out_path)
   all_normalized[[accession]] <- norm_df
 }
 

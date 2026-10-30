@@ -68,19 +68,23 @@ run_metabolomics_da <- function(accession, expr_matrix, sample_meta,
   fit2   <- eBayes(fit, trend = TRUE)
   tt     <- topTable(fit2, coef = "groupcase", number = Inf, sort.by = "none")
 
-  # Compute Hedges' g (SMD) for cross-study comparison
-  smd <- compute_hedges_g(expr_u, group)
-  smd_matched <- smd[match(rownames(tt), names(smd))]
+  # Compute Hedges' g (SMD) for cross-study comparison, with the SE of g.
+  # Not abs(logFC / t): that is limma's SE of log2FC, a different quantity on
+  # a different (log2 concentration) scale, and 06/06b/06g pool `effect_size`
+  # weighted by 1/se^2.
+  smd <- compute_hedges_g(expr_u, group, return_se = TRUE)
+  idx <- match(rownames(tt), names(smd$g))
+  smd_matched    <- smd$g[idx]
+  smd_se_matched <- smd$se[idx]
 
-  se_approx <- abs(tt$logFC / tt$t)
-
-  df <- build_effect_df(rownames(tt), smd_matched, se_approx,
+  df <- build_effect_df(rownames(tt), smd_matched, smd_se_matched,
                         tt$P.Value, tt$adj.P.Val,
                         n_case, n_ctrl, accession,
                         modality, id_space, "SMD")
 
-  # Also store raw log2FC for reference
+  # Keep the raw scale for reference, with its own SE under its own name.
   df$log2fc_raw <- tt$logFC
+  df$log2fc_se  <- abs(tt$logFC / tt$t)
   df
 }
 
@@ -91,17 +95,23 @@ run_metabolomics_da <- function(accession, expr_matrix, sample_meta,
 
 #' Compute Hedges' g for each feature (row) given case/control group vector.
 #'
-#' @param mat   Numeric matrix (features × samples).
-#' @param group Factor with levels c("control", "case").
-#' @return Named numeric vector of Hedges' g values.
-compute_hedges_g <- function(mat, group) {
+#' @param mat       Numeric matrix (features × samples).
+#' @param group     Factor with levels c("control", "case").
+#' @param return_se If TRUE, return a list with both `g` and its standard
+#'                  error rather than the g vector alone.
+#' @return Named numeric vector of Hedges' g values; when `return_se` is TRUE,
+#'   a list `list(g = , se = )`. The SE is Hedges & Olkin's
+#'   `sqrt((n1 + n0) / (n1 * n0) + g^2 / (2 * (n1 + n0)))`, i.e. the SE of the
+#'   effect this function returns — not the SE of log2FC, which is what this
+#'   backend used to attach to g.
+compute_hedges_g <- function(mat, group, return_se = FALSE) {
   n1 <- sum(group == "case")
   n0 <- sum(group == "control")
   # Correction factor J (Hedges 1981)
   df_total <- n1 + n0 - 2
   j <- 1 - (3 / (4 * df_total - 1))
 
-  apply(mat, 1, function(row) {
+  g <- apply(mat, 1, function(row) {
     m1 <- mean(row[group == "case"],    na.rm = TRUE)
     m0 <- mean(row[group == "control"], na.rm = TRUE)
     s1 <- var(row[group == "case"],    na.rm = TRUE)
@@ -110,6 +120,11 @@ compute_hedges_g <- function(mat, group) {
     if (is.na(sp) || sp == 0) return(NA_real_)
     j * (m1 - m0) / sp
   })
+
+  if (!return_se) return(g)
+
+  se <- sqrt((n1 + n0) / (n1 * n0) + g^2 / (2 * (n1 + n0)))
+  list(g = g, se = se)
 }
 
 

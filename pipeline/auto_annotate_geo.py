@@ -369,6 +369,14 @@ def annotate(sm: SeriesMatrix) -> Candidate | None:
 # ---------------------------------------------------------------------------
 
 def write_groups_csv(out_path: Path, sm: SeriesMatrix, cand: Candidate) -> None:
+    # zip() truncates to the shorter sequence: a characteristics row that lost
+    # or gained a tab would silently drop the tail of the cohort while the
+    # annotation log kept reporting the full series size. Fail instead.
+    if len(cand.labels) != len(sm.gsm_ids):
+        raise ValueError(
+            f"{sm.accession}: {len(cand.labels)} labels for "
+            f"{len(sm.gsm_ids)} samples (source={cand.source})"
+        )
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["sample_id", "group"])

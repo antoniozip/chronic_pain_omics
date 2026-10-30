@@ -18,6 +18,8 @@ import argparse
 import csv
 import json
 import logging
+import os
+import shutil
 from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Literal
@@ -178,12 +180,26 @@ def load_existing_screening(csv_path: Path) -> dict[str, ScreeningRecord]:
 
 
 def write_screening_csv(records: list[ScreeningRecord], csv_path: Path) -> None:
+    """Write the screening sheet atomically, keeping a `.bak` of the old sheet.
+
+    Every rewrite of this file goes through here: it is the PRISMA source of
+    truth, and an in-place truncating write leaves a half sheet if the process
+    dies mid-write.
+    """
     csv_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(csv_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=_FIELDNAMES)
-        writer.writeheader()
-        for r in records:
-            writer.writerow({f.name: getattr(r, f.name) for f in fields(r)})
+    tmp_path = csv_path.with_suffix(csv_path.suffix + ".tmp")
+    try:
+        with open(tmp_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=_FIELDNAMES)
+            writer.writeheader()
+            for r in records:
+                writer.writerow({f.name: getattr(r, f.name) for f in fields(r)})
+        if csv_path.exists():
+            shutil.copy2(csv_path, csv_path.with_suffix(".bak"))
+        os.replace(tmp_path, csv_path)
+    except BaseException:
+        tmp_path.unlink(missing_ok=True)
+        raise
     logger.info("Screening sheet written → %s (%d records)", csv_path, len(records))
 
 
@@ -391,6 +407,63 @@ def audit_sample(screening_csv: Path, n: int = 200, seed: int = 42) -> list[Scre
 # Main
 # ---------------------------------------------------------------------------
 
+def refresh_screening_sheet(
+    raw_dir: Path, output: Path, prune_orphans: bool = False
+) -> list[ScreeningRecord]:
+    """Rebuild the sheet from the JSONL hits, preserving curated rows.
+
+    A refresh used to be a whole-file replacement: any row in the master sheet
+    without a raw-hit counterpart (hand-curated `source=GEO` / `source=manual`
+    records) was silently deleted. Rows are now unioned in by default; pass
+    `prune_orphans=True` for the rare intentional removal.
+    """
+    all_hits = load_all_hits(raw_dir)
+    if not all_hits:
+        logger.info("No hits to screen. Run 01_search_literature.py first.")
+        return []
+
+    unique, n_dupes = deduplicate(all_hits)
+    logger.info("Loaded %d hits, removed %d cross-run duplicates → %d unique",
+                len(all_hits), n_dupes, len(unique))
+
+    # Preserve existing decisions when refreshing
+    existing = load_existing_screening(output)
+    preserved = 0
+    for r in unique:
+        key = r.dedup_key()
+        if key in existing:
+            prev = existing[key]
+            r.screening_decision = prev.screening_decision
+            r.exclusion_reason = prev.exclusion_reason
+            r.screened_by = prev.screened_by
+            r.screening_notes = prev.screening_notes
+            if prev.screening_decision:
+                preserved += 1
+
+    if preserved:
+        logger.info("Preserved %d existing decisions", preserved)
+
+    keys_in_hits = {r.dedup_key() for r in unique}
+    orphans = [r for k, r in existing.items() if k not in keys_in_hits]
+    if orphans and prune_orphans:
+        for r in orphans:
+            logger.warning(
+                "Pruning orphan sheet row: source=%s uid=%s decision=%r",
+                r.source, r.uid, r.screening_decision,
+            )
+        logger.warning("%d curated row(s) had no raw-hit counterpart and were pruned",
+                       len(orphans))
+    elif orphans:
+        logger.warning(
+            "%d sheet record(s) have no raw-hit counterpart and are preserved: %s",
+            len(orphans), [r.uid for r in orphans],
+        )
+
+    rows = unique if prune_orphans else unique + orphans
+    write_screening_csv(rows, output)
+    return rows
+
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -437,6 +510,13 @@ def parse_args() -> argparse.Namespace:
         metavar="N",
         help="Print N randomly sampled auto-excluded records for human audit",
     )
+    p.add_argument(
+        "--prune-orphans",
+        action="store_true",
+        help="On a refresh, drop sheet rows that have no raw-hit counterpart "
+             "(curated GEO/manual rows are preserved by default). Each dropped "
+             "(source, uid, decision) is logged.",
+    )
     return p.parse_args()
 
 
@@ -469,34 +549,10 @@ def main() -> None:
         return
 
     # Default: generate / refresh screening sheet from raw hits
-    all_hits = load_all_hits(args.raw_dir)
-    if not all_hits:
-        logger.info("No hits to screen. Run 01_search_literature.py first.")
-        return
-
-    unique, n_dupes = deduplicate(all_hits)
-    logger.info("Loaded %d hits, removed %d cross-run duplicates → %d unique",
-                len(all_hits), n_dupes, len(unique))
-
-    # Preserve existing decisions when refreshing
-    existing = load_existing_screening(args.output)
-    preserved = 0
-    for r in unique:
-        key = r.dedup_key()
-        if key in existing:
-            prev = existing[key]
-            r.screening_decision = prev.screening_decision
-            r.exclusion_reason = prev.exclusion_reason
-            r.screened_by = prev.screened_by
-            r.screening_notes = prev.screening_notes
-            if prev.screening_decision:
-                preserved += 1
-
-    if preserved:
-        logger.info("Preserved %d existing decisions", preserved)
-
-    write_screening_csv(unique, args.output)
-    print_status(args.output)
+    rows = refresh_screening_sheet(
+        args.raw_dir, args.output, prune_orphans=args.prune_orphans)
+    if rows:
+        print_status(args.output)
 
 
 if __name__ == "__main__":

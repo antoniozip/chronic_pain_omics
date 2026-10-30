@@ -9,6 +9,7 @@ recorded exclusion, not an error.
 from __future__ import annotations
 
 import logging
+import os
 from collections.abc import Callable, Iterable
 from pathlib import Path
 
@@ -51,23 +52,55 @@ def find_harmonised_file(
     return f"{directory}{chosen}"
 
 
+def _declared_size(headers: dict) -> int:
+    """Content-Length as an int, or 0 when absent/unparseable.
+
+    An HTML error page can carry a textual Content-Length; raising ValueError
+    out of here used to escape the callers' except tuples.
+    """
+    raw = headers.get("Content-Length") if hasattr(headers, "get") else None
+    try:
+        return int(raw or 0)
+    except (TypeError, ValueError):
+        logger.warning("Ignoring non-numeric Content-Length %r", raw)
+        return 0
+
+
 def download_file(
     url: str,
     dest: Path,
     http_stream: Callable[[str], tuple[dict, Iterable[bytes]]],
     max_bytes: int,
 ) -> int:
-    """Stream `url` to `dest`. Abort (no file written) if it exceeds max_bytes."""
+    """Stream `url` to `dest`, aborting cleanly if it exceeds `max_bytes`.
+
+    The cap is enforced on bytes actually written, not only on the declared
+    Content-Length: a chunked response (or one that under-reports its size)
+    would otherwise be written in full. The bytes go to a `.part` file and are
+    renamed into place only after a complete, size-checked read, so a
+    mid-stream failure never leaves a short file that looks complete.
+    """
     headers, chunks = http_stream(url)
-    size = int(headers.get("Content-Length", 0) or 0)
+    size = _declared_size(headers)
     if size > max_bytes:
         raise FileTooLargeError(
             f"{url}: {size} bytes exceeds cap {max_bytes}"
         )
     dest.parent.mkdir(parents=True, exist_ok=True)
+    part = dest.with_suffix(dest.suffix + ".part")
     written = 0
-    with open(dest, "wb") as f:
-        for chunk in chunks:
-            f.write(chunk)
-            written += len(chunk)
+    try:
+        with open(part, "wb") as f:
+            for chunk in chunks:
+                written += len(chunk)
+                if written > max_bytes:
+                    raise FileTooLargeError(
+                        f"{url}: exceeded cap {max_bytes} at {written} bytes"
+                    )
+                f.write(chunk)
+        if size and written != size:
+            raise OSError(f"{url}: short read, {written}/{size} bytes")
+        os.replace(part, dest)
+    finally:
+        part.unlink(missing_ok=True)
     return written

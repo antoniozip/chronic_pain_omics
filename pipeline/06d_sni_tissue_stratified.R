@@ -13,8 +13,68 @@ EFFECTS_CSV <- file.path(REPO_ROOT, "results", "per_study", "transcriptomics",
 TISSUE_CSV  <- file.path(REPO_ROOT, "data", "interim", "sni_tissue_annotations.csv")
 OUT_DIR     <- file.path(REPO_ROOT, "results", "meta", "transcriptomics", "stratified")
 
-# Load SNI pooled results
-sni_pooled <- read.csv(file.path(OUT_DIR, "SNI_pooled.csv"))
+# moderator_df() lives in R/meta_utils.R. metafor's `fit$m` is the number of
+# moderator coefficients and `fit$p` is that count plus the intercept; neither
+# is the quantity to publish or to gate on, `QMdf[1]` is.
+source(file.path(REPO_ROOT, "R", "meta_utils.R"))
+
+
+#' The pre-specified tissue-moderator family.
+#'
+#' Every feature observed in at least `min_tissues` tissues across at least
+#' `min_studies` studies. The rule is a property of the stratum's design and is
+#' evaluated before any effect or p-value is read, which is what makes the BH
+#' adjustment over this family valid.
+#'
+#' This used to be `head(x, 200)` after `order(-abs(yi))` — the family was
+#' selected on effect magnitude, so the retained 200 were enriched for small
+#' p-values and the adjusted count was anti-conservative with respect to
+#' correcting over all candidate features. A cap is no longer needed: the
+#' features are now indexed once by `split()` instead of re-scanning the whole
+#' table per feature.
+#'
+#' @param df_st Single-tissue rows of the stratum.
+#' @return Character vector of feature ids (deterministic, alphabetical).
+sni_tissue_family <- function(df_st, min_tissues = 2L, min_studies = 3L) {
+  n_tissues <- tapply(df_st$tissue, df_st$feature_id, function(x) length(unique(x)))
+  n_studies <- tapply(df_st$study_id, df_st$feature_id, function(x) length(unique(x)))
+  ids <- names(n_tissues)
+  ids[!is.na(n_tissues[ids]) & !is.na(n_studies[ids]) &
+        n_tissues[ids] >= min_tissues & n_studies[ids] >= min_studies]
+}
+
+
+#' Fit the tissue moderator for one feature.
+#'
+#' @param sub Rows of one feature (single-tissue studies only).
+#' @param fid Feature id, written into the result row.
+#' @return One-row data.frame, or NULL when the test is not identifiable.
+sni_tissue_moderator <- function(sub, fid) {
+  sub <- sub[!is.na(sub$se) & sub$se > 0, , drop = FALSE]
+  tissues <- unique(sub$tissue)
+  if (length(tissues) < 2 || nrow(sub) < 3) return(NULL)
+
+  fit <- tryCatch(
+    metafor::rma(yi = effect_size, sei = se, mods = ~ tissue, data = sub,
+                 method = "REML"),
+    error = function(e) NULL
+  )
+  # At least one moderator df. The gate used to be `fit$m < 2`, which under
+  # metafor's definition of `$m` (moderator coefficients, intercept excluded)
+  # silently skipped every two-tissue feature even though the family rule
+  # admits them.
+  if (is.null(fit) || moderator_df(fit) < 1) return(NULL)
+
+  data.frame(
+    feature_id = fid, k = fit$k, n_tissues = length(tissues),
+    I2_residual = fit$I2, tau2_residual = fit$tau2,
+    Q_between = fit$QM, Q_between_df = moderator_df(fit),
+    Q_between_pval = fit$QMp,
+    Q_residual = fit$QE, Q_residual_pval = fit$QEp,
+    stringsAsFactors = FALSE
+  )
+}
+
 
 # Load tissue map
 tissue_map <- read.csv(TISSUE_CSV, stringsAsFactors = FALSE)
@@ -35,54 +95,21 @@ cat(sprintf("SNI single-tissue: %d rows, %d studies, %d features\n",
 cat("Tissues:", paste(sort(unique(df_st$tissue)), collapse=", "), "\n")
 
 # ---------------------------------------------------------------------------
-# Focus on top SNI features (by pooled |yi|) with ≥2 tissues
+# Tissue moderator test over the pre-specified family
 # ---------------------------------------------------------------------------
 
-# Get top features: those with k>=2 and present in ≥2 tissues
-feat_tissues <- split(df_st$tissue, df_st$feature_id) |>
-  sapply(function(x) length(unique(x)))
-feat_studies <- split(df_st$study_id, df_st$feature_id) |>
-  sapply(function(x) length(unique(x)))
+family <- sni_tissue_family(df_st)
+cat(sprintf("Features in ≥2 tissues & ≥3 studies (pre-specified family): %d\n",
+            length(family)))
 
-multi_tissue <- names(feat_tissues)[feat_tissues >= 2 & feat_studies >= 3]
-cat(sprintf("Features in ≥2 tissues & ≥3 studies: %d\n", length(multi_tissue)))
-
-# Merge SNI pooled effect sizes to prioritize
-sni_pooled_idx <- sni_pooled[match(multi_tissue, sni_pooled$feature_id), ]
-sni_pooled_idx <- sni_pooled_idx[!is.na(sni_pooled_idx$yi), ]
-sni_pooled_idx <- sni_pooled_idx[order(-abs(sni_pooled_idx$yi)), ]
-
-# Top 200 features by effect magnitude
-top_features <- head(sni_pooled_idx$feature_id, 200)
-cat(sprintf("Testing top %d features by |yi|\n", length(top_features)))
-
-# ---------------------------------------------------------------------------
-# Fast tissue moderator test (top features only)
-# ---------------------------------------------------------------------------
+# Index once: a linear scan of the stratum per feature is what the old
+# top-200 cap was really buying.
+sub_by_feature <- split(df_st, df_st$feature_id)
 
 results <- list()
-for (i in seq_along(top_features)) {
-  fid <- top_features[i]
-  sub <- df_st[df_st$feature_id == fid & df_st$tissue != "multi_tissue", ]
-  sub <- sub[!is.na(sub$se) & sub$se > 0, ]
-  
-  tissues <- unique(sub$tissue)
-  if (length(tissues) < 2 || nrow(sub) < 3) next
-  
-  fit <- tryCatch(
-    rma(yi = effect_size, sei = se, mods = ~ tissue, data = sub, method = "REML"),
-    error = function(e) NULL
-  )
-  if (is.null(fit) || fit$m < 2) next
-  
-  results[[fid]] <- data.frame(
-    feature_id = fid, k = fit$k, n_tissues = length(tissues),
-    I2_residual = fit$I2, tau2_residual = fit$tau2,
-    Q_between = fit$QM, Q_between_df = fit$m,
-    Q_between_pval = fit$QMp,
-    Q_residual = fit$QE, Q_residual_pval = fit$QEp,
-    stringsAsFactors = FALSE
-  )
+for (fid in family) {
+  row <- sni_tissue_moderator(sub_by_feature[[fid]], fid)
+  if (!is.null(row)) results[[fid]] <- row
 }
 
 meta_df <- do.call(rbind, results)

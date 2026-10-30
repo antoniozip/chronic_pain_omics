@@ -32,7 +32,8 @@ from scipy import stats
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MANUSCRIPT = REPO_ROOT / "manuscript" / "manuscript.tex"
-ABBREVIATED_SUMMARY = REPO_ROOT / "manuscript" / "abbreviated_summary.txt"
+TOC_ENTRY = REPO_ROOT / "manuscript" / "toc_entry.md"
+TOC_VALUES = REPO_ROOT / "manuscript" / "figures" / "toc_graphic_values.csv"
 COVER_LETTER = REPO_ROOT / "manuscript" / "cover_letter.md"
 PRISMA_CHECKLIST = REPO_ROOT / "manuscript" / "prisma_2020_checklist.md"
 SUPPLEMENTARY = REPO_ROOT / "manuscript" / "supplementary_body.tex"
@@ -41,21 +42,22 @@ SUPPLEMENTARY = REPO_ROOT / "manuscript" / "supplementary_body.tex"
 #: names in `source`. The mutation harness enumerates this map too, so a
 #: document added here is mutation-tested without being named a second time.
 #:
-#: The Elsevier Highlights left with the Journal of Pain on 2026-09-21. Brain
-#: Communications asks instead for a 50-word abbreviated summary, which states
-#: no number (test_abbreviated_summary_meets_the_journal_format keeps it that
-#: way), so it needs no entry here.
+#: The Elsevier Highlights left with the Journal of Pain on 2026-09-21, and
+#: Brain Communications' abbreviated summary with that journal on 2026-10-20.
+#: iMetaOmics asks for a table-of-contents entry, whose text states no number
+#: (test_toc_entry_meets_the_journal_format keeps it that way) and whose image
+#: is checked through the values it plots, so neither needs an entry here.
 DOCUMENTS: dict[str, Path] = {
     "manuscript": MANUSCRIPT,
     # \input by supplementary.tex, the standalone document uploaded beside the
     # paper; since the move to Brain Communications it carries the detailed
-    # methods and results the 6,000-word limit sent out of the paper. It is its
+    # methods and results a 6,000-word limit sent out of the paper. It is its
     # own entry because the mutation harness perturbs files: a number it could
     # not find in manuscript.tex would be reported unperturbable and checked by
     # nothing.
     "supplementary": SUPPLEMENTARY,
-    # The Brain Communications cover letter restates headline numbers, and an
-    # editor reads it first. Markdown, not LaTeX: "%" is literal here.
+    # The cover letter restates headline numbers, and an editor reads it
+    # first. Markdown, not LaTeX: "%" is literal here.
     "cover_letter": COVER_LETTER,
 }
 
@@ -442,14 +444,10 @@ def _sni_tissue() -> pd.DataFrame:
     return _read(STRAT / "sni_tissue_meta.csv", usecols=["feature_id", "padj"])
 
 
-@cache
-def _sni_tissue_top_n() -> int:
-    """How many candidates 06d ranks down to before fitting."""
-    src = (REPO_ROOT / "pipeline" / "06d_sni_tissue_stratified.R").read_text()
-    m = re.search(r"head\(sni_pooled_idx\$feature_id,\s*(\d+)\)", src)
-    if not m:
-        raise MissingInput("06d_sni_tissue_stratified.R: no head(...) cap found")
-    return int(m.group(1))
+# _sni_tissue_top_n was deleted with the top-200 |effect| cap it read from 06d.
+# The family is now pre-specified (features in >=2 tissues and >=3 studies), so
+# there is no cap to transcribe; sni_tissue_tested already binds the tested
+# count to the results table.
 
 
 @cache
@@ -807,7 +805,7 @@ def _sens_claims() -> list[Claim]:
     The count is now a claim of its own, and the row patterns do not care.
     """
     arms = [("published", r"Published \(5\)", "published_pool"),
-            ("tissue", r"Tissue-matched \(10\)", "tissue_matched"),
+            ("tissue", r"Tissue-matched \(11\)", "tissue_matched"),
             ("all", r"All human \(\d+\)", "all_human")]
     species = [("mouse", "Mus musculus"), ("rat", "Rattus norvegicus")]
 
@@ -829,7 +827,7 @@ def _sens_claims() -> list[Claim]:
                       row + r" & [\d,]+ & [\d.]+\\% & [^&]+ & (?:\$-\$)?([\d.]+) ",
                       lambda slug=slug, sp=sp:
                           abs(float(_sens_row(slug, sp)["spearman_r"])),
-                      tol=0.0005),
+                      tol=0.001),
             ]
     # The whole-corpus arm's study count, which the row patterns deliberately
     # no longer pin. It moves with the human pool: 24 before GSE262037 was
@@ -1284,12 +1282,9 @@ CLAIMS: list[Claim] = [
     Claim("sni_tissue_tested_recap",
           r"\\gene\{C1qa\} and \\gene\{C1qb\} are among\s+those ([\d,]+) and are null",
           lambda: len(_sni_tissue())),
-    # 06d's candidate cap, read out of 06d rather than transcribed: Methods
-    # describes the pre-filter, so a change to the cap silently makes Methods
-    # wrong. Same reason build_table_s1.py parses STUDY_MODEL out of 06b.
-    Claim("sni_tissue_top_n",
-          r"fall outside the largest ([\d,]+) pooled effects\s+that the candidate set admits",
-          lambda: _sni_tissue_top_n()),
+    # The cap claim ("fall outside the largest N pooled effects") was deleted
+    # with the cap: 06d no longer ranks candidates by effect magnitude, so the
+    # sentence it verified is gone rather than renumbered.
     # How many strata yield nothing, and the feature range over the five the
     # sentence is about. The range read 21,914--47,060, an upper bound no
     # stratum has carried for two regenerations.
@@ -1372,48 +1367,55 @@ CLAIMS: list[Claim] = [
     Claim("coverage_rat",
           r"and ([\d,]+) of [\d,]+ for\s+rat",
           lambda: int(_summary_row("Rattus norvegicus")["n_mapped_to_human"])),
+    Claim("coverage_rat_denom",
+          r"and [\d,]+ of ([\d,]+) for\s+rat",
+          lambda: int(_summary_row("Rattus norvegicus")["n_animal_features"])),
     # The rest of the concordance sentence. Its percentages and Spearman rho
     # carried claims; its binomial p-values, Spearman p-values and Pearson
     # coefficients did not, and on 2026-08-31 all six were stale -- rat's
     # Pearson r had gone from -0.002 to +0.006, so the sentence still called it
     # "negative and not significant" when it was neither.
     Claim("binom_p_mouse",
-          r"mouse falls above it, binomial\s*\n\\pval\\,=([\d.]+)"
-          r"\$\\times\$10\\textsuperscript\{-3\};",
-          lambda: _binomial_p("Mus musculus") * 1e3, tol=0.05),
+          r"mouse binomial\s*\n\\pval\\,=([\d.]+)"
+          r"\$\\times\$10\\textsuperscript\{(-?\d+)\};",
+          lambda: _binomial_p("Mus musculus"), tol=0),
+
     Claim("binom_p_rat",
-          r"rat sits further above,\s*\n\\pval\\,=([\d.]+)"
-          r"\$\\times\$10\\textsuperscript\{-8\}\)",
-          lambda: _binomial_p("Rattus norvegicus") * 1e8, tol=0.05),
+          r"rat\s*\n\\pval\\,=([\d.]+)"
+          r"\$\\times\$10\\textsuperscript\{(-?\d+)\}\)",
+          lambda: _binomial_p("Rattus norvegicus"), tol=0),
+
     Claim("rho_p_mouse",
           r"\$\\rho\$\\,=\\,[\d.]+, \\pval\\,=([\d.]+)"
-          r"\$\\times\$10\\textsuperscript\{-7\}; rat:",
-          lambda: float(_summary_row("Mus musculus")["spearman_p"]) * 1e7, tol=0.05),
+          r"\$\\times\$10\\textsuperscript\{(-?\d+)\}; rat:",
+          lambda: float(_summary_row("Mus musculus")["spearman_p"]), tol=0),
+
     Claim("rho_p_rat",
-          r"\$\\rho\$\\,=\\,[\d.]+, \\pval\\,=([\d.]+)\$\\times\$10\\textsuperscript\{-20\}\)",
-          lambda: float(_summary_row("Rattus norvegicus")["spearman_p"]) * 1e20,
-          tol=0.05),
+          r"\$\\rho\$\\,=\\,0\.074, \\pval\\,=([\d.]+)\$\\times\$10\\textsuperscript\{(-?\d+)\}",
+          lambda: float(_summary_row("Rattus norvegicus")["spearman_p"]), tol=0),
+
     Claim("pearson_r_mouse",
           r"\(mouse:\s*\n\\textit\{r\}\\,=\\,([\d.]+),",
           lambda: float(_summary_row("Mus musculus")["pearson_r"]), tol=0.0005),
     Claim("pearson_p_mouse",
           r"\\textit\{r\}\\,=\\,[\d.]+, \\pval\\,=([\d.]+)"
-          r"\$\\times\$10\\textsuperscript\{-10\}; rat:",
-          lambda: float(_summary_row("Mus musculus")["pearson_p"]) * 1e10, tol=0.05),
+          r"\$\\times\$10\\textsuperscript\{(-?\d+)\}; rat:",
+          lambda: float(_summary_row("Mus musculus")["pearson_p"]), tol=0),
+
     Claim("pearson_r_rat",
           r"; rat:\s*\n\\textit\{r\}\\,=\\,((?:\$-\$)?[\d.]+), \\pval\\,=[\d.]+\$",
           lambda: float(_summary_row("Rattus norvegicus")["pearson_r"]),
           tol=0.0005),
     Claim("pearson_p_rat",
-          r"; rat:\s*\n\\textit\{r\}\\,=\\,(?:\$-\$)?[\d.]+, \\pval\\,=([\d.]+)"
-          r"\$\\times\$10\\textsuperscript\{-11\}\)",
-          lambda: float(_summary_row("Rattus norvegicus")["pearson_p"]) * 1e11,
-          tol=0.05),
+          r"; rat:\s*\n\\textit\{r\}\\,=\\,[\d.]+, \\pval\\,=([\d.]+)"
+          r"\$\\times\$10\\textsuperscript\{(-?\d+)\}",
+          lambda: float(_summary_row("Rattus norvegicus")["pearson_p"]), tol=0),
+
     # The abstract restated the SNL count and both concordance percentages with
     # no claim behind them, so they survived a regeneration that moved every
     # one of them. Registered now.
     Claim("abstract_snl_significant",
-          r"model yielded the most\s*\n\s*significant features \((\d[\d,]*)\)",
+          r"model yielded the most\s+significant features \((\d[\d,]*)\)",
           lambda: _n_sig(_stratum("SNL"))),
     # The tissue-matched arm as the prose states it. Table 4's row carries the
     # same figures and is claimed, but the sentence restating them was not --
@@ -1421,73 +1423,76 @@ CLAIMS: list[Claim] = [
     # significant, and quoted the published-pool rho in the Discussion while
     # describing the tissue-matched pool.
     Claim("tm_pct_mouse",
-          r"takes concordance to ([\d.]+)\\% for mouse",
+          r"leaves concordance at ([\d.]+)\\% for mouse",
           lambda: float(_sens_row("tissue_matched", "Mus musculus")["pct_concordant"]),
           tol=0.05),
+
     Claim("tm_pct_rat",
           r"and ([\d.]+)\\%\s*\nfor rat \(\\pval",
           lambda: float(_sens_row("tissue_matched", "Rattus norvegicus")["pct_concordant"]),
           tol=0.05),
     Claim("tm_binom_mouse",
-          r"\(binomial\s*\n\\pval\\,=([\d.]+)\$\\times\$10\\textsuperscript\{-3\}\)",
-          lambda: _sens_binomial_p("tissue_matched", "Mus musculus") * 1e3,
-          tol=0.05),
+          r"\(binomial\s*\n\\pval\\,=([\d.]+)\$\\times\$10\\textsuperscript\{(-?\d+)\}\)",
+          lambda: _sens_binomial_p("tissue_matched", "Mus musculus"), tol=0),
+
     Claim("tm_binom_rat",
-          r"for rat \(\\pval\\,=\\,([\d.]+)\)",
-          lambda: _sens_binomial_p("tissue_matched", "Rattus norvegicus"),
-          tol=0.005),
+          r"for rat \(\\pval\\,=([\d.]+)\$\\times\$10\\textsuperscript\{(-?\d+)\}\)",
+          lambda: _sens_binomial_p("tissue_matched", "Rattus norvegicus"), tol=0),
+
     Claim("tm_rho_mouse",
-          r"\(\$-\$([\d.]+) for mouse and \$-\$[\d.]+ for rat;",
-          lambda: abs(float(_sens_row("tissue_matched",
-                                      "Mus musculus")["spearman_r"])),
-          tol=0.0005),
+          r"coefficients \(([\d.]+) for mouse and [\d.]+ for rat;",
+          lambda: abs(float(_sens_row("tissue_matched", "Mus musculus")["spearman_r"])),
+          tol=0.001),
+
     Claim("tm_rho_rat",
-          r"\(\$-\$[\d.]+ for mouse and \$-\$([\d.]+) for rat;",
-          lambda: abs(float(_sens_row("tissue_matched",
-                                      "Rattus norvegicus")["spearman_r"])),
+          r"coefficients \([\d.]+ for mouse and ([\d.]+) for rat;",
+          lambda: abs(float(_sens_row("tissue_matched", "Rattus norvegicus")["spearman_r"])),
           tol=0.0005),
-    Claim("tm_pairs_mouse_prose",
-          r"which\s+is a statement about the ([\d,]+) pairs behind the test",
-          lambda: int(_sens_row("tissue_matched",
-                                "Mus musculus")["n_ortholog_pairs"])),
+
     # The abstract and the Discussion restate the arm's two percentages.
     Claim("abstract_tm_rat",
-          r"for mouse \(([\d.]+)\\% and",
-          lambda: float(_sens_row("tissue_matched",
-                                  "Rattus norvegicus")["pct_concordant"]),
+          r"remained ([\d.]+)\\% for both",
+          lambda: float(_sens_row("tissue_matched", "Rattus norvegicus")["pct_concordant"]),
           tol=0.05),
+
     Claim("abstract_tm_mouse",
-          r"for mouse \([\d.]+\\% and ([\d.]+)\\%\)",
+          r"remained ([\d.]+)\\% for both",
           lambda: float(_sens_row("tissue_matched", "Mus musculus")["pct_concordant"]),
           tol=0.05),
+
     Claim("discussion_tm_low",
-          r"concordance of ([\d.]+)--[\d.]+\\% in tissue-comparable",
-          lambda: min(float(_sens_row("tissue_matched", sp)["pct_concordant"])
+          r"concordance of ([\d.]+)--[\d.]+\\% across three",
+          lambda: min(float(_sens_row(a, sp)["pct_concordant"])
+                      for a in ("published_pool", "tissue_matched", "all_human")
                       for sp in ("Mus musculus", "Rattus norvegicus")),
           tol=0.05),
+
     Claim("discussion_tm_high",
-          r"concordance of [\d.]+--([\d.]+)\\% in tissue-comparable",
-          lambda: max(float(_sens_row("tissue_matched", sp)["pct_concordant"])
+          r"concordance of [\d.]+--([\d.]+)\\% across three",
+          lambda: max(float(_sens_row(a, sp)["pct_concordant"])
+                      for a in ("published_pool", "tissue_matched", "all_human")
                       for sp in ("Mus musculus", "Rattus norvegicus")),
           tol=0.05),
+
     Claim("discussion_tm_rho_mouse",
-          r"\(\$\\rho\$ of \$-\$([\d.]+) for mouse",
-          lambda: abs(float(_sens_row("tissue_matched",
-                                      "Mus musculus")["spearman_r"])),
+          r"\(\$\\rho\$ of ([\d.]+) for mouse",
+          lambda: float(_summary_row("Mus musculus")["spearman_r"]),
           tol=0.0005),
+
     Claim("discussion_tm_rho_rat",
-          r"for mouse and \$-\$([\d.]+) for rat\) suggest",
-          lambda: abs(float(_sens_row("tissue_matched",
-                                      "Rattus norvegicus")["spearman_r"])),
+          r"for mouse and ([\d.]+) for rat\)",
+          lambda: float(_summary_row("Rattus norvegicus")["spearman_r"]),
           tol=0.0005),
+
     Claim("abstract_concordance_rat",
-          r"concordance was\s*\n\s*([\d.]+)\\% for rat",
+          r"concordance was\s+([\d.]+)\\% for rat",
           lambda: float(_summary_row("Rattus norvegicus")["pct_concordant"]),
           tol=0.05),
     Claim("abstract_concordance_mouse",
-          r"for rat and ([\d.]+)\\% for mouse, falling",
+          r"for rat and ([\d.]+)\\% for mouse, and remained",
           lambda: float(_summary_row("Mus musculus")["pct_concordant"]),
           tol=0.05),
+
     # The SNL power caveat. Four numbers that would otherwise drift silently,
     # which is how the abstract's figures survived a regeneration untouched.
     Claim("snl_pct_significant",
@@ -1647,6 +1652,9 @@ CLAIMS: list[Claim] = [
     Claim("amendment_admitted",
           r"and \d+ of the (\d+) admitted are endometrial",
           lambda: _amendment_admitted(), source="supplementary"),
+    Claim("prisma_candidates",
+          r"Of the ([\d,]+) candidates",
+          lambda: int(_prisma_verdicts().sum())),
     Claim("prisma_include",
           r"Of the [\d,]+ candidates, (\d+) are\s+included",
           lambda: int(_prisma_verdicts().get("include", 0))),
@@ -1772,6 +1780,11 @@ CLAIMS: list[Claim] = [
     Claim("magma_genes_convergence",
           r"concordant transcripts for the ([\d,]+)\s+MAGMA-significant genes",
           lambda: len(_read(GENOMICS / "magma" / "significant_genes.csv"))),
+    # The abstract's copy. It stated 25 with no claim behind it from the Brain
+    # Communications abstract until the 2026-10-20 trim for iMetaOmics.
+    Claim("abstract_magma_genes",
+          r"none of the ([\d,]+) genome-wide-significant genes\s+from gene-based",
+          lambda: len(_read(GENOMICS / "magma" / "significant_genes.csv"))),
 
     # -- publication bias ---------------------------------------------------
     Claim("egger_features",
@@ -1818,7 +1831,8 @@ CLAIMS: list[Claim] = [
     # -- proteomics: screening and triage -----------------------------------
     # These read the PRISMA tables, which are tracked, so they never skip.
     Claim("proteomic_datasets",
-          r"A keyword search of PRIDE returned (\d+) pain-targeted",
+          r"A keyword search of the PRoteomics IDEntifications database \(PRIDE\)"
+          r" returned (\d+)\s+pain-targeted",
           lambda: len(_triage())),
     Claim("proteomic_raw_only",
           r"these, (\d+) are deposited as instrument or peak files only",
@@ -2107,7 +2121,21 @@ def test_manuscript_claim_matches_results(claim: Claim):
     except MissingInput as exc:
         pytest.skip(f"results not generated: {exc}")
 
-    stated = _as_number(matches[0])
+    m = matches[0]
+    if isinstance(m, tuple):
+        # LaTeX scientific notation: mantissa and exponent are separate groups.
+        mantissa, exponent = m
+        stated = float(f"{mantissa}e{exponent}")
+        assert not (float(mantissa) == 0 and expected > 0), (
+            f"{claim.name}: the {claim.source} prints {m} for a non-zero value "
+            f"({expected:.3g}); normalise the mantissa instead of zeroing it.")
+        digits = _significant_digits(mantissa)
+        rounded = _round_sig(expected, digits)
+        assert rounded == pytest.approx(stated, rel=1e-9, abs=0), (
+            f"{claim.name}: the {claim.source} states {stated:.3g}, results give "
+            f"{expected:.6g}, which to {digits} significant digits is {rounded:.3g}.")
+        return
+    stated = _as_number(m)
     delta = abs(stated - expected)
     assert delta <= claim.tol, (
         f"{claim.name}: the {claim.source} says {stated:,.4g}, results give "
@@ -2116,31 +2144,77 @@ def test_manuscript_claim_matches_results(claim: Claim):
     )
 
 
-#: Brain Communications' abbreviated summary: at most 50 words, third person
-#: ("Zippo reports that ..."), accessible to a non-specialist, and free of
-#: abbreviations other than approved gene symbols. It is entered in the
-#: submission system and reused on social media, so nothing downstream would
-#: catch an over-long or jargon-laden one.
-_SUMMARY_MAX_WORDS = 50
+#: iMetaOmics' table-of-contents entry: the article title, the authors with the
+#: corresponding one starred, "no more than 80 words or 3 sentences" of text and
+#: an image legible at 50 x 60 mm. It is uploaded at first submission and
+#: printed beside the abstract, so nothing downstream would catch an over-long
+#: one, a stale title or a figure copied out of the paper.
+_TOC_MAX_WORDS = 80
+_TOC_MAX_SENTENCES = 3
 
 
-def test_abbreviated_summary_meets_the_journal_format():
-    if not ABBREVIATED_SUMMARY.exists():
-        pytest.skip(f"no abbreviated summary at {ABBREVIATED_SUMMARY}")
-    text = ABBREVIATED_SUMMARY.read_text().strip()
+def _toc_blocks() -> list[str]:
+    if not TOC_ENTRY.exists():
+        pytest.skip(f"no table-of-contents entry at {TOC_ENTRY}")
+    return [b.strip() for b in TOC_ENTRY.read_text().split("\n\n") if b.strip()]
+
+
+def test_toc_entry_meets_the_journal_format():
+    title, authors, text, image = _toc_blocks()
+    stated = re.search(r"\\title\{\\textbf\{(.+?)\}\}", _manuscript(), re.S)
+    assert stated, "the manuscript title is no longer recognisable; update this test"
+    assert title == f"**{' '.join(stated.group(1).split())}**", (
+        "the table-of-contents entry carries a title the manuscript no longer has")
+    assert authors.endswith(r"\*"), "the corresponding author must be starred"
     words = text.split()
-    assert len(words) <= _SUMMARY_MAX_WORDS, (
-        f"abbreviated_summary.txt has {len(words)} words; the journal allows "
-        f"{_SUMMARY_MAX_WORDS}")
-    assert text.startswith("Zippo reports"), (
-        "the journal asks for the third person: 'Author et al. report that ...'")
-    abbreviations = re.findall(r"\b[A-Z]{2,}\b", text)
-    assert not abbreviations, f"abbreviations the journal disallows: {abbreviations}"
+    assert len(words) <= _TOC_MAX_WORDS, (
+        f"the entry's text has {len(words)} words; the journal allows {_TOC_MAX_WORDS}")
+    sentences = re.findall(r"[.!?](?:\s|$)", text)
+    assert len(sentences) <= _TOC_MAX_SENTENCES, (
+        f"the entry's text has {len(sentences)} sentences; the journal allows "
+        f"{_TOC_MAX_SENTENCES}")
     # A number here would be a copy of a manuscript figure that no claim reads,
     # which is how the Highlights had to be bound one by one. Stating none keeps
-    # the summary outside the registry honestly rather than by omission.
-    assert not re.search(r"\d", text), (
-        "the abbreviated summary states a number; bind it with a claim or drop it")
+    # the entry outside the registry honestly rather than by omission.
+    assert not re.search(r"\d", title + authors + text), (
+        "the table-of-contents entry states a number; bind it with a claim or drop it")
+    figure = re.fullmatch(r"!\[[^\]]*\]\(([^)]+)\)(\{[^}]*\})?", image)
+    assert figure, "the entry's last block must be its image"
+    assert (TOC_ENTRY.parent / figure.group(1)).exists(), (
+        f"the entry's image {figure.group(1)} has not been drawn; run "
+        "pipeline/08_figures.py --toc-only")
+
+
+#: Each series the table-of-contents image plots, and the claim stating the
+#: same quantity in the paper. The image is a picture no claim can read, so it
+#: writes what it plots beside it and this binds that to the registry: an image
+#: drawn before a regeneration fails here instead of contradicting the abstract.
+_TOC_SERIES = {
+    "human_halves": "hvh_replicate_pct_abstract",
+    "mouse_all_human": "abstract_concordance_mouse",
+    "rat_all_human": "abstract_concordance_rat",
+    "mouse_tissue_matched": "abstract_tm_mouse",
+    "rat_tissue_matched": "abstract_tm_rat",
+}
+
+
+def test_toc_graphic_plots_the_claimed_values():
+    if not TOC_VALUES.exists():
+        pytest.skip(f"no table-of-contents image values at {TOC_VALUES}")
+    plotted = pd.read_csv(TOC_VALUES).set_index("series")["value"]
+    assert set(plotted.index) == set(_TOC_SERIES), (
+        f"the image plots {sorted(plotted.index)}, the registry binds "
+        f"{sorted(_TOC_SERIES)}")
+    for series, name in _TOC_SERIES.items():
+        claim = next(c for c in CLAIMS if c.name == name)
+        try:
+            expected = float(claim.expected())
+        except MissingInput as exc:
+            pytest.skip(f"results not generated: {exc}")
+        assert abs(float(plotted[series]) - expected) <= claim.tol, (
+            f"the table-of-contents image plots {series} at {plotted[series]:.4g} "
+            f"where the paper states {expected:.4g}; redraw it with "
+            "pipeline/08_figures.py --toc-only")
 
 
 SUPPLEMENTARY_DIR = REPO_ROOT / "manuscript" / "supplementary"
@@ -2357,9 +2431,10 @@ GENE_CLAIMS: list[GeneClaim] = [
     # human pool went from 24 studies to 23 the same mistake in _sens_claims
     # unmatched six claims at once -- reported as "no longer appears in the
     # manuscript" rather than as a wrong number. The count has its own claim.
-    GeneClaim("table_rt1dmb",
-              r"CCI & \d+ & [\d,]+ & [\d,]+ & \d+ & \\gene\{RT1-DMb\} \(([\d.]+)e(-\d+)\)",
-              lambda: _gene_stat(lambda: _stratum("CCI"), "RT1-DMb", "padj")),
+    GeneClaim("table_mtnd3",
+              r"CCI & \d+ & [\d,]+ & [\d,]+ & \d+ & \\gene\{Mt-nd3\} \(([\d.]+)e(-\d+)\)",
+              lambda: _gene_stat(lambda: _stratum("CCI"), "Mt-nd3", "padj")),
+
     GeneClaim("table_exoc8",
               r"SNL & \d+ & [\d,]+ & [\d,]+ & [\d,]+ & \\gene\{Exoc8\} \(([\d.]+)e(-\d+)\)",
               lambda: _gene_stat(lambda: _stratum("SNL"), "Exoc8", "padj")),
@@ -2871,15 +2946,24 @@ CLAIMS += [
     _restate("cl_null_p", "q_null_p", r"\(P = ([\d.]+)\)", "cover_letter"),
     _restate("cl_conc_mouse", "concordance_mouse", r"effects is ([\d.]+)% for\s+mouse",
              "cover_letter"),
-    _restate("cl_conc_rat", "concordance_rat", r"mouse and ([\d.]+)% for rat, and falls",
+    _restate("cl_conc_rat", "concordance_rat", r"mouse and ([\d.]+)% for rat, and remains",
              "cover_letter"),
-    _restate("cl_tm_mouse", "tm_pct_mouse", r"falls to ([\d.]+)% and [\d.]+% once",
+    _restate("cl_tm_mouse", "tm_pct_mouse", r"remains ([\d.]+)% for both once",
              "cover_letter"),
-    _restate("cl_tm_rat", "tm_pct_rat", r"falls to [\d.]+% and ([\d.]+)% once", "cover_letter"),
+    _restate("cl_tm_rat", "tm_pct_rat", r"remains ([\d.]+)% for both once", "cover_letter"),
     _restate("cl_hvh", "hvh_replicate_pct_abstract", r"agree ([\d.]+)% of the time",
              "cover_letter"),
     _restate("cl_magma", "magma_genes", r"None of\s+the (\d+) genome-wide-significant genes",
              "cover_letter"),
+    # The deposit audit, which the iMetaOmics letter added as a finding.
+    _restate("cl_prot_datasets", "proteomic_datasets",
+             r"Of the (\d+) pain-targeted\s+proteomic datasets", "cover_letter"),
+    _restate("cl_prot_raw_only", "proteomic_raw_only",
+             r"in PRIDE, (\d+) deposit instrument", "cover_letter"),
+    _restate("cl_metab_empty", "metab_empty_mafs",
+             r"peak files only, and (\w+)\s+of the \w+ MetaboLights", "cover_letter"),
+    _restate("cl_metab_screened", "metab_screened",
+             r"of the (\w+) MetaboLights studies that passed screening", "cover_letter"),
     # The registry's own size, counted when the tests run, so it includes
     # these claims and moves whenever one is added or retired.
     Claim("cl_registry_size", r"each of those\s+([\d,]+) tests",
@@ -2911,8 +2995,9 @@ def test_every_checklist_location_names_a_real_heading():
 def test_combined_workbook_carries_every_cited_table_and_no_other():
     """Supplementary_Tables.xlsx is the file the journal receives.
 
-    Brain Communications allows ten supplementary files and there are eighteen
-    tables, so they ship as one workbook. A table cited but missing from it, or
+    Brain Communications allowed ten supplementary files and iMetaOmics
+    recommends "all the supplementary tables in one Excel", and there are
+    eighteen tables, so they ship as one workbook. A table cited but missing from it, or
     a sheet no text cites, is the same dead reference the per-table checks
     above catch, one file further out.
     """

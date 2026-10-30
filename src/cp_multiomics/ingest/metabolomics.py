@@ -245,7 +245,8 @@ class MetabolomicsIngester(OmicsIngester):
                     (f.get("technology_type", []) or []) + (f.get("instrument_platform", []) or [])
                 )
             )
-            year = (_first(f, "publication_date") or _first(f, "submission_date"))[:4]
+            year = (_first(f, "publication_date")
+                    or _first(f, "submission_date") or "")[:4]
 
             records.append(
                 DatasetRecord(

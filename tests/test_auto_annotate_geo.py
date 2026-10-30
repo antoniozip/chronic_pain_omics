@@ -125,3 +125,43 @@ def test_a_dry_run_writes_nothing_into_the_cache(tmp_path: Path):
     before = sorted(p.name for p in tmp_path.iterdir())
     aag.run(tmp_path, dry_run=True)
     assert sorted(p.name for p in tmp_path.iterdir()) == before
+
+
+# -- B6: a misaligned series matrix must not truncate the cohort -------------
+
+def _series(accession: str, n: int) -> aag.SeriesMatrix:
+    return aag.SeriesMatrix(
+        accession=accession,
+        file_name=f"{accession}_series_matrix.txt.gz",
+        gsm_ids=[f"GSM{i}" for i in range(1, n + 1)],
+        titles=[f"t{i}" for i in range(1, n + 1)],
+        source_names=[f"s{i}" for i in range(1, n + 1)],
+        characteristics=[],
+    )
+
+
+def test_write_groups_csv_refuses_mismatched_labels(tmp_path: Path):
+    # zip() truncates to the shorter side, so a characteristics row that lost
+    # a field silently drops the tail of the cohort while the log keeps
+    # reporting the full series size.
+    out = tmp_path / "GSE1_groups.csv"
+    cand = aag.Candidate(source="title", labels=["case", "control"],
+                         n_case=1, n_ctrl=1, coverage=2 / 3)
+
+    with pytest.raises(ValueError, match="2 labels for 3 samples"):
+        aag.write_groups_csv(out, _series("GSE1", 3), cand)
+
+    assert not out.exists()
+
+
+def test_write_groups_csv_writes_an_aligned_matrix(tmp_path: Path):
+    out = tmp_path / "GSE1_groups.csv"
+    cand = aag.Candidate(source="title", labels=["case", "control", ""],
+                         n_case=1, n_ctrl=1, coverage=2 / 3)
+
+    aag.write_groups_csv(out, _series("GSE1", 3), cand)
+
+    with open(out, newline="") as fh:
+        rows = list(csv.reader(fh))
+    assert rows == [["sample_id", "group"],
+                    ["GSM1", "case"], ["GSM2", "control"], ["GSM3", ""]]

@@ -31,6 +31,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from scipy import stats
+from statsmodels.stats.multitest import multipletests
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TABLES = REPO_ROOT / "data" / "raw" / "proteomics" / "tables"
@@ -40,6 +41,24 @@ MIN_PER_GROUP = 3          # usable observations required in each arm
 SCHEMA = ["feature_id", "effect_size", "se", "pval", "control_mean",
           "treatment_mean", "n_control", "n_treatment", "study_id",
           "region", "condition", "cohort", "padj"]
+
+
+def bh_adjust(pvals) -> np.ndarray:
+    """Benjamini-Hochberg over the finite p-values, NA elsewhere.
+
+    `multipletests(p, method="fdr_bh")` given a single NaN returns an all-NaN
+    adjusted vector, because `fdrcorrection` sorts NaN last and then
+    `np.minimum.accumulate` propagates it across the whole array — the `reject`
+    side still reports the finite rows significant. Downstream that is a study
+    with `padj` all NaN and `(padj < 0.05).sum() == 0`: it contributes no
+    significant feature and no error. One NaN row must not nullify the family.
+    """
+    p = np.asarray(pvals, dtype=float)
+    out = np.full(p.shape, np.nan, dtype=float)
+    ok = np.isfinite(p)
+    if ok.any():
+        out[ok] = multipletests(p[ok], method="fdr_bh")[1]
+    return out
 
 
 def hedges_g(case: np.ndarray, ctrl: np.ndarray) -> tuple[float, float]:
@@ -81,8 +100,7 @@ def differential(expr: pd.DataFrame, case_cols: list[str], ctrl_cols: list[str],
         })
     df = pd.DataFrame(rows, columns=SCHEMA)
     if not df.empty:
-        from statsmodels.stats.multitest import multipletests
-        df["padj"] = multipletests(df["pval"], method="fdr_bh")[1]
+        df["padj"] = bh_adjust(df["pval"])
     return df
 
 

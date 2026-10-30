@@ -21,6 +21,7 @@ import argparse
 import gzip
 import json
 import logging
+import os
 import re
 from datetime import UTC, datetime
 from pathlib import Path
@@ -62,11 +63,22 @@ def id_space_of(counts: Path) -> str:
 
 
 def main() -> int:
-    argparse.ArgumentParser(description=__doc__).parse_args()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--accession", action="append",
+                        help="restrict to these accessions (repeatable)")
+    args = parser.parse_args()
 
     registry = pd.read_csv(REGISTRY).set_index("accession")
     candidates = pd.read_csv(CANDIDATES)
     included = candidates[candidates["verdict"] == "include"]["accession"]
+    if args.accession:
+        wanted = set(args.accession)
+        unknown = wanted - set(candidates["accession"])
+        if unknown:
+            logger.error("no candidate entry matches %s", sorted(unknown))
+            return 2
+        included = included[included.isin(wanted)]
+    replaced = set(args.accession) if args.accession else set(candidates["accession"])
 
     records = []
     for accession in sorted(included):
@@ -104,10 +116,26 @@ def main() -> int:
         logger.info("%-10s %-18s %2d samples, ids in %s space", accession,
                     "/".join(species), len(samples), records[-1]["id_space"])
 
+    existing: list[dict] = []
+    if MANIFEST.exists():
+        for line in MANIFEST.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                existing.append(json.loads(line))
+    kept = [record for record in existing
+            if record.get("accession") not in replaced]
+    records = sorted(kept + records, key=lambda record: record["accession"])
+
+    if not records:
+        logger.error("no harmonized single-cell records to write; refusing to "
+                     "replace %s with an empty manifest", MANIFEST)
+        return 1
+
     INTERIM.mkdir(parents=True, exist_ok=True)
-    with open(MANIFEST, "w") as handle:
+    tmp = MANIFEST.with_suffix(MANIFEST.suffix + ".tmp")
+    with open(tmp, "w", encoding="utf-8") as handle:
         for record in records:
             handle.write(json.dumps(record) + "\n")
+    os.replace(tmp, MANIFEST)
     logger.info("%d studies -> %s", len(records), MANIFEST)
     return 0
 

@@ -172,3 +172,37 @@ def test_main_continues_past_one_failed_modality_and_exits_nonzero(
     assert exc_info.value.code == 1
     # Every modality was attempted despite metabolomics failing.
     assert set(calls) == set(pipeline_03.ALL_MODALITIES)
+
+
+# ---------------------------------------------------------------------------
+# MetaboLights parsing — a missing date must not drop the record
+# ---------------------------------------------------------------------------
+
+from dataclasses import asdict  # noqa: E402
+
+from cp_multiomics.harmonize.metabolomics import MetabolomicsHarmonizer  # noqa: E402
+
+
+def test_metabolights_missing_dates_keep_the_record():
+    ingester = MetabolomicsIngester()
+    entry = {
+        "id": "MTBLS1",
+        "fields": {
+            "name": ["Serum metabolomics of knee osteoarthritis"],
+            "description": ["Pain cohort"],
+            "organism": ["Homo sapiens"],
+            "study_design": ["chronic pain"],
+            "publication_date": [None],
+            "submission_date": [None],
+        },
+    }
+
+    records = ingester._parse_entries([entry])
+
+    assert len(records) == 1
+    assert records[0].year == ""
+
+    harmonized = MetabolomicsHarmonizer().harmonize(
+        [asdict(records[0])], {"filters": {"min_samples": 5}}
+    )
+    assert len(harmonized) == 1, "the record must still reach harmonization"

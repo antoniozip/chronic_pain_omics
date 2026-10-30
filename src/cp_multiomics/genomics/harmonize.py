@@ -97,6 +97,21 @@ def harmonize_sumstats(
     build: str = "GRCh38",
 ) -> int:
     """Map a harmonised .h.tsv.gz to the common schema; return rows written."""
+    # `n` is consumed as the METAL SAMPLESIZE weight (metal_runner.py emits
+    # `WEIGHT n`), and as the tie-break for which study represents a cohort.
+    # Nothing downstream filters it, and parse_sample_size() legitimately
+    # returns -1 for text it cannot parse: a negative weight either makes METAL
+    # abort the group or inverts that study's contribution to the pooled Z.
+    # Refusing the study here makes 04b record `harmonize_failed` with a reason.
+    if isinstance(study.n, bool) or not isinstance(study.n, (int, np.integer)):
+        raise ValueError(
+            f"{study.accession}: sample size must be a positive integer, got {study.n!r}"
+        )
+    if study.n <= 0:
+        raise ValueError(
+            f"{study.accession}: sample size must be a positive integer, got {study.n!r}"
+        )
+
     df = pd.read_csv(gz_path, sep="\t", compression="gzip", low_memory=False)
 
     missing = [c for c in _REQUIRED_COLUMNS if c not in df.columns]
@@ -157,8 +172,31 @@ def harmonize_sumstats(
     out["beta"] = out["beta"].replace([np.inf, -np.inf], np.nan)
     out["se"] = out["se"].replace([np.inf, -np.inf], np.nan)
 
-    out = out.dropna(subset=["rsid", "beta", "se"])
-    out = out[out["rsid"].astype(str).str.strip().ne("") & out["rsid"].astype(str).ne("NA")]
+    # Drop reasons are counted separately: a study that shrinks needs to be
+    # attributable, and "se <= 0" is invisible to dropna() because a negative
+    # or zero SE is neither NaN nor infinite. Both then enter METAL — a negative
+    # SE flips the variance sign, a zero SE is an infinite weight.
+    n_total = len(out)
+    no_id = out["rsid"].isna() | out["rsid"].astype(str).str.strip().eq("") | \
+        out["rsid"].astype(str).eq("NA")
+    out = out.loc[~no_id]
+    n_no_id = n_total - len(out)
+
+    bad_se = ~(out["se"] > 0)          # NaN, negative and zero all land here
+    n_bad_se = int(bad_se.sum())
+    out = out.loc[~bad_se]
+
+    n_before_beta = len(out)
+    out = out.dropna(subset=["beta"])
+    n_no_beta = n_before_beta - len(out)
+
+    if n_no_id or n_bad_se or n_no_beta:
+        logger.info(
+            "[%s] dropped %d/%d rows: %d without an identifier, %d with a "
+            "non-finite or non-positive se, %d missing beta",
+            study.accession, n_total - len(out), n_total,
+            n_no_id, n_bad_se, n_no_beta,
+        )
 
     out["n"] = study.n
     out["study_id"] = study.accession

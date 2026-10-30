@@ -8,11 +8,14 @@ Figures produced:
     {modality}_concordance_{sp}.pdf — human vs animal concordance scatter plots
     prisma_flow.pdf                 — PRISMA 2020 flow diagram
     graphical_abstract.pdf          — front-page summary of the three findings
+    toc_graphic.pdf/.png            — iMetaOmics table-of-contents image, with
+                                      toc_graphic_values.csv, what it plots
 
 Usage:
     uv run python pipeline/08_figures.py
     uv run python pipeline/08_figures.py --modality transcriptomics
     uv run python pipeline/08_figures.py --prisma-only
+    uv run python pipeline/08_figures.py --toc-only
 """
 
 from __future__ import annotations
@@ -29,6 +32,7 @@ from cp_multiomics.viz import (
     plot_concordance_scatter,
     plot_graphical_abstract,
     plot_repository_flow,
+    plot_toc_graphic,
     plot_volcano,
     set_publication_style,
 )
@@ -89,6 +93,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--figures-dir", type=Path, default=REPO_ROOT / "manuscript" / "figures")
     p.add_argument("--prisma-only", action="store_true",
                    help="Generate only the PRISMA flow diagram and exit")
+    p.add_argument("--toc-only", action="store_true",
+                   help="Generate only the table-of-contents image and exit")
     return p.parse_args()
 
 
@@ -99,6 +105,11 @@ def main() -> None:
 
     padj  = cfg.get("da", {}).get("padj_threshold", 0.05)
     lfc   = cfg.get("da", {}).get("lfc_threshold", 0.5)
+
+    toc_graphic = args.figures_dir / "toc_graphic.pdf"
+    if args.toc_only:
+        plot_toc_graphic(REPO_ROOT / "results", toc_graphic)
+        return
 
     # --- PRISMA flow ---
     # Datasets through the repositories that supplied them; see
@@ -123,6 +134,11 @@ def main() -> None:
               ("Proteomic", "proteomics", 43),
               ("Metabolomic", "metabolomics", 9)],
     )
+
+    # --- Table-of-contents image ---
+    # iMetaOmics' 50 x 60 mm entry image, read from results/ like the graphical
+    # abstract; it writes the values it plots beside it for the claim tests.
+    plot_toc_graphic(REPO_ROOT / "results", toc_graphic)
 
     modalities = ALL_MODALITIES if args.modality == "all" else [args.modality]
 
