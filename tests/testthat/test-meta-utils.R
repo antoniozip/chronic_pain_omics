@@ -435,3 +435,17 @@ test_that("the funnel and the forest select the same feature", {
   # Both take the pooled table, so neither can rank across unadjusted rows.
   expect_true(any(grepl("plot_funnel\\(effects_df, pooled,", src)))
 })
+
+test_that("merge_normalized_combined replaces processed studies and keeps the rest", {
+  old <- data.frame(study_id = c("A", "B"), effect_size = c(1, 2))
+  new <- data.frame(study_id = c("B", "C"), effect_size = c(20, 3))
+  out <- merge_normalized_combined(old, new)
+  expect_equal(sort(out$study_id), c("A", "B", "C"))
+  expect_equal(out$effect_size[out$study_id == "B"], 20)
+  expect_equal(out$effect_size[out$study_id == "A"], 1)
+})
+
+test_that("merge_normalized_combined handles an absent previous file", {
+  new <- data.frame(study_id = "A", effect_size = 1)
+  expect_equal(merge_normalized_combined(NULL, new), new)
+})

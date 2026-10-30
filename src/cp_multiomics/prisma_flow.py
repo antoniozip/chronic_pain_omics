@@ -164,6 +164,38 @@ def _pooled_units(root: Path, modality: str) -> int | None:
     return int(ids.str.split(";").explode().str.strip().nunique())
 
 
+# Reason codes carried by transcriptomic candidate rows whose file-level check
+# failed. They reach the PRISMA flow only once the pending queue is resolved,
+# so they were absent from the original mapping; the grouping keeps the figure
+# legible while every code stays traceable in the screening sheet.
+GEO_EXCLUDED.update({
+    "no_count_matrix_in_deposit": "No count matrix in deposit",
+    "no_count_matrix_in_supplementary_files": "No count matrix in supplementary files",
+    "platform_table_carries_no_symbol_column": "Platform table lacks gene symbols",
+    "matrix_columns_absent_from_sample_metadata":
+        "Matrix columns absent from sample metadata",
+    "step05_error_row_id_length_mismatch": "Effect-size extraction failed",
+    "step05_error_na_covariate_values": "Effect-size extraction failed",
+    "step05_error_invalid_multibyte_string": "Effect-size extraction failed",
+    "step05_error_covariate_problem": "Effect-size extraction failed",
+    "case_arm_is_a_treated_group_not_the_model": "Case arm is not the pain model",
+    "case_arm_is_model_plus_analgesic_no_untreated_arm": "Case arm is not the pain model",
+    "case_arm_is_six_drug_treatment_groups": "Case arm is not the pain model",
+    "case_control_confounded_with_batch": "Design confounded",
+    "case_control_split_collapses_four_diet_arms": "Design confounded",
+    "two_colour_channels_duplicate_each_sample": "Design confounded",
+    "feature_ids_are_row_indices_not_probes": "Feature identifiers unusable",
+    "normalized_beadchip_xlsx_across_two_platforms": "Feature identifiers unusable",
+    "raw_archive_exceeds_download_limit": "Archive not retrievable",
+    "raw_tar_filenames_match_neither_groups_nor_vocabulary": "Archive not retrievable",
+    "repeated_samples_per_animal_pseudoreplication": "Pseudoreplication",
+    "three_cell_subsets_per_subject_pseudoreplication": "Pseudoreplication",
+    "single_cell_deposit_not_bulk": "Single-cell deposit, no bulk matrix",
+    "supplementary_file_selection_picks_lncrna_not_mrna":
+        "Wrong assay in supplementary files",
+})
+
+
 def geo_flow(root: Path) -> SourceFlow:
     d = pd.read_csv(root / PRISMA_DIR / "transcriptomics_candidates.csv")
     exc = d[d["verdict"] == "exclude"]
@@ -178,8 +210,11 @@ def geo_flow(root: Path) -> SourceFlow:
         source="GEO (bulk transcriptomics)", identified=len(d),
         identified_label="series",
         excluded=_group(exc["reason_code"], GEO_EXCLUDED, "GEO"),
-        awaiting=(("Cleared on design; files not yet checked", ready),
-                  ("Design or file problem under review", len(pend) - ready)),
+        awaiting=tuple(
+            (label, n) for label, n in (
+                ("Cleared on design; files not yet checked", ready),
+                ("Design or file problem under review", len(pend) - ready),
+            ) if n > 0),
         included=int((d["verdict"] == "include").sum()), included_label="accessions",
         units=units)
 

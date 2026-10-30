@@ -1,0 +1,5 @@
+accession,verdict,reason_code,screened_by,notes
+GSE311957,exclude,case_arm_is_a_treated_group_not_the_model,human,"RSC96 Schwann cell line, material treatment vs control; not a pain-model contrast"
+GSE285607,exclude,case_arm_is_a_treated_group_not_the_model,human,macrophages treated with IL-4/IL-27 vs untreated; in vitro
+GSE277072,exclude,case_arm_is_a_treated_group_not_the_model,human,BV-2 microglial cell line treated with LPS/BHB; in vitro
+GSE137515,exclude,genotype_contrast_not_pain_versus_control,human,importin alpha3 knockout vs wild type under SNI; genotype contrast

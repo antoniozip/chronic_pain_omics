@@ -360,7 +360,6 @@ def test_default_refresh_preserves_curated_orphans(pipeline_02, tmp_path):
     _write_hits(raw_dir, _make_hit("111", doi="10.1/abc"))
 
     sheet = tmp_path / "screening.csv"
-    hit_row = pipeline_02.ScreeningRecord.from_hit(_make_hit("111", doi="10.1/abc"))
     curated = pipeline_02.ScreeningRecord.from_hit(
         _make_hit("manual-1", source="manual"))
     curated.screening_decision = "include"

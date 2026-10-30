@@ -827,7 +827,7 @@ def _sens_claims() -> list[Claim]:
                       row + r" & [\d,]+ & [\d.]+\\% & [^&]+ & (?:\$-\$)?([\d.]+) ",
                       lambda slug=slug, sp=sp:
                           abs(float(_sens_row(slug, sp)["spearman_r"])),
-                      tol=0.001),
+                      tol=0.00005),
             ]
     # The whole-corpus arm's study count, which the row patterns deliberately
     # no longer pin. It moves with the human pool: 24 before GSE262037 was

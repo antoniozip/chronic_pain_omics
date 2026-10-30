@@ -230,3 +230,21 @@ resolve_by_parent <- function(ids, map) {
   }
   out
 }
+
+
+#' Merge a targeted normalisation run into the combined per-study table.
+#'
+#' `05b` writes `effects_normalized_all.csv` from the studies it processed. A
+#' run restricted with `--accessions` therefore holds only those studies, and
+#' writing it verbatim would delete every other study from the combined table
+#' that `06b`, `06c` and `06d` read. This replaces the processed studies in the
+#' previous table and keeps the rest.
+#'
+#' @param old Previous combined table, or NULL when none exists.
+#' @param new Rows written by this run.
+#' @return A data.frame with one row block per study.
+merge_normalized_combined <- function(old, new) {
+  if (is.null(old) || nrow(old) == 0) return(new)
+  kept <- old[!old$study_id %in% unique(new$study_id), , drop = FALSE]
+  rbind(kept, new)
+}

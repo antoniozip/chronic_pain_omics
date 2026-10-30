@@ -131,8 +131,8 @@ four of them naming papers that do not exist under the title given.
 ## Tests
 
 ```bash
-pytest tests/                                         # 1,148 in the full repository
-Rscript -e 'testthat::test_dir("tests/testthat")'     # 421
+pytest tests/                                         # 1,156 in the full repository
+Rscript -e 'testthat::test_dir("tests/testthat")'     # 429
 ruff check . && mypy src/
 ```
 

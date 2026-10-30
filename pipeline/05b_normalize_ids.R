@@ -35,7 +35,9 @@ option_list <- list(
   make_option("--interim-dir",  type = "character",
               default = file.path(REPO_ROOT, "data", "interim")),
   make_option("--cache-dir",    type = "character",
-              default = file.path(REPO_ROOT, "data", "raw", "geo_cache"))
+              default = file.path(REPO_ROOT, "data", "raw", "geo_cache")),
+  make_option("--accessions",   type = "character", default = "",
+              help = "Comma-separated accessions to process; default: all in the selection")
 )
 opt <- parse_args(OptionParser(option_list = option_list))
 
@@ -886,6 +888,24 @@ if (length(superseded) > 0) {
   effect_files <- effect_files[!drop]
 }
 
+# Optional restriction to specific accessions, for targeted re-runs after new
+# studies are added. Requested accessions must be in the post-supersession
+# selection; unknown ones abort instead of being silently dropped.
+requested <- trimws(strsplit(opt[["accessions"]], ",")[[1]])
+requested <- requested[nzchar(requested)]
+if (length(requested) > 0) {
+  accessions <- sub("_effects\\.csv$", "", basename(effect_files))
+  unknown <- setdiff(requested, accessions)
+  if (length(unknown) > 0) {
+    stop(sprintf("requested accession(s) not in the selection: %s",
+                 paste(unknown, collapse = ", ")))
+  }
+  keep <- accessions %in% requested
+  effect_files <- effect_files[keep]
+  accessions <- accessions[keep]
+  message(sprintf("Restricted to %d requested accession(s)", length(accessions)))
+}
+
 if (length(effect_files) == 0) {
   message("No effect files found in ", in_dir)
   quit(status = 0)
@@ -1000,6 +1020,13 @@ for (eff_path in effect_files) {
 if (length(all_normalized) > 0) {
   combined <- bind_rows(all_normalized)
   combined_path <- file.path(in_dir, "effects_normalized_all.csv")
+  # A targeted run must not shrink the combined table to its own studies.
+  if (length(requested) > 0) {
+    previous <- if (file.exists(combined_path)) {
+      read.csv(combined_path, stringsAsFactors = FALSE)
+    } else NULL
+    combined <- merge_normalized_combined(previous, combined)
+  }
   write.csv(combined, combined_path, row.names = FALSE)
   message(sprintf("\nCombined normalized file: %d rows from %d studies → %s",
                   nrow(combined), length(all_normalized), combined_path))

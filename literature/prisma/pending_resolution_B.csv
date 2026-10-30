@@ -1,0 +1,53 @@
+accession,verdict,reason_code,screened_by,notes
+GSE117319,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE117320,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE134003,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE137515,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE184014,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE192566,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE201163,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE202111,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE206043,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE237797,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE263762,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE265957,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE277072,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE285607,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE293520,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE298326,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE298388,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE304075,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE310627,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE311957,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE53762,include,,human,"provisional include: matrix downloaded, DA gate pending"
+GSE117321,exclude,no_count_matrix_in_deposit,human,file-check observation
+GSE2884,exclude,no_count_matrix_in_deposit,human,file-check observation
+GSE155622,exclude,single_cell_deposit_not_bulk,human,file-check observation
+GSE162807,exclude,single_cell_deposit_not_bulk,human,file-check observation
+GSE198608,exclude,single_cell_deposit_not_bulk,human,file-check observation
+GSE253345,exclude,single_cell_deposit_not_bulk,human,file-check observation
+GSE254360,exclude,single_cell_deposit_not_bulk,human,file-check observation
+GSE283177,exclude,single_cell_deposit_not_bulk,human,file-check observation
+GSE328175,exclude,single_cell_deposit_not_bulk,human,file-check observation
+GSE20895,exclude,raw_archive_exceeds_download_limit,human,file-check observation
+GSE145125,exclude,no_case_control_split_in_series_matrix,human,file-check observation
+GSE150598,exclude,matrix_columns_absent_from_sample_metadata,human,file-check observation
+GSE287284,exclude,matrix_columns_absent_from_sample_metadata,human,file-check observation
+GSE53861,exclude,matrix_columns_absent_from_sample_metadata,human,file-check observation
+GSE60670,exclude,matrix_columns_absent_from_sample_metadata,human,file-check observation
+GSE111216,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE123919,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE150795,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE198020,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE205906,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE226989,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE227159,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE253954,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE267096,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE283281,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE297165,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE327170,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE62405,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE65997,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE71527,exclude,no_count_matrix_in_supplementary_files,human,file-check observation
+GSE99265,exclude,no_count_matrix_in_supplementary_files,human,file-check observation

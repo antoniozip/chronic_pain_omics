@@ -1,0 +1,18 @@
+accession,verdict,reason_code,screened_by,notes
+GSE293520,exclude,step05_error_na_covariate_values,human,provisional include failed the 05 effect-table gate
+GSE237797,exclude,step05_error_covariate_problem,human,provisional include failed the 05 effect-table gate
+GSE192566,exclude,step05_error_covariate_problem,human,provisional include failed the 05 effect-table gate
+GSE117320,exclude,step05_error_covariate_problem,human,provisional include failed the 05 effect-table gate
+GSE117319,exclude,step05_error_covariate_problem,human,provisional include failed the 05 effect-table gate
+GSE53762,exclude,step05_error_row_id_length_mismatch,human,provisional include failed the 05 effect-table gate
+GSE310627,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE298388,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE304075,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE298326,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE263762,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE265957,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE202111,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE184014,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE201163,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE206043,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate
+GSE134003,exclude,matrix_columns_absent_from_sample_metadata,human,provisional include failed the 05 effect-table gate

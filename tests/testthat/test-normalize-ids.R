@@ -587,3 +587,13 @@ test_that("every id space is tested by a share, never by any() or all()", {
   expect_false(any(grepl("\\ball\\(grepl", body)))
   expect_true(any(grepl("ID_SPACE_MIN_SHARE", body)))
 })
+
+test_that("05b exposes an --accessions filter and intersects it with the effects files", {
+  # Source-level, like the dispatch-table test above: the script runs its whole
+  # pipeline when sourced, so a functional fixture would need the annotation
+  # stack. The assertions pin the option and the two filtering steps.
+  expect_true(any(grepl('make_option\\("--accessions"', SRC)))
+  expect_true(any(grepl('requested <- trimws\\(strsplit\\(opt\\[\\["accessions"\\]\\]', SRC)))
+  expect_true(any(grepl('effect_files <- effect_files\\[keep\\]', SRC)))
+  expect_true(any(grepl('accessions <- accessions\\[keep\\]', SRC)))
+})
