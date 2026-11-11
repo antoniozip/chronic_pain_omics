@@ -59,6 +59,7 @@ meta:
 
   # Output: top N features to report
   top_n_features: 50
+  top_n_features_main: 10   # main Figure 2 panels (grid, one page)
 
 output:
   per_study_dir: "results/per_study"

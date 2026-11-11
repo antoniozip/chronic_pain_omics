@@ -309,20 +309,22 @@ plot_forest <- function(effects_df, pooled_df, modality, figures_dir, cfg) {
   # Two files, because a pdf() device fixes one page size for the whole
   # document and the two readers need different ones. The supplementary set
   # is sized for its deepest panel, which is right for a file read on screen;
-  # the manuscript figure shows only the top feature, so it gets a page the
-  # size of that panel. Drawing the manuscript figure as page 1 of the
-  # supplementary set gave it a 10x30 inch page for a 3-study forest, which
-  # LaTeX refused to place and which blocked every float behind it.
+  # the manuscript figure shows the ten most significant features as a grid,
+  # so it gets one page sized to those shallow panels. Drawing the manuscript
+  # figure as page 1 of the supplementary set gave it a 10x30 inch page for a
+  # 3-study forest, which LaTeX refused to place and blocked every float.
   supp_path <- file.path(figures_dir,
                          sprintf("%s_forest_supplementary.pdf", modality))
   write_forest_pdf(supp_path, effects_df, top_features, method = method,
                    slab_max_chars = cfg$meta$slab_max_chars)
   message(sprintf("  Forest plots (supplementary) → %s", supp_path))
 
+  main_features <- top_pooled_features(pooled_df, cfg$meta$top_n_features_main)
   main_path <- file.path(figures_dir, sprintf("%s_forest.pdf", modality))
-  write_forest_pdf(main_path, effects_df, top_features[1], method = method,
-                   slab_max_chars = cfg$meta$slab_max_chars)
-  message(sprintf("  Forest plot (manuscript) → %s", main_path))
+  write_forest_grid_pdf(main_path, effects_df, main_features, method = method,
+                        slab_max_chars = cfg$meta$slab_max_chars)
+  message(sprintf("  Forest plots (manuscript, %d panels) → %s",
+                  length(main_features), main_path))
 }
 
 

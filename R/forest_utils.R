@@ -35,15 +35,25 @@ forest_page_height <- function(k) {
 #' pooled estimate reported for the feature. Returns TRUE if a panel was
 #' drawn, FALSE if the feature had too few usable rows or the fit failed.
 draw_forest_panel <- function(feat_df, feature_id, method = "REML",
-                              slab_max_chars = 60) {
+                              slab_max_chars = 60, cex = NULL) {
   if (nrow(feat_df) < 2) return(FALSE)
   ok <- TRUE
   tryCatch({
     res <- metafor::rma(yi = effect_size, sei = se, data = feat_df,
                         method = method, slab = feat_df$study_id)
-    metafor::forest(res,
-                    main = substr(feature_id, 1, slab_max_chars),
-                    xlab = unique(feat_df$effect_unit)[1])
+    if (is.null(cex)) {
+      metafor::forest(res,
+                      main = substr(feature_id, 1, slab_max_chars),
+                      xlab = unique(feat_df$effect_unit)[1])
+    } else {
+      # forest() otherwise sizes text from the page, which on a grid page
+      # shrinks the study labels to about 4.6 pt -- barely legible before the
+      # journal scales the figure to column width.
+      metafor::forest(res,
+                      main = substr(feature_id, 1, slab_max_chars),
+                      xlab = unique(feat_df$effect_unit)[1],
+                      cex = cex)
+    }
   }, error = function(e) ok <<- FALSE)
   ok
 }
@@ -136,6 +146,45 @@ write_forest_pdf <- function(out_path, effects_df, features, method = "REML",
   for (feat in features) {
     draw_forest_panel(panel_df(feat), feat, method = method,
                       slab_max_chars = slab_max_chars)
+  }
+  invisible(out_path)
+}
+
+
+#' Draw several features' forest panels on one page, in a grid.
+#'
+#' The main manuscript figure wants the ten most significant features rather
+#' than one. Those panels are shallow (3-7 studies), so a fixed cell size is
+#' enough and one page can hold them; the supplementary set keeps one page per
+#' feature because its deepest panel would not fit a grid.
+#'
+#' @param out_path Output PDF.
+#' @param effects_df Per-study rows for all features to draw.
+#' @param features Feature ids, in display order.
+#' @param method Random-effects estimator passed to metafor.
+#' @param slab_max_chars Truncate study labels.
+#' @param cex Text size passed to `metafor::forest()`; NULL keeps its
+#'   page-dependent default, which is too small on a multi-panel page.
+#' @param ncol Columns in the grid.
+#' @param width,panel_height Page geometry: ten 3-7 study panels fit one
+#'   8 x 10.5 inch page, which scales to about 8.5 in of text height at
+#'   journal width without dropping the study labels below 5 pt.
+#' @return The output path, invisibly.
+write_forest_grid_pdf <- function(out_path, effects_df, features,
+                                  method = "REML", slab_max_chars = 60,
+                                  cex = 0.9, ncol = 2L, width = 8,
+                                  panel_height = 2.1) {
+  drawable <- features[vapply(features, function(f)
+    sum(effects_df$feature_id == f) >= 2, logical(1))]
+  if (length(drawable) == 0) return(invisible(NULL))
+  nrow <- ceiling(length(drawable) / ncol)
+  grDevices::pdf(out_path, width = width, height = panel_height * nrow)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  graphics::par(mfrow = c(nrow, ncol))
+  for (feat in drawable) {
+    draw_forest_panel(effects_df[effects_df$feature_id == feat, , drop = FALSE],
+                      feat, method = method, slab_max_chars = slab_max_chars,
+                      cex = cex)
   }
   invisible(out_path)
 }

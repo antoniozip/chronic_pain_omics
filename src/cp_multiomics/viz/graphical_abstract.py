@@ -15,8 +15,11 @@ others are correction families. The axis label says so, because a bar that
 means something different from its neighbours and does not admit it is a
 figure that misleads.
 
-Panel B is model specificity. SNL dominates, and the Results explain why: it is
-the best-covered stratum, so this is depth rather than biology.
+Panel B is the yield of each pain-model stratum. SNL dominates, and the Results
+explain why: it is the best-covered stratum, so this is depth rather than
+biology. The panel does not claim model specificity: the between-model excess
+over a permuted-label null is not significant, so neither the title nor the
+caption may say the models are disjoint.
 
 Panel C is cross-species concordance against the 50% line. Both species sit
 just above chance, and tissue matching does not change the estimate.
@@ -86,9 +89,9 @@ def _genomic_gene_count(meta_dir: Path) -> tuple[int, int]:
     return len(df), int((df["n_studies"] > 1).sum())
 
 
-def _panel_corpus(ax, meta_dir: Path, arms: list[tuple[str, str, int]]) -> None:
+def _panel_corpus(ax, meta_dir: Path, arms: list[tuple[str, str, str]]) -> None:
     labels, families, sigs, colours = [], [], [], []
-    for label, modality, n_studies in arms:
+    for label, modality, corpus in arms:
         if modality == "genomics":
             family, sig = _genomic_gene_count(meta_dir)
         else:
@@ -96,7 +99,7 @@ def _panel_corpus(ax, meta_dir: Path, arms: list[tuple[str, str, int]]) -> None:
             if not path.exists():
                 raise FileNotFoundError(path)
             family, sig = _family_and_significant(path)
-        labels.append(f"{label}\n{n_studies} studies")
+        labels.append(f"{label}\n{corpus}")
         families.append(max(family, 1))       # log axis cannot show 0
         sigs.append(sig)
         colours.append(ARM_COLOURS[label])
@@ -143,7 +146,7 @@ def _panel_models(ax, strat_dir: Path) -> None:
                   color=STRATUM_COLOUR, width=0.62, zorder=3)
     ax.set_yscale("log")
     ax.set_ylabel("significant features")
-    ax.set_title("B  Pain models are near-disjoint", loc="left", fontweight="bold")
+    ax.set_title("B  Yield by pain model", loc="left", fontweight="bold")
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="y", color="0.9", zorder=0)
     ax.set_axisbelow(True)
@@ -187,7 +190,7 @@ def _panel_species(ax, summary: Path) -> None:
 
 
 def plot_graphical_abstract(results_dir: Path, out_path: Path,
-                            arms: list[tuple[str, str, int]]) -> Path | None:
+                            arms: list[tuple[str, str, str]]) -> Path | None:
     """Draw the graphical abstract, or return None if an input is missing."""
     set_publication_style()
     meta = results_dir / "meta"
@@ -215,9 +218,9 @@ def plot_graphical_abstract(results_dir: Path, out_path: Path,
     fig.add_artist(Rectangle((0.045, band * 0.63), 0.915, 0.004,
                              transform=fig.transFigure, color="0.82", lw=0))
     fig.text(0.045, band * 0.13,
-             "Evidence layers in chronic pain do not converge: pain models share "
-             "few significant features, and rodent and human\ntranscriptomes agree "
-             "only slightly above chance.",
+             "Rodent and human transcriptomes agree on effect direction only slightly "
+             "above chance, below a within-species control;\nbetween-model differences "
+             "do not exceed a permuted-label null.",
              fontsize=8.5, color="0.25", transform=fig.transFigure)
 
     fig.tight_layout(rect=(0, band, 1, 1))

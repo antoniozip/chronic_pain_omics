@@ -4,12 +4,14 @@
 #' The figure is produced by `pipeline/06_meta_analysis.R`, but re-running that
 #' step for transcriptomics takes about two hours and recomputes nothing this
 #' figure needs: the per-study effects and the pooled estimates are already on
-#' disk. This draws the panel from them, through the same
-#' `write_forest_pdf()` the pipeline calls, so the two cannot diverge.
+#' disk. This draws the panels from them, through the same
+#' `write_forest_pdf()` and `write_forest_grid_pdf()` the pipeline calls, so
+#' the two cannot diverge.
 #'
-#' Writes manuscript/figures/{modality}_forest.pdf: one page, the top pooled
-#' feature, on a page sized to that panel, and {modality}_funnel.pdf for the
-#' same feature. The two are a pair and must show the same gene -- the funnel
+#' Writes manuscript/figures/{modality}_forest.pdf: one page holding the
+#' `top_n_features_main` most significant pooled features as a grid of forest
+#' panels, and {modality}_funnel.pdf for the first of them. The funnel and the
+#' first forest panel are a pair and must show the same gene -- the funnel
 #' used to take the most-measured feature instead, so the pair described two
 #' different genes and neither filename nor title said so.
 #'
@@ -53,7 +55,8 @@ for (path in c(file.path(meta_dir, "pooled_effects.csv"), per_study_csv)) {
 
 pooled <- read.csv(file.path(meta_dir, "pooled_effects.csv"),
                    stringsAsFactors = FALSE)
-n_features <- if (supplementary) cfg$meta$top_n_features else 1
+n_features <- if (supplementary) cfg$meta$top_n_features else
+  cfg$meta$top_n_features_main
 top_feature <- top_pooled_features(pooled, n_features)
 if (length(top_feature) == 0) stop("no pooled feature has an adjusted p-value")
 message(sprintf("%d top pooled feature(s): %s", length(top_feature),
@@ -70,27 +73,31 @@ effects$effect_size <- as.numeric(effects$effect_size)
 effects$se <- as.numeric(effects$se)
 message(sprintf("%d per-study rows for it", nrow(effects)))
 
-out <- write_forest_pdf(
-  file.path(figures_dir, sprintf("%s_forest%s.pdf", modality,
-                                 if (supplementary) "_supplementary" else "")),
-  effects, top_feature, method = cfg$meta$method,
-  slab_max_chars = cfg$meta$slab_max_chars
-)
+out_path <- file.path(figures_dir, sprintf("%s_forest%s.pdf", modality,
+                                           if (supplementary) "_supplementary" else ""))
+out <- if (supplementary) {
+  write_forest_pdf(out_path, effects, top_feature, method = cfg$meta$method,
+                   slab_max_chars = cfg$meta$slab_max_chars)
+} else {
+  write_forest_grid_pdf(out_path, effects, top_feature, method = cfg$meta$method,
+                        slab_max_chars = cfg$meta$slab_max_chars)
+}
 message(sprintf("Wrote %s", out))
 
-# The funnel belongs to the manuscript figure's single feature; a rebuild of
-# the supplementary set neither draws nor invalidates it.
+# The funnel belongs to the feature in the manuscript figure's first panel; a
+# rebuild of the supplementary set neither draws nor invalidates it.
 if (supplementary) quit(save = "no")
 
 # The funnel of the same feature, drawn here rather than by re-running step 06
 # for the same reason the forest is: nothing it needs is recomputed by that run.
+funnel_effects <- effects[effects$feature_id == top_feature[1], , drop = FALSE]
 funnel_path <- file.path(figures_dir, sprintf("%s_funnel.pdf", modality))
-if (nrow(effects) >= 3) {
+if (nrow(funnel_effects) >= 3) {
   pdf(funnel_path, width = 7, height = 6)
   tryCatch({
-    res <- metafor::rma(yi = effect_size, sei = se, data = effects,
+    res <- metafor::rma(yi = effect_size, sei = se, data = funnel_effects,
                         method = cfg$meta$method)
-    metafor::funnel(res, main = sprintf("%s: %s", modality, top_feature))
+    metafor::funnel(res, main = sprintf("%s: %s", modality, top_feature[1]))
   }, error = function(e) message("  funnel failed: ", e$message))
   dev.off()
   message(sprintf("Wrote %s", funnel_path))

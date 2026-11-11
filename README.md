@@ -30,11 +30,12 @@ bookkeeping that makes those reproducible.
 
 Three results, all negative, and that is the point:
 
-- **Pain model adds modest structure, no more.** 10,707 of 75,978 testable
-  features differ significantly between pain models, but shuffling the model
-  label across studies still makes 8.1% of features look model-dependent. The
-  excess over that null, roughly 4,500 features, falls short of conventional
-  significance (p = 0.109, 1,000 permutations).
+- **Whether pain model shapes the transcriptome remains open.** 10,707 of
+  75,978 testable features differ significantly between pain models, but
+  shuffling the model label across studies still makes 8.1% of features look
+  model-dependent. The excess over that null, roughly 4,500 features, is not
+  significant (p = 0.109, 1,000 permutations), so the paper does not claim
+  model specificity.
 - **Rodent-to-human agreement is slightly above chance, not below it.**
   Direction concordance is 51.5% for mouse and 51.7% for rat, and remains
   51.8% for both when the human pool is restricted to tissue-comparable
@@ -94,7 +95,7 @@ any analysis step.
 Every numeric claim in the paper is bound to the results file that produces it.
 
 ```bash
-pytest tests/test_manuscript_claims.py          # 358 claims (needs manuscript sources; skips here)
+pytest tests/test_manuscript_claims.py          # 357 claims (needs manuscript sources; skips here)
 python scripts/mutation_test_claims.py          # prove each claim can fail
 ```
 
@@ -132,7 +133,7 @@ four of them naming papers that do not exist under the title given.
 
 ```bash
 pytest tests/                                         # 1,156 in the full repository
-Rscript -e 'testthat::test_dir("tests/testthat")'     # 429
+Rscript -e 'testthat::test_dir("tests/testthat")'     # 440
 ruff check . && mypy src/
 ```
 

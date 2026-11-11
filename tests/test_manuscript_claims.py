@@ -28,6 +28,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+import yaml
 from scipy import stats
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -1161,7 +1162,7 @@ CLAIMS: list[Claim] = [
           r"Between-model Q & --- & [\d,]+ & --- & \\textbf\{([\d,]+)\}",
           lambda: int((_between_model_q()["padj_QM"] < 0.05).sum())),
     Claim("q_significant_discussion",
-          r"([\d,]+) features differ significantly between pain models",
+          r"([\d,]+) features differ significantly\s+between models, some",
           lambda: int((_between_model_q()["padj_QM"] < 0.05).sum())),
     # The permutation null. Without it "14,267 features differ by model" is a
     # statement about study-to-study variation as much as about models: 7.4% of
@@ -1442,7 +1443,7 @@ CLAIMS: list[Claim] = [
     Claim("tm_rho_mouse",
           r"coefficients \(([\d.]+) for mouse and [\d.]+ for rat;",
           lambda: abs(float(_sens_row("tissue_matched", "Mus musculus")["spearman_r"])),
-          tol=0.001),
+          tol=0.0005),
 
     Claim("tm_rho_rat",
           r"coefficients \([\d.]+ for mouse and ([\d.]+) for rat;",
@@ -1459,30 +1460,6 @@ CLAIMS: list[Claim] = [
           r"remained ([\d.]+)\\% for both",
           lambda: float(_sens_row("tissue_matched", "Mus musculus")["pct_concordant"]),
           tol=0.05),
-
-    Claim("discussion_tm_low",
-          r"concordance of ([\d.]+)--[\d.]+\\% across three",
-          lambda: min(float(_sens_row(a, sp)["pct_concordant"])
-                      for a in ("published_pool", "tissue_matched", "all_human")
-                      for sp in ("Mus musculus", "Rattus norvegicus")),
-          tol=0.05),
-
-    Claim("discussion_tm_high",
-          r"concordance of [\d.]+--([\d.]+)\\% across three",
-          lambda: max(float(_sens_row(a, sp)["pct_concordant"])
-                      for a in ("published_pool", "tissue_matched", "all_human")
-                      for sp in ("Mus musculus", "Rattus norvegicus")),
-          tol=0.05),
-
-    Claim("discussion_tm_rho_mouse",
-          r"\(\$\\rho\$ of ([\d.]+) for mouse",
-          lambda: float(_summary_row("Mus musculus")["spearman_r"]),
-          tol=0.0005),
-
-    Claim("discussion_tm_rho_rat",
-          r"for mouse and ([\d.]+) for rat\)",
-          lambda: float(_summary_row("Rattus norvegicus")["spearman_r"]),
-          tol=0.0005),
 
     Claim("abstract_concordance_rat",
           r"concordance was\s+([\d.]+)\\% for rat",
@@ -1610,6 +1587,12 @@ CLAIMS: list[Claim] = [
     Claim("human_pool_studies_results",
           r"productive of the\s+three: its (\d+) human studies yield",
           lambda: _species_studies("Homo_sapiens")),
+    Claim("endometrial_in_concordance_caption",
+          r"adds its (\d+) endometrial and",
+          lambda: _endometrial_human_units()),
+    Claim("sc_bulk_units_comparison",
+          r"smaller experiment than ([\d,]+) bulk units",
+          lambda: _pooled_study_count()),
     Claim("endometrial_in_human_pool",
           r"The human pool contains\s*\n(\d+) endometrial studies",
           lambda: _endometrial_human_units()),
@@ -2438,6 +2421,10 @@ GENE_CLAIMS: list[GeneClaim] = [
     GeneClaim("table_exoc8",
               r"SNL & \d+ & [\d,]+ & [\d,]+ & [\d,]+ & \\gene\{Exoc8\} \(([\d.]+)e(-\d+)\)",
               lambda: _gene_stat(lambda: _stratum("SNL"), "Exoc8", "padj")),
+    GeneClaim("table_gm7361",
+              r"Neuropathy \(rodent\) & \d+ & [\d,]+ & [\d,]+ & \d+ & "
+              r"\\gene\{Gm7361\} \(([\d.]+)e(-\d+)\)",
+              lambda: _gene_stat(lambda: _stratum("neuropathy_rodent"), "Gm7361", "padj")),
     GeneClaim("table_clec2d2l1", r"\\gene\{Clec2d2l1\} \(([\d.]+)e(-\d+)\)",
               lambda: _gene_stat(lambda: _stratum("SNI"), "Clec2d2l1", "padj")),
     # Stated as a value, not as the "$<$1e-300" bound it replaced: a bound
@@ -2565,12 +2552,26 @@ def test_no_ortholog_pair_is_significant_in_both_species():
         )
 
 
-def test_forest_caption_names_the_top_pooled_feature():
-    """Figure 2's caption calls its subject "the most significant pooled feature".
+def _main_forest_panels() -> int:
+    """How many features Figure 2 draws, from the config the figure reads."""
+    cfg = yaml.safe_load((REPO_ROOT / "conf" / "analysis" / "default.yaml").read_text())
+    return int(cfg["meta"]["top_n_features_main"])
 
-    That is a ranking, not a number, so no Claim pattern covers it -- and it
-    drifted: the caption still named Olr830 (padj 0.649 in the current pool)
-    after 08_figures.py had regenerated the figure around SERTM2.
+
+def _number_word(n: int) -> str:
+    words = {v: k for k, v in _WORDS.items()}
+    return words.get(n, str(n))
+
+
+def test_forest_caption_names_the_top_pooled_features():
+    """Figure 2's caption names its leading feature and its panel count.
+
+    The ranking is not a number, so no Claim pattern covers the feature name --
+    and it drifted: the caption still named Olr830 (padj 0.649 in the current
+    pool) after 08_figures.py had regenerated the figure around SERTM2. The
+    count is read from `top_n_features_main`, the same key the figure code
+    uses, because the figure grew from one panel to ten and the caption has to
+    grow with it.
     """
     try:
         pooled = _read(TX_META / "pooled_effects.csv",
@@ -2579,11 +2580,26 @@ def test_forest_caption_names_the_top_pooled_feature():
         pytest.skip(f"results not generated: {exc}")
     fam = pooled[pooled["padj_pooled"].notna()]
     top = str(fam.sort_values("padj_pooled")["feature_id"].iloc[0])
-    caption = re.search(r"\\caption\{(?:\\textbf\{)?Random-effects forest plot.*?\}",
+    caption = re.search(r"\\caption\{(.*?)\\label\{fig:forest\}",
                         _manuscript(), re.S)
     assert caption, "the forest figure's caption is no longer recognisable"
+    text = re.sub(r"\s+", " ", caption.group(1))
+    n = _main_forest_panels()
+    assert f"{_number_word(n)} most significant pooled features" in text, (
+        f"the caption does not describe the {n}-panel figure the config asks for"
+    )
     assert top in caption.group(0), (
         f"the caption names a different feature than the top of the pool ({top})"
+    )
+
+
+def test_supplementary_forest_caption_matches_the_main_panel_count():
+    """The supplementary caption says how many panels Fig. 2 reproduces."""
+    n = _main_forest_panels()
+    body = re.sub(r"\s+", " ", _document("supplementary"))
+    assert (f"the first {_number_word(n)} panels are reproduced as "
+            "Fig.~\\ref{M-fig:forest}") in body, (
+        f"the supplementary caption does not say Fig. 2 is the first {n} panels"
     )
 
 

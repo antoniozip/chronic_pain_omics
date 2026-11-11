@@ -436,6 +436,24 @@ test_that("the funnel and the forest select the same feature", {
   expect_true(any(grepl("plot_funnel\\(effects_df, pooled,", src)))
 })
 
+# The manuscript figure carries the ten leading features as one grid; the
+# supplementary set keeps the 50-feature, one-page-per-feature layout. The
+# count and the writer are separate config keys on purpose, so a change to one
+# cannot silently reshape the other.
+test_that("the manuscript forest is a grid of the configured features", {
+  src <- readLines(file.path(REPO_ROOT, "pipeline", "06_meta_analysis.R"),
+                   warn = FALSE)
+  at <- grep("^plot_forest <- function", src)
+  expect_length(at, 1)
+  close_at <- grep("^\\}", src); close_at <- close_at[close_at > at][1]
+  body <- src[at:close_at]
+  expect_true(any(grepl("top_n_features_main", body)))
+  expect_true(any(grepl("write_forest_grid_pdf", body)))
+  # The supplementary set still uses the per-feature writer and its own count.
+  expect_true(any(grepl("write_forest_pdf\\(supp_path", body)))
+  expect_true(any(grepl("top_n_features\\b", body)))
+})
+
 test_that("merge_normalized_combined replaces processed studies and keeps the rest", {
   old <- data.frame(study_id = c("A", "B"), effect_size = c(1, 2))
   new <- data.frame(study_id = c("B", "C"), effect_size = c(20, 3))

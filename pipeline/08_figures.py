@@ -123,16 +123,18 @@ def main() -> None:
         return
 
     # --- Graphical abstract ---
-    # Study counts are the corpus sizes the abstract reports; every other
-    # number in the figure is read from results/ when it is drawn, so the
-    # figure cannot disagree with the meta-analysis it summarises.
+    # Corpus labels are the sizes the manuscript states (103 transcriptomic
+    # units, 57 GWAS, three of 43 proteomic datasets pooled, twelve metabolomic
+    # units); every other number in the figure is read from results/ when it
+    # is drawn. Not part of the iMetaOmics submission, which takes only the
+    # table-of-contents image.
     plot_graphical_abstract(
         REPO_ROOT / "results",
         args.figures_dir / "graphical_abstract.pdf",
-        arms=[("Transcriptomic", "transcriptomics", 58),
-              ("Genomic", "genomics", 57),
-              ("Proteomic", "proteomics", 43),
-              ("Metabolomic", "metabolomics", 9)],
+        arms=[("Transcriptomic", "transcriptomics", "103 study units"),
+              ("Genomic", "genomics", "57 GWAS"),
+              ("Proteomic", "proteomics", "3 of 43 datasets pooled"),
+              ("Metabolomic", "metabolomics", "12 study units")],
     )
 
     # --- Table-of-contents image ---
