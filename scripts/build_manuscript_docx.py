@@ -322,6 +322,62 @@ def expand_repository_paths(source: str) -> str:
     return _REPOPATH_RE.sub(code, source)
 
 
+# Pandoc reads a fixed-width column, p{0.30\linewidth}, as "this column has a
+# width and the others have none": Table 1 reached the Word file as slivers
+# three characters wide, one letter to a line, every number split across rows.
+# It also reads a column modifier, >{\raggedleft\arraybackslash}p{..}, as
+# something it cannot parse and silently empties every cell that begins with a
+# digit. The build reported success in both cases. So a table that wraps text
+# gives every column a p width in the source, and this strips the modifiers,
+# which only the PDF can use: the .docx gets the same proportions, left aligned.
+_TABULAR_SPEC_RE = re.compile(
+    r"(\\begin\{tabular\*?\})\{((?:[^{}]|\{[^{}]*\})*)\}")
+_FIXED_COLUMN_RE = re.compile(
+    r"(?:[>@!]\{[^{}]*\})*([pmb]\{[^{}]*\})(?:<\{[^{}]*\})*")
+
+
+_WIDTH_RE = re.compile(r"p\{([\d.]+)\\linewidth\}")
+
+
+def _fill_width(spec: str) -> str:
+    """Scale an all-p column spec so its widths sum to the full line.
+
+    The PDF leaves room for the inter-column padding, so its fractions sum to
+    well under one; the .docx has no use for the margin, and its 12 pt text
+    breaks "change" mid-word in a column sized for 8 pt.
+    """
+    widths = [float(w) for w in _WIDTH_RE.findall(spec)]
+    if not widths or _WIDTH_RE.sub("", spec).strip():
+        return spec
+    scale = 1.0 / sum(widths)
+    return _WIDTH_RE.sub(
+        lambda m: f"p{{{float(m.group(1)) * scale:.3f}\\linewidth}}", spec)
+
+
+def plain_fixed_columns(source: str) -> str:
+    """Reduce each fixed-width tabular column to a bare ``p{width}``."""
+    changed = 0
+
+    def respec(match: re.Match[str]) -> str:
+        nonlocal changed
+        spec = match.group(2)
+        stripped = _FIXED_COLUMN_RE.sub(
+            lambda m: "p" + m.group(1)[1:], spec)
+        stripped = _fill_width(stripped)
+        changed += stripped != spec
+        if "p{" in stripped and re.search(r"(?<![a-z])[lrc](?![a-z])",
+                                          re.sub(r"p\{[^{}]*\}", "", stripped)):
+            logger.warning("tabular {%s} mixes fixed-width and automatic "
+                           "columns; pandoc gives the automatic ones no width",
+                           stripped)
+        return f"{match.group(1)}{{{stripped}}}"
+
+    text = _TABULAR_SPEC_RE.sub(respec, source)
+    if changed:
+        logger.info("stripped modifiers from %d fixed-width table spec(s)", changed)
+    return text
+
+
 _NUMBERED_CAPTION_RE = re.compile(r"\\caption\{")
 
 
@@ -433,6 +489,7 @@ def stage_sources(tex_path: Path, work_dir: Path) -> Path:
     body = inline_bbl(source, tex_path.with_suffix(".bbl"), numbers)
     body = numeric_citations(body, numbers)
     body = expand_repository_paths(body)
+    body = plain_fixed_columns(body)
     staged.write_text(
         hoist_figure_captions(
             unwrap_abstract(_INCLUDEGRAPHICS_RE.sub(swap, body))))

@@ -1,4 +1,4 @@
-"""Regenerate Supplementary Table S1 (transcriptomic studies).
+"""Regenerate Supplementary Table 4 (transcriptomic study units).
 
 The table shipped with five columns while the manuscript advertised six
 fields, three of which it did not contain. This script derives every column
@@ -21,7 +21,7 @@ from a named source so the table cannot drift from the analysis again:
 Tissue is annotated only for the SNI studies that step 06d stratifies, so it
 is reported as "not annotated" elsewhere rather than guessed.
 
-    uv run python scripts/build_table_s1.py
+    uv run python scripts/build_transcriptomic_studies_table.py
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ STRATA_CSV = REPO_ROOT / "conf" / "analysis" / "study_strata.csv"
 TISSUE_CSV = REPO_ROOT / "data" / "interim" / "sni_tissue_annotations.csv"
 SUPERSEDED_CSV = REPO_ROOT / "conf" / "analysis" / "superseded_studies.csv"
 DEFAULT_OUT = (REPO_ROOT / "manuscript" / "supplementary"
-               / "Table_S1_transcriptomic_studies.csv")
+               / "Table_S4_transcriptomic_studies.csv")
 
 UNKNOWN = "not annotated"
 _STUDY_MODEL_RE = re.compile(r"(GSE[A-Za-z0-9_]+)\s*=\s*\"([^\"]+)\"")

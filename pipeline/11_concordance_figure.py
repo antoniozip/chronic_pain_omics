@@ -4,8 +4,12 @@ Generates:
   manuscript/figures/cross_species_concordance.pdf
     Panel A: Scatter plot (mouse vs. human effect sizes), both-sig genes labelled
     Panel B: Scatter plot (rat vs. human effect sizes), both-sig genes labelled
-    Panel C: Bar chart — % concordant direction by significance stratum
-    Panel D: Table inset — concordant both-significant genes with key stats
+    Panel C: Scatter plot (mouse vs. rat effect sizes), pairs joined through
+             their shared human ortholog (ortholog.concordance.rodent_pairs)
+    Panel D: Bar chart — % concordant direction by significance stratum
+
+A fourth panel listing the concordant both-significant genes was dropped on
+2026-11-16: there are none, so it drew a sentence, not a plot.
 """
 
 from __future__ import annotations
@@ -20,6 +24,8 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+from cp_multiomics.ortholog.concordance import rodent_pairs
 
 logger = logging.getLogger(__name__)
 
@@ -70,9 +76,19 @@ def load_concordance(fname: str) -> pd.DataFrame:
 def scatter_panel(
     ax: plt.Axes,
     df: pd.DataFrame,
-    species_label: str,
+    x_label: str,
+    y_label: str = "Human",
+    x: str = "animal_yi",
+    y: str = "human_yi",
+    name_col: str = "human_feature_id",
 ) -> None:
-    """Scatter: animal_yi (x) vs. human_yi (y), coloured by concordance."""
+    """Scatter of two pooled effects, coloured by concordance.
+
+    Defaults draw a rodent (x) against human (y); the mouse--rat panel passes
+    its own columns. ``x_label``/``y_label`` are species names, e.g.
+    "Mouse (Mus musculus)"; the part before " (" titles the panel.
+    """
+    df = df.rename(columns={x: "_x", y: "_y"})
     nonsig  = df[~df["both_significant"]]
     bs_disc = df[df["both_significant"] & ~df["concordant"]]
     bs_con  = df[df["both_significant"] & df["concordant"]]
@@ -83,30 +99,30 @@ def scatter_panel(
     # sources. Only the background cloud is rasterized; the both-significant
     # points, their outlines and every label stay vector, as in
     # pipeline/13_human_rodent_volcano.py.
-    ax.scatter(nonsig["animal_yi"], nonsig["human_yi"],
+    ax.scatter(nonsig["_x"], nonsig["_y"],
                s=4, alpha=ALPHA_BG, c=COL_NONSIG, linewidths=0, zorder=1,
                rasterized=True)
     if not bs_disc.empty:
-        ax.scatter(bs_disc["animal_yi"], bs_disc["human_yi"],
+        ax.scatter(bs_disc["_x"], bs_disc["_y"],
                    s=30, alpha=ALPHA_SIG, c=COL_DISCORD, linewidths=0.4,
                    edgecolors="white", zorder=3, label=f"Both-sig, discordant (n={len(bs_disc)})")
     if not bs_con.empty:
-        ax.scatter(bs_con["animal_yi"], bs_con["human_yi"],
+        ax.scatter(bs_con["_x"], bs_con["_y"],
                    s=50, alpha=0.9, c=COL_CONCORD, linewidths=0.5,
                    edgecolors="white", zorder=4, label=f"Both-sig, concordant (n={len(bs_con)})")
         # Label concordant genes
         for _, row in bs_con.iterrows():
             ax.annotate(
-                row["human_feature_id"],
-                (row["animal_yi"], row["human_yi"]),
+                row[name_col],
+                (row["_x"], row["_y"]),
                 fontsize=pt("gene"), ha="left", va="bottom",
                 xytext=(3, 2), textcoords="offset points",
                 color=COL_CONCORD,
             )
 
     lim = max(
-        abs(df["animal_yi"]).quantile(0.999),
-        abs(df["human_yi"]).quantile(0.999),
+        abs(df["_x"]).quantile(0.999),
+        abs(df["_y"]).quantile(0.999),
         0.5,
     ) * 1.1
     ax.set_xlim(-lim, lim)
@@ -118,14 +134,15 @@ def scatter_panel(
     n_total = len(df)
     n_con   = df["concordant"].sum()
     pct_con = n_con / n_total * 100 if n_total > 0 else 0
-    ax.set_xlabel(f"{species_label} log₂FC (meta-analysis)", fontsize=pt("axis"))
-    ax.set_ylabel("Human log₂FC (meta-analysis)", fontsize=pt("axis"))
+    ax.set_xlabel(f"{x_label} log₂FC (meta-analysis)", fontsize=pt("axis"))
+    ax.set_ylabel(f"{y_label.split(' (')[0]} log₂FC (meta-analysis)", fontsize=pt("axis"))
     ax.set_title(
-        f"{species_label.split(' (')[0]} ↔ Human  (n={n_total:,} pairs)\n"
+        f"{x_label.split(' (')[0]} ↔ {y_label.split(' (')[0]}  (n={n_total:,} pairs)\n"
         f"{pct_con:.1f}% concordant direction",
         fontsize=pt("title"), pad=8,
     )
-    ax.legend(fontsize=pt("tick"), loc="upper left")
+    if ax.get_legend_handles_labels()[0]:
+        ax.legend(fontsize=pt("tick"), loc="upper left")
     ax.tick_params(labelsize=pt("tick"))
 
 
@@ -181,61 +198,6 @@ def concordance_bars(ax: plt.Axes, df_m: pd.DataFrame, df_r: pd.DataFrame) -> No
     ax.tick_params(labelsize=pt("tick"))
 
 
-def concordant_gene_table(ax: plt.Axes, df_m: pd.DataFrame, df_r: pd.DataFrame) -> None:
-    """Inset table of concordant both-significant genes."""
-    con_m = df_m[df_m["both_significant"] & df_m["concordant"]].copy()
-    con_r = df_r[df_r["both_significant"] & df_r["concordant"]].copy()
-
-    # Merge mouse and rat
-    all_genes = set(con_m["human_feature_id"]) | set(con_r["human_feature_id"])
-    rows = []
-    for gene in sorted(all_genes):
-        m_row = con_m[con_m["human_feature_id"] == gene]
-        r_row = con_r[con_r["human_feature_id"] == gene]
-        rows.append({
-            "Gene": gene,
-            "Mouse FC\n(animal)":
-                f"{m_row['animal_yi'].values[0]:+.2f}" if not m_row.empty else "—",
-            "Rat FC\n(animal)":
-                f"{r_row['animal_yi'].values[0]:+.2f}" if not r_row.empty else "—",
-            "Human FC": "{:+.2f}".format(
-                m_row["human_yi"].values[0] if not m_row.empty
-                else r_row["human_yi"].values[0]),
-            "In mouse": "✓" if not m_row.empty else "",
-            "In rat":   "✓" if not r_row.empty else "",
-        })
-
-    if not rows:
-        ax.text(0.5, 0.5, "No concordant both-significant genes", ha="center", va="center",
-                fontsize=pt("title"), transform=ax.transAxes)
-        ax.axis("off")
-        return
-
-    tbl_df = pd.DataFrame(rows)
-    ax.axis("off")
-    tbl = ax.table(
-        cellText=tbl_df.values,
-        colLabels=tbl_df.columns,
-        cellLoc="center", loc="center",
-    )
-    tbl.auto_set_font_size(False)
-    tbl.set_fontsize(pt("tick"))
-    tbl.scale(1, 1.4)
-
-    # Header styling
-    for j in range(len(tbl_df.columns)):
-        tbl[(0, j)].set_facecolor("#2166ac")
-        tbl[(0, j)].set_text_props(color="white", fontweight="bold")
-
-    # Alternating row colours
-    for i in range(1, len(rows) + 1):
-        bg = "#e8f0fb" if i % 2 == 0 else "white"
-        for j in range(len(tbl_df.columns)):
-            tbl[(i, j)].set_facecolor(bg)
-
-    ax.set_title("Concordant both-significant genes", fontsize=pt("title"), pad=16)
-
-
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
 
@@ -253,11 +215,14 @@ def main() -> None:
 
     scatter_panel(ax_a, df_m, "Mouse (Mus musculus)")
     scatter_panel(ax_b, df_r, "Rat (Rattus norvegicus)")
-    concordance_bars(ax_c, df_m, df_r)
-    concordant_gene_table(ax_d, df_m, df_r)
+    pairs = rodent_pairs(df_m, df_r)
+    scatter_panel(ax_c, pairs, "Mouse (Mus musculus)",
+                  y_label="Rat (Rattus norvegicus)", x="mouse_yi", y="rat_yi",
+                  name_col="mouse_feature_id")
+    concordance_bars(ax_d, df_m, df_r)
 
     fig.suptitle(
-        "Cross-species transcriptomic concordance: rodent models ↔ human chronic pain",
+        "Cross-species transcriptomic concordance in chronic pain",
         fontsize=pt("suptitle"), fontweight="bold", y=1.01,
     )
 
@@ -279,8 +244,8 @@ def main() -> None:
           f"{len(con_m)} concordant both-sig")
     print(f"Rat:   {len(df_r):,} pairs, {df_r['both_significant'].sum()} both-sig, "
           f"{len(con_r)} concordant both-sig")
-    print("Concordant both-sig genes: "
-          f"{sorted(set(con_m['human_feature_id']) | set(con_r['human_feature_id']))}")
+    print(f"Mouse-rat: {len(pairs):,} pairs, "
+          f"{pairs['concordant'].mean() * 100:.1f}% concordant direction")
 
 
 if __name__ == "__main__":

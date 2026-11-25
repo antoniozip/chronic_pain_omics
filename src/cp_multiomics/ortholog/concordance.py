@@ -137,3 +137,32 @@ def compute_summary(merged: pd.DataFrame, modality: str) -> ConcordanceSummary:
         spearman_r=float(sr),
         spearman_p=float(sp),
     )
+
+
+def rodent_pairs(mouse: pd.DataFrame, rat: pd.DataFrame) -> pd.DataFrame:
+    """Mouse--rat pairs, joined through their shared human ortholog.
+
+    Takes the two rodent-to-human concordance tables step 07 writes and pairs
+    a mouse and a rat feature when both map to the same human gene. Rodent
+    symbols are never compared directly (the project's rule is explicit
+    ortholog tables, not symbol identity), and a human gene reached by more
+    than one feature of either species is dropped rather than letting it
+    enter the comparison several times as a cross product.
+
+    Returns one row per pair with ``mouse_yi``, ``rat_yi``, ``mouse_padj``,
+    ``rat_padj``, ``concordant`` (same sign) and ``both_significant``.
+    """
+    def one_to_one(df: pd.DataFrame) -> pd.DataFrame:
+        return df[~df["human_feature_id"].duplicated(keep=False)]
+
+    cols = ["human_feature_id", "animal_feature_id", "animal_yi", "animal_padj"]
+    m = one_to_one(mouse)[cols].rename(columns={
+        "animal_feature_id": "mouse_feature_id", "animal_yi": "mouse_yi",
+        "animal_padj": "mouse_padj"})
+    r = one_to_one(rat)[cols].rename(columns={
+        "animal_feature_id": "rat_feature_id", "animal_yi": "rat_yi",
+        "animal_padj": "rat_padj"})
+    pairs = m.merge(r, on="human_feature_id", how="inner")
+    pairs["concordant"] = np.sign(pairs["mouse_yi"]) == np.sign(pairs["rat_yi"])
+    pairs["both_significant"] = (pairs["mouse_padj"] < 0.05) & (pairs["rat_padj"] < 0.05)
+    return pairs

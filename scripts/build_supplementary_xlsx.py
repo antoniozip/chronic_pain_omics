@@ -16,7 +16,7 @@ A table drawing on more than one CSV gets one sheet per source, named for the
 file it came from, because merging them would lose which record said what.
 
 It also writes all of them into one workbook, Supplementary_Tables.xlsx: an
-index sheet, then one sheet per table (or per source, named S8_workbench_...,
+index sheet, then one sheet per table (or per source, named S10_workbench_...,
 where a table draws on several). That single file is what the journal receives;
 Brain Communications asks for at most ten supplementary files, and eighteen
 workbooks exceeded it.
@@ -63,26 +63,41 @@ def _p(rel: str) -> Path:
     return REPO_ROOT / rel
 
 
-#: Every numbered supplementary data table, in order. S1-S3 already shipped as
-#: CSV and are rendered here too, so the bundle is one format throughout.
+#: Every numbered supplementary data table, numbered and ordered by first
+#: citation in the paper's prose (renumbered on 2026-11-23; the old-to-new map
+#: is in plan/2026-11-23-supplementary-table-renumbering.md, and
+#: tests/test_manuscript_claims.py fails if the order drifts again). S1, S2 and
+#: S4 already shipped as CSV and are rendered here too, so the bundle is one
+#: format throughout.
 TABLES: tuple[Table, ...] = (
-    Table(1, "transcriptomic_studies", "Transcriptomic study units",
-          (_p("manuscript/supplementary/Table_S1_transcriptomic_studies.csv"),)),
-    Table(2, "GWAS_studies", "Retrieved GWAS studies",
-          (_p("manuscript/supplementary/Table_S2_GWAS_studies.csv"),)),
-    Table(3, "MAGMA_gene_results", "MAGMA gene-based results",
-          (_p("manuscript/supplementary/Table_S3_MAGMA_gene_results.csv"),)),
-    Table(4, "egger_test", "Egger's regression test per feature",
-          (_p("results/meta/transcriptomics/egger_test.csv"),)),
-    Table(5, "PXD013362_peptides", "Per-peptide proteomic effect sizes",
-          (_p("results/meta/proteomics/PXD013362_pooled.csv"),)),
+    Table(1, "GWAS_studies", "Retrieved GWAS studies",
+          (_p("manuscript/supplementary/Table_S1_GWAS_studies.csv"),)),
+    Table(2, "MAGMA_gene_results", "MAGMA gene-based results",
+          (_p("manuscript/supplementary/Table_S2_MAGMA_gene_results.csv"),)),
+    # Table 5 of the Journal of Pain version. Brain Communications allows eight
+    # display items, and the GWAS figure (now Fig. 2A) already shows the same
+    # ranking, so the table moved to the supplementary (2026-09-21): an excerpt
+    # is printed there, and this workbook carries the whole ranking.
+    Table(3, "gwas_replication_ranking", "Lead-variant genes by replication count",
+          (_p("results/meta/genomics/gwas_gene_meta_replication.csv"),)),
+    Table(4, "transcriptomic_studies", "Transcriptomic study units",
+          (_p("manuscript/supplementary/Table_S4_transcriptomic_studies.csv"),)),
+    Table(5, "depth_sensitivity", "Subsampling to equal depth, per seed",
+          (_p("results/meta/transcriptomics/depth_sensitivity.csv"),
+           _p("results/meta/transcriptomics/depth_sensitivity_shared.csv"),
+           _p("results/meta/transcriptomics/depth_sensitivity_strata.csv")),
+          ("all_features", "shared_orthologs", "by_stratum")),
     Table(6, "proteomic_screening", "Proteomic screening and triage",
           (_p("literature/prisma/proteomics_triage.csv"),
            _p("literature/prisma/proteomics_manual_review.csv")),
           ("triage", "manual_review")),
-    Table(7, "proteomic_pooled", "Pooled proteomic effect sizes",
+    Table(7, "PXD013362_peptides", "Per-peptide proteomic effect sizes",
+          (_p("results/meta/proteomics/PXD013362_pooled.csv"),)),
+    Table(8, "peptide_gene_map", "Peptide to precursor protein assignments",
+          (_p("conf/analysis/peptide_gene_map.csv"),)),
+    Table(9, "proteomic_pooled", "Pooled proteomic effect sizes",
           (_p("results/meta/proteomics/pooled_effects.csv"),)),
-    Table(8, "metabolomic_screening", "Metabolomic screening and triage",
+    Table(10, "metabolomic_screening", "Metabolomic screening and triage",
           (_p("literature/prisma/metabolomics_manual_review.csv"),
            _p("literature/prisma/metabolomics_file_triage.csv"),
            _p("literature/prisma/metabolomics_workbench_candidates.csv"),
@@ -90,34 +105,22 @@ TABLES: tuple[Table, ...] = (
            _p("literature/prisma/metabolomics_workbench_validation.csv")),
           ("metabolights_review", "metabolights_files", "workbench_candidates",
            "workbench_counts", "workbench_validation")),
-    Table(9, "metabolomic_pooled", "Pooled metabolomic effect sizes",
-          (_p("results/meta/metabolomics/pooled_effects.csv"),)),
-    Table(10, "contrast_audit", "Contrast audit of included transcriptomic accessions",
-          (_p("literature/prisma/transcriptomics_contrast_audit.csv"),)),
-    # New numbers, for files the text previously cited only by repository path.
-    Table(11, "transcriptomic_screening", "Transcriptomic screening record",
-          (_p("literature/prisma/transcriptomics_candidates.csv"),)),
-    Table(12, "superseded_studies", "Study units superseded by a finer-grained re-analysis",
-          (_p("conf/analysis/superseded_studies.csv"),)),
-    Table(13, "phenotype_scope", "Phenotype scope decisions",
-          (_p("conf/analysis/phenotype_scope.csv"),)),
-    Table(14, "metabolite_id_map", "Metabolite name to ChEBI assignments",
+    Table(11, "metabolite_id_map", "Metabolite name to ChEBI assignments",
           (_p("conf/analysis/metabolite_id_map.csv"),)),
-    Table(15, "peptide_gene_map", "Peptide to precursor protein assignments",
-          (_p("conf/analysis/peptide_gene_map.csv"),)),
-    Table(16, "sni_tissue_annotations", "SNI tissue annotations",
+    Table(12, "metabolomic_pooled", "Pooled metabolomic effect sizes",
+          (_p("results/meta/metabolomics/pooled_effects.csv"),)),
+    Table(13, "egger_test", "Egger's regression test per feature",
+          (_p("results/meta/transcriptomics/egger_test.csv"),)),
+    Table(14, "phenotype_scope", "Phenotype scope decisions",
+          (_p("conf/analysis/phenotype_scope.csv"),)),
+    Table(15, "transcriptomic_screening", "Transcriptomic screening record",
+          (_p("literature/prisma/transcriptomics_candidates.csv"),)),
+    Table(16, "contrast_audit", "Contrast audit of included transcriptomic accessions",
+          (_p("literature/prisma/transcriptomics_contrast_audit.csv"),)),
+    Table(17, "superseded_studies", "Study units superseded by a finer-grained re-analysis",
+          (_p("conf/analysis/superseded_studies.csv"),)),
+    Table(18, "sni_tissue_annotations", "SNI tissue annotations",
           (_p("data/interim/sni_tissue_annotations.csv"),)),
-    Table(17, "depth_sensitivity", "Subsampling to equal depth, per seed",
-          (_p("results/meta/transcriptomics/depth_sensitivity.csv"),
-           _p("results/meta/transcriptomics/depth_sensitivity_shared.csv"),
-           _p("results/meta/transcriptomics/depth_sensitivity_strata.csv")),
-          ("all_features", "shared_orthologs", "by_stratum")),
-    # Table 5 of the Journal of Pain version. Brain Communications allows eight
-    # display items, and Fig. 5A already shows the same ranking, so the table
-    # moved to the supplementary (2026-09-21): an excerpt is printed there, and
-    # this workbook carries the whole ranking.
-    Table(18, "gwas_replication_ranking", "Lead-variant genes by replication count",
-          (_p("results/meta/genomics/gwas_gene_meta_replication.csv"),)),
 )
 
 

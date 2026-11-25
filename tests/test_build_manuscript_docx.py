@@ -10,6 +10,7 @@ the build log, so the checks live here.
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -389,8 +390,88 @@ def test_repopath_reaches_the_docx_as_code():
 def test_native_numbering_follows_the_source():
     """Number captions in Word only where the source numbers them.
 
-    The supplementary labels its one table "Supplementary Table 18" itself;
+    The supplementary labels its one table "Supplementary Table 3" itself;
     pandoc's own numbering called it "Table 1".
     """
     assert bmd.numbers_its_captions("\\caption{A table.}")
-    assert not bmd.numbers_its_captions("\\caption*{\\textbf{Supplementary Table 18} A.}")
+    assert not bmd.numbers_its_captions("\\caption*{\\textbf{Supplementary Table 3} A.}")
+
+
+def test_column_modifiers_are_stripped_from_fixed_width_columns():
+    """Table 1's role column was p{0.30\\linewidth} and flattened the rest.
+
+    A bare p width is read by pandoc; the >{\\raggedleft\\arraybackslash}
+    modifier is not, and silently emptied every cell that began with a digit.
+    """
+    src = ("\\begin{tabular}{>{\\raggedright\\arraybackslash}p{0.1\\linewidth}"
+           ">{\\raggedleft\\arraybackslash}p{0.2\\linewidth}}\nA & 1 \\\\\n\\end{tabular}")
+    out = bmd.plain_fixed_columns(src)
+    assert "\\begin{tabular}{p{0.333\\linewidth}p{0.667\\linewidth}}" in out
+    assert "raggedleft" not in out and "arraybackslash" not in out
+    assert "A & 1" in out
+
+
+def test_plain_fixed_columns_leaves_ordinary_columns_alone():
+    src = "\\begin{tabular}{lrrcrl}\nx\\end{tabular}\\parbox{0.92\\linewidth}{n}"
+    assert bmd.plain_fixed_columns(src) == src
+
+
+def test_a_fixed_width_table_reaches_the_docx_intact(tmp_path: Path):
+    """Through pandoc: every cell survives, and no column is a sliver."""
+    pypandoc = pytest.importorskip("pypandoc")
+    import re
+    import zipfile
+    src = ("\\begin{tabular}{>{\\raggedright\\arraybackslash}p{0.1\\linewidth}"
+           ">{\\raggedleft\\arraybackslash}p{0.1\\linewidth}"
+           "p{0.3\\linewidth}}\nGene & k & Role \\\\\n\\hline\n"
+           "Atf3 & 60 & a long functional description that wraps \\\\\n"
+           "\\end{tabular}\n")
+    out = tmp_path / "t.docx"
+    pypandoc.convert_text(bmd.plain_fixed_columns(src), "docx",
+                          format="latex", outputfile=str(out))
+    xml = zipfile.ZipFile(out).read("word/document.xml").decode()
+    text = re.sub(r"<[^>]+>", " ", xml)
+    assert " 60 " in text, "a cell that opens with a digit was emptied"
+    widths = [int(w) for w in re.findall(r'<w:gridCol w:w="(\d+)"', xml)]
+    assert widths and min(widths) > 500, widths
+
+
+def test_docx_column_widths_fill_the_line():
+    src = ("\\begin{tabular}{p{0.2\\linewidth}>{\\raggedleft\\arraybackslash}"
+           "p{0.3\\linewidth}}\nA & 1 \\\\\n\\end{tabular}")
+    out = bmd.plain_fixed_columns(src)
+    assert "{p{0.400\\linewidth}p{0.600\\linewidth}}" in out
+
+
+def _cited_in_order(document: str) -> list[str]:
+    """Bibliography keys in the order the document first cites them."""
+    tex_dir = REPO_ROOT / "manuscript"
+    source = (tex_dir / f"{document}.tex").read_text()
+    source = re.sub(r"\\input\{(\w+)\}",
+                    lambda m: (tex_dir / f"{m.group(1)}.tex").read_text(), source)
+    source = "\n".join(re.sub(r"(?<!\\)%.*", "", line) for line in source.splitlines())
+    keys = (k.strip() for group in re.findall(r"\\cite\{([^}]*)\}", source)
+            for k in group.split(","))
+    return list(dict.fromkeys(k for k in keys if k))
+
+
+@pytest.mark.parametrize("document", ["manuscript", "supplementary"])
+def test_references_are_numbered_in_order_of_first_citation(document):
+    """Reference N is the Nth work the document cites, as the journal requires.
+
+    ama-brain.bst numbers in citation order, so a fresh build satisfies this by
+    construction. What breaks it is a stale .bbl -- a citation added or moved
+    since bibtex last ran -- which the .docx then numbers from the old list,
+    because the builder reads the numbers LaTeX recorded rather than the
+    source; or a switch to a style that sorts. The .bbl is gitignored, so this
+    runs wherever the paper is built and skips in CI.
+    """
+    bbl = REPO_ROOT / "manuscript" / f"{document}.bbl"
+    if not bbl.exists():
+        pytest.skip(f"{bbl.name} not built; run bibtex {document}")
+    numbered = re.findall(r"\\bibitem\{([^}]*)\}", bbl.read_text())
+    cited = _cited_in_order(document)
+    assert numbered == cited, (
+        f"{document}.bbl numbers {len(numbered)} references in an order that "
+        f"differs from first citation ({len(cited)} cited); re-run pdflatex, "
+        f"bibtex {document}, pdflatex twice")

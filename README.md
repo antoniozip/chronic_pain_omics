@@ -47,7 +47,7 @@ Three results, all negative, and that is the point:
   25 genome-wide-significant genes is significant in the human transcriptomic
   pool or is a cross-species concordant transcript, and none of the 15
   most-replicated GWAS pain genes approaches significance there (smallest
-  adjusted p 0.396).
+  adjusted p 0.30).
 
 ## Layout
 
@@ -81,7 +81,7 @@ python pipeline/04_harmonize.py --modality transcriptomics
 Rscript pipeline/05_per_study_da.R --modality transcriptomics
 Rscript pipeline/06_meta_analysis.R --modality transcriptomics
 Rscript pipeline/06g_species_meta.R --modality transcriptomics
-python pipeline/07_cross_species.py
+python pipeline/07_cross_species.py --modality transcriptomics
 python pipeline/08_figures.py
 ```
 
@@ -95,7 +95,7 @@ any analysis step.
 Every numeric claim in the paper is bound to the results file that produces it.
 
 ```bash
-pytest tests/test_manuscript_claims.py          # 357 claims (needs manuscript sources; skips here)
+pytest tests/test_manuscript_claims.py          # 361 claims (needs manuscript sources; skips here)
 python scripts/mutation_test_claims.py          # prove each claim can fail
 ```
 
@@ -108,7 +108,7 @@ numbers behind; the registry caught all four in one run.
 
 Claims are themselves mutation-tested: `mutation_test_claims.py` perturbs the
 number each one reads and checks that the claim fails. A claim that survives
-its own mutation reports green while checking nothing.
+its own mutation reports green while checking nothing. All 361 are killed.
 
 ## Building the paper
 
@@ -118,21 +118,28 @@ code-only snapshot.
 ```bash
 cd manuscript
 pdflatex manuscript && bibtex manuscript && pdflatex manuscript && pdflatex manuscript
-pdflatex supplementary && pdflatex supplementary   # after manuscript.aux exists
+pdflatex supplementary && bibtex supplementary \
+  && pdflatex supplementary && pdflatex supplementary   # after manuscript.aux exists
 ```
 
-References are BibTeX (`manuscript/references.bib`) in Elsevier's
-`elsarticle-num` style, which ships in TeX Live's `texlive-publishers`. Every
-entry carries the DOI that was resolved against CrossRef: when the hand-written
-bibliography was converted, ten of its 46 entries did not survive that check,
-four of them naming papers that do not exist under the title given.
+The supplementary has its own reference list, and reads the paper's figure and
+table numbers from `manuscript.aux`, so build the paper first.
 
-`python scripts/build_manuscript_docx.py` renders Word versions.
+References are BibTeX (`manuscript/references.bib`) in AMA style, from
+`manuscript/ama-brain.bst`. Every entry carries the DOI that was resolved
+against CrossRef: when the hand-written bibliography was converted, ten of its
+46 entries did not survive that check, four of them naming papers that do not
+exist under the title given.
+
+`python3 scripts/build_manuscript_docx.py` renders the Word version the journal
+receives (`--tex manuscript/supplementary.tex` for the supplementary). It needs
+pypandoc and the `.bbl` from the build above.
+`python scripts/build_supplementary_xlsx.py` writes Supplementary Tables 1 to 18.
 
 ## Tests
 
 ```bash
-pytest tests/                                         # 1,156 in the full repository
+pytest tests/                                         # 1,172 in the full repository
 Rscript -e 'testthat::test_dir("tests/testthat")'     # 440
 ruff check . && mypy src/
 ```

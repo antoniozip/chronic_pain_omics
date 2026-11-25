@@ -28,7 +28,7 @@ SUPP_DIR = Path("manuscript") / "supplementary"
 META_DIR = Path("results") / "meta"
 
 # Exclusion reasons drawn per repository before the rest fold into one line.
-# Every reason still reaches the reader: Supplementary Tables 2, 6, 8 and 11
+# Every reason still reaches the reader: Supplementary Tables 1, 6, 10 and 15
 # carry each screened record with its reason code. The diagram cannot carry
 # them all and print at a legible size: at 12 pt, 174 mm wide, the full
 # breakdown made it 389 mm tall against a page of about 229 mm. Three reasons
@@ -204,7 +204,7 @@ def geo_flow(root: Path) -> SourceFlow:
     # waiting only for its files is a different state from one held for a
     # design or file problem, whatever that problem's code.
     ready = int((pend["reason_code"] == "usable_pending_file_check").sum())
-    units_path = root / SUPP_DIR / "Table_S1_transcriptomic_studies.csv"
+    units_path = root / SUPP_DIR / "Table_S4_transcriptomic_studies.csv"
     units = len(pd.read_csv(units_path)) if units_path.exists() else None
     return SourceFlow(
         source="GEO (bulk transcriptomics)", identified=len(d),
@@ -230,7 +230,7 @@ def single_cell_flow(root: Path) -> SourceFlow:
 
 
 def gwas_flow(root: Path) -> SourceFlow:
-    d = pd.read_csv(root / SUPP_DIR / "Table_S2_GWAS_studies.csv")
+    d = pd.read_csv(root / SUPP_DIR / "Table_S1_GWAS_studies.csv")
     return SourceFlow(
         source="GWAS Catalog", identified=len(d), identified_label="studies",
         excluded=_group(d.loc[d["Disposition"] == "Excluded", "Reason"],

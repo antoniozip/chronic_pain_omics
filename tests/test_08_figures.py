@@ -205,7 +205,7 @@ def test_flow_diagram_prints_at_full_width_on_one_page(tmp_path):
     from cp_multiomics.prisma_flow import SUPP_DIR, repository_flows
     from cp_multiomics.viz.prisma import PAGE_HEIGHT, WIDTH, plot_repository_flow
 
-    if not (REPO / SUPP_DIR / "Table_S2_GWAS_studies.csv").exists():
+    if not (REPO / SUPP_DIR / "Table_S1_GWAS_studies.csv").exists():
         pytest.skip("GWAS screening record absent: the code-only snapshot ships no manuscript/")
     out = plot_repository_flow(repository_flows(REPO), ["Summary line"], out_dir=tmp_path)
     box = re.search(rb"/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]",

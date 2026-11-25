@@ -28,7 +28,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-import yaml
 from scipy import stats
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -708,9 +707,9 @@ def _amendment_admitted() -> int:
 
 
 @cache
-def _table_s1() -> pd.DataFrame:
+def _study_table() -> pd.DataFrame:
     return _read(REPO_ROOT / "manuscript" / "supplementary"
-                 / "Table_S1_transcriptomic_studies.csv")
+                 / "Table_S4_transcriptomic_studies.csv")
 
 
 def _n_sig(df: pd.DataFrame, col: str = "padj") -> int:
@@ -1151,7 +1150,8 @@ CLAIMS: list[Claim] = [
           r"The between-model Q test identified ([\d,]+) of",
           lambda: int((_read(STRAT / "between_model_Q.csv",
                              usecols=["padj_QM"])["padj_QM"] < 0.05).sum())),
-    # Table 2's Q row and the Discussion state the same two figures. Both were
+    # The stratified table's Q row (tab:stratified) and the Discussion state
+    # the same two figures. Both were
     # stale and stale differently: the row said 33,853 tested and 3,685
     # significant, the sentence 62,792 and 13,192, and the Discussion restated
     # the row's 3,685. Nothing read any of the three.
@@ -1343,6 +1343,14 @@ CLAIMS: list[Claim] = [
     Claim("concordance_rat",
           r"was [\d.]+\\% for mouse and ([\d.]+)\\% for\s*\n?rat",
           lambda: _summary_row("Rattus norvegicus")["pct_concordant"], tol=0.05),
+    # Fig. 2C, added 2026-11-16 in place of a panel that stated "none". The
+    # pairing is ortholog.concordance.rodent_pairs, which the figure also calls.
+    Claim("fig_mouse_rat_pairs",
+          r"human ortholog: ([\d,]+) pairs, of which",
+          lambda: len(_rodent_pairs())),
+    Claim("fig_mouse_rat_concordance",
+          r"pairs, of which ([\d.]+)\\% change in the same",
+          lambda: _rodent_pairs()["concordant"].mean() * 100, tol=0.05),
     # The table and the Discussion carried pre-regeneration values -- 48.0/49.6%
     # with rho -0.068/-0.034 -- while the abstract and Results, which were
     # claim-tested, carried the correct 48.7/48.5%. The stale pair were also
@@ -1708,28 +1716,36 @@ CLAIMS: list[Claim] = [
     # The Introduction's copy of the ortholog count. It is the fourth place the
     # figure appears and was the only one no claim read, so it alone stayed at
     # 33,033 while the other three tracked the analysis.
-    Claim("forest_caption_units",
-          r"measured in \$\\geq\$3 of the ([\d,]+) study units can be pooled",
-          lambda: _pooled_study_count()),
+    # forest_caption_units went with the forest figure on 2026-11-12, when
+    # Table 1 replaced it; the study count is still claimed by intro_tx_units
+    # and the others above.
+    # The leading-genes table's (tab:top_genes) depth rule, stated in the
+    # Results. The rows themselves are checked whole by
+    # test_top_genes_table_matches_the_pool.
+    Claim("top_genes_deep_significant",
+          r"ranks\s+within the ([\d,]+) significant features pooled from at least",
+          lambda: _deep_significant_count()),
 
-    # -- Supplementary Table S1 ---------------------------------------------
-    # S1 is regenerated from the tracked results by scripts/build_table_s1.py.
+    # -- Supplementary Table 4 (transcriptomic study units) -----------------
+    # Regenerated from the tracked results by
+    # scripts/build_transcriptomic_studies_table.py. It was Supplementary
+    # Table 1 until the 2026-11-23 renumbering, when its s1_ ids were renamed.
     # Its counts sat at the 58-study corpus until 2026-08-29 because the prose
     # describing it was read by nothing.
-    Claim("s1_tissue_annotated",
+    Claim("study_table_tissue_annotated",
           r"Tissue is recorded only for the (\d+) SNI studies",
-          lambda: int((_table_s1()["Tissue"].astype(str) != "not annotated").sum()),
+          lambda: int((_study_table()["Tissue"].astype(str) != "not annotated").sum()),
           source="supplementary"),
-    Claim("s1_counts_recoverable",
+    Claim("study_table_counts_recoverable",
           r"recoverable for (\d+) of the [\d,]+ studies",
-          lambda: int(pd.to_numeric(_table_s1()["N_Analysed"],
+          lambda: int(pd.to_numeric(_study_table()["N_Analysed"],
                                     errors="coerce").notna().sum()), source="supplementary"),
-    Claim("s1_studies",
+    Claim("study_table_units",
           r"recoverable for \d+ of the ([\d,]+) studies",
-          lambda: len(_table_s1()), source="supplementary"),
-    Claim("s1_samples",
+          lambda: len(_study_table()), source="supplementary"),
+    Claim("study_table_samples",
           r"of the [\d,]+ studies \(([\d,]+) samples in total\)",
-          lambda: int(pd.to_numeric(_table_s1()["N_Analysed"],
+          lambda: int(pd.to_numeric(_study_table()["N_Analysed"],
                                     errors="coerce").sum()), source="supplementary"),
 
     # -- genomics -----------------------------------------------------------
@@ -2018,18 +2034,44 @@ def _expected_of(name: str) -> Callable[[], float]:
     return next(c.expected for c in CLAIMS if c.name == name)
 
 
-# The supplementary describes Tables 7 and 9 by their correction families.
-# Neither sentence was claimed, and Table 9's said 74 features for three months
+# The supplementary describes Tables 9 and 12 (7 and 9 before the 2026-11-23
+# renumbering) by their correction families. Neither sentence was claimed, and
+# the metabolomic one said 74 features for three months
 # after the metabolomic family had grown to 236 -- found while moving the text
 # for Brain Communications (2026-09-21). Each is bound to the same expectation
 # as the paper's own statement of that family, so the two cannot disagree.
 CLAIMS += [
-    Claim("s7_prot_family",
+    Claim("supp_prot_family",
           r"Correction is applied within the\s+(\w+) features measured in at least three units",
           _expected_of("proteomic_pooled_family"), source="supplementary"),
-    Claim("s9_metab_family",
+    Claim("supp_metab_family",
           r"correction is applied within the\s+([\d,]+) features reaching three or more units",
           _expected_of("metab_pooled_family"), source="supplementary"),
+]
+
+# Supplementary Fig. 1 draws one panel per page. The paper and the legend each
+# state how many, and nothing read either number until 2026-11-23. Both are
+# bound to the figure as shipped, so a redraw at another depth fails here.
+SUPP_FOREST = REPO_ROOT / "manuscript" / "figures" / "transcriptomics_forest_supplementary.pdf"
+
+
+def _supp_forest_panels() -> int:
+    """Pages in the shipped Supplementary Fig. 1, from the PDF's page tree."""
+    if not SUPP_FOREST.exists():
+        raise MissingInput(f"no {SUPP_FOREST}")
+    counts = [int(n) for n in re.findall(rb"/Count (\d+)", SUPP_FOREST.read_bytes())]
+    if not counts:
+        raise RuntimeError(f"no readable page count in {SUPP_FOREST}")
+    return max(counts)
+
+
+CLAIMS += [
+    Claim("supp_fig1_panels",
+          r"The (\d+) features at the top of the ranking by",
+          _supp_forest_panels),
+    Claim("supp_fig1_panels_legend",
+          r"for the (\d+) most significant features measured in",
+          _supp_forest_panels, source="supplementary"),
 ]
 
 # The manuscript spells small counts as words. The map ran to ten and stopped,
@@ -2317,6 +2359,90 @@ def test_every_supplementary_workbook_is_cited():
         + ", ".join(f"S{n}" for n in orphaned))
 
 
+def _body_prose() -> str:
+    """The prose whose first citations set the numbering, comments stripped.
+
+    Introduction to the end of Methods and the back matter before the data
+    statement. The floats follow the references in the submitted file, so
+    their captions are read after every citation here, and the data statement
+    restates numbers rather than introducing them.
+    """
+    text = "\n".join(re.sub(r"(?<!\\)%.*", "", line)
+                     for line in _manuscript().splitlines())
+    start = text.find("\\section{Introduction}")
+    end = re.search(r"\\section\*?\{Data and code availability\}", text)
+    assert start >= 0 and end, "Introduction or data statement heading renamed"
+    return text[start:end.start()]
+
+
+def _first_citations(pattern: re.Pattern[str], text: str) -> list[int]:
+    """Item numbers in the order the text first cites them, lists expanded."""
+    order: list[int] = []
+    for group in pattern.findall(text):
+        for lo, hi in re.findall(r"(\d+)(?:--(\d+))?", group):
+            for n in range(int(lo), int(hi or lo) + 1):
+                if n not in order:
+                    order.append(n)
+    return order
+
+
+_SUPP_FIG_REF = re.compile(
+    r"Supplementary\s+Figs?\.[~\s]+"
+    r"((?:\d+(?:--\d+)?)(?:(?:,\s*|,?\s+and[~\s]+)\d+(?:--\d+)?)*)")
+
+
+def test_floats_are_numbered_in_order_of_first_citation():
+    """Table N and Fig. N are the Nth the prose cites, and every one is cited.
+
+    LaTeX numbers a float by where it sits after the references, not by where
+    the text first mentions it, so moving a Results paragraph renumbers
+    nothing and leaves the text citing Table 3 before Table 1.
+    """
+    text = _manuscript()
+    floats = text[text.index("\\bibliography{"):]
+    prose = _body_prose()
+    for kind in ("tab", "fig"):
+        placed = re.findall(rf"\\label\{{({kind}:[^}}]+)\}}", floats)
+        cited = list(dict.fromkeys(re.findall(rf"\\ref\{{({kind}:[^}}]+)\}}", prose)))
+        assert cited == placed, (
+            f"{kind} floats are placed as {placed} but first cited as {cited}")
+
+
+@pytest.mark.parametrize("pattern,shipped", [
+    (_SUPP_TABLE_REF, "tables"), (_SUPP_FIG_REF, "figures")])
+def test_supplementary_items_are_numbered_in_order_of_first_citation(pattern, shipped):
+    """Supplementary Table N is the Nth the paper's prose cites.
+
+    The first citations ran 2, 3, 18, 1, 17, ... until 2026-11-23: the tables
+    were numbered as they were added, and three of them were cited only by the
+    data statement's 1--18 range. Requiring the sequence 1..N also requires
+    every item to be cited in the prose, not just in a range or a caption.
+    """
+    supp = _document("supplementary")
+    kind = "Table" if shipped == "tables" else "Fig."
+    legends = re.findall(rf"^Supplementary {re.escape(kind)}~(\d+):", supp, re.M)
+    assert legends, f"no supplementary {shipped} legends found"
+    order = _first_citations(pattern, _body_prose())
+    assert order == list(range(1, len(legends) + 1)), (
+        f"supplementary {shipped} are first cited in the order {order}; "
+        f"renumber so the prose cites 1..{len(legends)} in sequence")
+
+
+def test_supplementary_legends_and_workbook_run_in_numerical_order():
+    """The supplementary lists its tables, and the workbook its sheets, 1..N."""
+    import sys
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    import build_supplementary_xlsx as bsx  # noqa: E402
+
+    legends = [int(n) for n in re.findall(r"^Supplementary Table~(\d+):",
+                                          _document("supplementary"), re.M)]
+    assert legends == list(range(1, len(legends) + 1)), (
+        f"supplementary legends run {legends}")
+    assert [t.number for t in bsx.TABLES] == legends, (
+        "build_supplementary_xlsx.TABLES is not numbered and ordered 1..N "
+        "like the legends, so the workbook's index and sheets run out of order")
+
+
 # ---------------------------------------------------------------------------
 # Named-gene statistics
 # ---------------------------------------------------------------------------
@@ -2552,54 +2678,67 @@ def test_no_ortholog_pair_is_significant_in_both_species():
         )
 
 
-def _main_forest_panels() -> int:
-    """How many features Figure 2 draws, from the config the figure reads."""
-    cfg = yaml.safe_load((REPO_ROOT / "conf" / "analysis" / "default.yaml").read_text())
-    return int(cfg["meta"]["top_n_features_main"])
+def _rodent_pairs() -> pd.DataFrame:
+    """Fig. 2C's mouse--rat pairs, built as the figure builds them."""
+    from cp_multiomics.ortholog.concordance import rodent_pairs
+    return rodent_pairs(_concordance("musculus"), _concordance("norvegicus"))
 
 
-def _number_word(n: int) -> str:
-    words = {v: k for k, v in _WORDS.items()}
-    return words.get(n, str(n))
+def _top_genes_builder():
+    """scripts/build_top_genes_table.py, loaded as a module."""
+    import importlib.util
+    path = REPO_ROOT / "scripts" / "build_top_genes_table.py"
+    spec = importlib.util.spec_from_file_location("build_top_genes_table", path)
+    assert spec and spec.loader
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
-def test_forest_caption_names_the_top_pooled_features():
-    """Figure 2's caption names its leading feature and its panel count.
+def _deep_significant_count() -> int:
+    """Significant features pooled from >= the significant set's median depth."""
+    d = _read(TX_META / "pooled_effects.csv", usecols=["k", "padj_pooled"])
+    sig = d[d["padj_pooled"] < 0.05]
+    return int((sig["k"] >= _median_k("significant")).sum())
 
-    The ranking is not a number, so no Claim pattern covers the feature name --
-    and it drifted: the caption still named Olr830 (padj 0.649 in the current
-    pool) after 08_figures.py had regenerated the figure around SERTM2. The
-    count is read from `top_n_features_main`, the same key the figure code
-    uses, because the figure grew from one panel to ten and the caption has to
-    grow with it.
+
+def test_top_genes_table_matches_the_pool():
+    """The leading-genes table's rows are exactly what the builder derives.
+
+    Table 1 replaced the ten-panel forest figure on 2026-11-12. That figure's
+    caption named its leading feature and drifted twice (Olr830, then SERTM2)
+    before a test read it; a table of 60 numbers would drift the same way.
+    Comparing the rows whole means any regeneration of the pool, any change of
+    depth rule and any gene lacking a written role fails here.
     """
     try:
-        pooled = _read(TX_META / "pooled_effects.csv",
-                       usecols=["feature_id", "padj_pooled"])
+        pooled = _read(TX_META / "pooled_effects.csv")
     except MissingInput as exc:
         pytest.skip(f"results not generated: {exc}")
-    fam = pooled[pooled["padj_pooled"].notna()]
-    top = str(fam.sort_values("padj_pooled")["feature_id"].iloc[0])
-    caption = re.search(r"\\caption\{(.*?)\\label\{fig:forest\}",
-                        _manuscript(), re.S)
-    assert caption, "the forest figure's caption is no longer recognisable"
-    text = re.sub(r"\s+", " ", caption.group(1))
-    n = _main_forest_panels()
-    assert f"{_number_word(n)} most significant pooled features" in text, (
-        f"the caption does not describe the {n}-panel figure the config asks for"
-    )
-    assert top in caption.group(0), (
-        f"the caption names a different feature than the top of the pool ({top})"
+    builder = _top_genes_builder()
+    assert builder.depth_threshold(pooled) == _median_k("significant")
+    expected = [r.strip() for r in builder.table_rows(pooled)]
+    table = re.search(r"\\label\{tab:top_genes\}.*?\\midrule\n(.*?)\\bottomrule",
+                      _manuscript(), re.S)
+    assert table, "Table 1 (tab:top_genes) is no longer recognisable"
+    printed = [r.strip() for r in table.group(1).strip().splitlines()]
+    assert printed == expected, (
+        "Table 1 differs from the pool; re-run scripts/build_top_genes_table.py "
+        "and paste its rows in"
     )
 
 
-def test_supplementary_forest_caption_matches_the_main_panel_count():
-    """The supplementary caption says how many panels Fig. 2 reproduces."""
-    n = _main_forest_panels()
-    body = re.sub(r"\s+", " ", _document("supplementary"))
-    assert (f"the first {_number_word(n)} panels are reproduced as "
-            "Fig.~\\ref{M-fig:forest}") in body, (
-        f"the supplementary caption does not say Fig. 2 is the first {n} panels"
+def test_results_describe_table_one_direction():
+    """The Results say all ten Table 1 genes are raised in cases."""
+    try:
+        pooled = _read(TX_META / "pooled_effects.csv")
+    except MissingInput as exc:
+        pytest.skip(f"results not generated: {exc}")
+    top = _top_genes_builder().top_genes(pooled)
+    body = re.sub(r"\s+", " ", _manuscript())
+    assert "All ten genes it lists are raised in cases" in body
+    assert (top["yi_pooled"] > 0).all(), (
+        "a Table 1 gene is now lowered in cases; the Results sentence is wrong"
     )
 
 
@@ -2612,7 +2751,7 @@ def test_between_model_sentence_names_the_top_q_features():
     in the top five, and Alox12e stood at the head of a table row whose own
     counts were two regenerations stale.
 
-    Ranked on padj then raw p, as Table 2's rows are: the leaders all underflow
+    Ranked on padj then raw p, as the leading-genes table's rows are: the leaders all underflow
     to padj exactly 0, so padj alone leaves the order arbitrary.
     """
     try:
